@@ -1,0 +1,457 @@
+import { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
+import { useMeta } from '../context/MetaContext';
+import { Eye, EyeOff, Mail, Lock, User, BookOpen, GraduationCap } from 'lucide-react';
+import Button from '../components/Button';
+import Skeleton from '../components/Skeleton';
+
+const Register = () => {
+  const [formData, setFormData] = useState({
+    fullName: '',
+    email: '',
+    password: '',
+    confirmPassword: '',
+    college: '',
+    semester: '',
+    course: '',
+  });
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [errors, setErrors] = useState<{ [key: string]: string }>({});
+  const [authError, setAuthError] = useState('');
+
+  const { register } = useAuth();
+  const navigate = useNavigate();
+  const { colleges, semesters, courses, loading: metaLoading } = useMeta();
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+    // Clear error when user starts typing
+    if (errors[name]) {
+      setErrors(prev => ({
+        ...prev,
+        [name]: ''
+      }));
+    }
+    if (authError) {
+      setAuthError('');
+    }
+  };
+
+  const validateForm = () => {
+    const newErrors: { [key: string]: string } = {};
+
+    if (!formData.fullName.trim()) {
+      newErrors.fullName = 'Full name is required';
+    } else if (formData.fullName.trim().length < 2) {
+      newErrors.fullName = 'Full name must be at least 2 characters';
+    }
+
+    if (!formData.email) {
+      newErrors.email = 'Email is required';
+    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
+      newErrors.email = 'Email is invalid';
+    }
+
+    if (!formData.password) {
+      newErrors.password = 'Password is required';
+    } else if (formData.password.length < 6) {
+      newErrors.password = 'Password must be at least 6 characters';
+    }
+
+    if (!formData.confirmPassword) {
+      newErrors.confirmPassword = 'Please confirm your password';
+    } else if (formData.password !== formData.confirmPassword) {
+      newErrors.confirmPassword = 'Passwords do not match';
+    }
+
+    if (!formData.college) {
+      newErrors.college = 'Please select your college';
+    }
+
+    if (!formData.semester) {
+      newErrors.semester = 'Please select your semester';
+    }
+
+    if (!formData.course) {
+      newErrors.course = 'Please select your course';
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!validateForm()) {
+      return;
+    }
+
+    setIsLoading(true);
+    setAuthError('');
+    
+    try {
+      const profile = {
+        name: formData.fullName,
+        email: formData.email,
+        college: formData.college,
+        semester: formData.semester,
+        course: formData.course,
+        role: 'student' as const
+      };
+
+      await register(formData.email, formData.password, profile);
+      navigate('/dashboard');
+    } catch (error: any) {
+      console.error('Registration error:', error);
+      if (error.code === 'auth/email-already-in-use') {
+        setAuthError('An account with this email already exists');
+      } else if (error.code === 'auth/invalid-email') {
+        setAuthError('Invalid email address');
+      } else if (error.code === 'auth/weak-password') {
+        setAuthError('Password is too weak. Please choose a stronger password');
+      } else {
+        setAuthError('Failed to create account. Please try again.');
+      }
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
+      <div className="sm:mx-auto sm:w-full sm:max-w-md">
+        <div className="flex justify-center">
+          <Link to="/" className="flex items-center space-x-2">
+            <div className="w-10 h-10 bg-primary-600 rounded-lg flex items-center justify-center">
+              <BookOpen className="w-6 h-6 text-white" />
+            </div>
+            <span className="text-2xl font-bold text-gray-900">StudyVault</span>
+          </Link>
+        </div>
+        <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
+          Create your account
+        </h2>
+        <p className="mt-2 text-center text-sm text-gray-600">
+          Or{' '}
+          <Link
+            to="/login"
+            className="font-medium text-primary-600 hover:text-primary-500"
+          >
+            sign in to your existing account
+          </Link>
+        </p>
+      </div>
+
+      <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
+        <div className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
+          {authError && (
+            <div className="mb-4 bg-red-50 border border-red-200 rounded-md p-4">
+              <p className="text-sm text-red-600">{authError}</p>
+            </div>
+          )}
+
+          <form className="space-y-6" onSubmit={handleSubmit}>
+            {/* Full Name */}
+            <div>
+              <label htmlFor="fullName" className="block text-sm font-medium text-gray-700">
+                Full Name
+              </label>
+              <div className="mt-1 relative">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <User className="h-5 w-5 text-gray-400" />
+                </div>
+                <input
+                  id="fullName"
+                  name="fullName"
+                  type="text"
+                  autoComplete="name"
+                  required
+                  value={formData.fullName}
+                  onChange={handleChange}
+                  className={`appearance-none block w-full pl-10 pr-3 py-2 border rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm ${
+                    errors.fullName ? 'border-red-300' : 'border-gray-300'
+                  }`}
+                  placeholder="Enter your full name"
+                />
+              </div>
+              {errors.fullName && (
+                <p className="mt-2 text-sm text-red-600">{errors.fullName}</p>
+              )}
+            </div>
+
+            {/* Email */}
+            <div>
+              <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+                Email address
+              </label>
+              <div className="mt-1 relative">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <Mail className="h-5 w-5 text-gray-400" />
+                </div>
+                <input
+                  id="email"
+                  name="email"
+                  type="email"
+                  autoComplete="email"
+                  required
+                  value={formData.email}
+                  onChange={handleChange}
+                  className={`appearance-none block w-full pl-10 pr-3 py-2 border rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm ${
+                    errors.email ? 'border-red-300' : 'border-gray-300'
+                  }`}
+                  placeholder="Enter your email"
+                />
+              </div>
+              {errors.email && (
+                <p className="mt-2 text-sm text-red-600">{errors.email}</p>
+              )}
+            </div>
+
+            {/* Password */}
+            <div>
+              <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+                Password
+              </label>
+              <div className="mt-1 relative">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <Lock className="h-5 w-5 text-gray-400" />
+                </div>
+                <input
+                  id="password"
+                  name="password"
+                  type={showPassword ? 'text' : 'password'}
+                  autoComplete="new-password"
+                  required
+                  value={formData.password}
+                  onChange={handleChange}
+                  className={`appearance-none block w-full pl-10 pr-10 py-2 border rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm ${
+                    errors.password ? 'border-red-300' : 'border-gray-300'
+                  }`}
+                  placeholder="Enter your password"
+                />
+                <div className="absolute inset-y-0 right-0 pr-3 flex items-center">
+                  <Button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    variant="outline"
+                    className="text-gray-400 hover:text-gray-600 p-1 h-auto min-w-0"
+                    aria-label={showPassword ? 'Hide password' : 'Show password'}
+                  >
+                    {showPassword ? (
+                      <EyeOff className="h-5 w-5" />
+                    ) : (
+                      <Eye className="h-5 w-5" />
+                    )}
+                  </Button>
+                </div>
+              </div>
+              {errors.password && (
+                <p className="mt-2 text-sm text-red-600">{errors.password}</p>
+              )}
+            </div>
+
+            {/* Confirm Password */}
+            <div>
+              <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700">
+                Confirm Password
+              </label>
+              <div className="mt-1 relative">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <Lock className="h-5 w-5 text-gray-400" />
+                </div>
+                <input
+                  id="confirmPassword"
+                  name="confirmPassword"
+                  type={showConfirmPassword ? 'text' : 'password'}
+                  autoComplete="new-password"
+                  required
+                  value={formData.confirmPassword}
+                  onChange={handleChange}
+                  className={`appearance-none block w-full pl-10 pr-10 py-2 border rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm ${
+                    errors.confirmPassword ? 'border-red-300' : 'border-gray-300'
+                  }`}
+                  placeholder="Confirm your password"
+                />
+                <div className="absolute inset-y-0 right-0 pr-3 flex items-center">
+                  <Button
+                    type="button"
+                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                    variant="outline"
+                    className="text-gray-400 hover:text-gray-600 p-1 h-auto min-w-0"
+                    aria-label={showConfirmPassword ? 'Hide confirm password' : 'Show confirm password'}
+                  >
+                    {showConfirmPassword ? (
+                      <EyeOff className="h-5 w-5" />
+                    ) : (
+                      <Eye className="h-5 w-5" />
+                    )}
+                  </Button>
+                </div>
+              </div>
+              {errors.confirmPassword && (
+                <p className="mt-2 text-sm text-red-600">{errors.confirmPassword}</p>
+              )}
+            </div>
+
+            {/* College */}
+            <div>
+              <label htmlFor="college" className="block text-sm font-medium text-gray-700">
+                College
+              </label>
+              <div className="mt-1 relative">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <GraduationCap className="h-5 w-5 text-gray-400" />
+                </div>
+                {metaLoading ? (
+                  <Skeleton variant="rect" width="100%" height={40} className="mb-2" />
+                ) : (
+                <select
+                  id="college"
+                  name="college"
+                  value={formData.college}
+                  onChange={handleChange}
+                  className={`appearance-none block w-full pl-10 pr-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm ${
+                    errors.college ? 'border-red-300' : 'border-gray-300'
+                  }`}
+                >
+                  <option value="">Select your college</option>
+                    {colleges.length === 0 ? (
+                      <option value="">No colleges found</option>
+                    ) : (
+                      colleges.map((college) => (
+                        <option key={college.id || college} value={college.name || college}>{college.name || college}</option>
+                      ))
+                    )}
+                </select>
+                )}
+              </div>
+              {errors.college && (
+                <p className="mt-2 text-sm text-red-600">{errors.college}</p>
+              )}
+            </div>
+
+            {/* Semester and Course */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label htmlFor="semester" className="block text-sm font-medium text-gray-700">
+                  Semester
+                </label>
+                <div className="mt-1 relative">
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <GraduationCap className="h-5 w-5 text-gray-400" />
+                  </div>
+                  {metaLoading ? (
+                    <Skeleton variant="rect" width="100%" height={40} className="mb-2" />
+                  ) : (
+                <select
+                  id="semester"
+                  name="semester"
+                  value={formData.semester}
+                  onChange={handleChange}
+                      className={`appearance-none block w-full pl-10 pr-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm ${
+                    errors.semester ? 'border-red-300' : 'border-gray-300'
+                  }`}
+                >
+                  <option value="">Select semester</option>
+                      {semesters.length === 0 ? (
+                        <option value="">No semesters found</option>
+                      ) : (
+                        semesters.map((semester) => (
+                          <option key={semester.id || semester} value={semester.name || semester}>{semester.name || semester}</option>
+                        ))
+                      )}
+                </select>
+                  )}
+                </div>
+                {errors.semester && (
+                  <p className="mt-2 text-sm text-red-600">{errors.semester}</p>
+                )}
+              </div>
+
+              <div>
+                <label htmlFor="course" className="block text-sm font-medium text-gray-700">
+                  Course
+                </label>
+                <div className="mt-1 relative">
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <GraduationCap className="h-5 w-5 text-gray-400" />
+                  </div>
+                  {metaLoading ? (
+                    <Skeleton variant="rect" width="100%" height={40} className="mb-2" />
+                  ) : (
+                <select
+                  id="course"
+                  name="course"
+                  value={formData.course}
+                  onChange={handleChange}
+                      className={`appearance-none block w-full pl-10 pr-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm ${
+                    errors.course ? 'border-red-300' : 'border-gray-300'
+                  }`}
+                >
+                  <option value="">Select course</option>
+                      {courses.length === 0 ? (
+                        <option value="">No courses found</option>
+                      ) : (
+                        courses.map((course) => (
+                          <option key={course.id || course} value={course.name || course}>{course.name || course}</option>
+                        ))
+                      )}
+                </select>
+                  )}
+                </div>
+                {errors.course && (
+                  <p className="mt-2 text-sm text-red-600">{errors.course}</p>
+                )}
+              </div>
+            </div>
+
+            <div>
+              <Button
+                type="submit"
+                variant="primary"
+                className="w-full"
+                loading={isLoading}
+                disabled={isLoading}
+              >
+                {isLoading ? 'Creating account...' : 'Create account'}
+              </Button>
+            </div>
+          </form>
+
+          <div className="mt-6">
+            <div className="relative">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t border-gray-300" />
+              </div>
+              <div className="relative flex justify-center text-sm">
+                <span className="px-2 bg-white text-gray-500">Or continue with</span>
+              </div>
+            </div>
+
+            <div className="mt-6">
+              <button
+                type="button"
+                className="w-full inline-flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-500 hover:bg-gray-50"
+              >
+                <svg className="w-5 h-5" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20">
+                  <path d="M6.29 18.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0020 3.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.073 4.073 0 01.8 7.713v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 010 16.407a11.616 11.616 0 006.29 1.84" />
+                </svg>
+                <span className="ml-2">Sign up with Google</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default Register; 

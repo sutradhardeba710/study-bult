@@ -1,0 +1,323 @@
+Website Development Breakdown
+🏷️ 1. PROJECT TITLE IDEAS
+StudyVault
+
+SemPapers
+
+EduStack
+
+MyCollegePapers
+
+UnivQBank
+
+🧭 2. USER ROLES
+Role	Permissions
+Visitor	Browse papers, preview, search (no upload or download)
+Student	Register/login, upload, like, download, dashboard access
+Admin (optional)	Approve/reject uploads, manage subjects/courses/users
+
+🏠 3. FRONTEND STRUCTURE
+🔗 Navigation (Common across pages)
+Logo
+
+Home
+
+Browse Papers
+
+Upload Paper (if logged in)
+
+Dashboard
+
+Login/Register or User Avatar dropdown
+
+Mobile Menu
+
+🌍 Public Pages
+1. Home /
+Hero section
+
+Features highlight (Upload / Search / Download)
+
+Call-to-action: “Get Started” or “Browse Papers”
+
+Recently uploaded papers preview
+
+Footer with links
+
+2. Browse /browse
+Sidebar filters:
+
+College
+
+Semester
+
+Course
+
+Subject
+
+Year / Exam type
+
+Paper Grid with:
+
+Title
+
+Subject
+
+Semester
+
+Preview
+
+Like + Download buttons
+
+Pagination or infinite scroll
+
+3. Paper Preview Modal
+Opens on click
+
+Shows PDF viewer (embed in modal)
+
+Like / Download options
+
+Upload info & paper meta
+
+4. Login /login
+Email + Password
+
+Google OAuth (optional)
+
+Forgot password link
+
+5. Register /register
+Full name, email, password
+
+Select: college, semester, course
+
+👤 Student Dashboard (Private Pages)
+Sidebar Layout:
+📊 Dashboard Home
+
+📁 My Uploads
+
+⬆️ Upload Paper
+
+❤️ Liked Papers
+
+⚙️ Settings
+
+🚪 Logout
+
+📊 Dashboard Home /dashboard
+Welcome back message
+
+Stats:
+
+Total uploads
+
+Total likes received
+
+Downloads count
+
+Quick links:
+
+Upload new paper
+
+View My Uploads
+
+Recommended papers
+
+⬆️ Upload Paper /dashboard/upload
+Fields:
+
+Title
+
+PDF file (drag/drop)
+
+College / Semester / Course / Subject (dropdown)
+
+Exam Type
+
+Optional description
+
+Submit button
+
+Status: Pending (if moderation) or Published
+
+📁 My Uploads /dashboard/uploads
+Table format:
+
+Paper Title
+
+Subject / Semester
+
+Date uploaded
+
+Status (approved/pending)
+
+Likes / Downloads
+
+Actions: Edit | Delete
+
+❤️ Liked Papers /dashboard/likes
+Grid of papers the student liked
+
+Same format as browse
+
+Option to unlike
+
+⚙️ Settings /dashboard/settings
+Edit name, email
+
+Update course/semester
+
+Change password
+
+Delete account
+
+🛠️ Backend Logic
+1. Auth
+JWT or Firebase Auth
+
+Password encryption (bcrypt)
+
+Auth middleware for protected routes
+
+2. Uploads
+File storage in Firebase / AWS S3 / local storage
+
+File format: only PDF
+
+Limit file size (e.g. 10MB)
+
+Duplicate file hash check (optional)
+
+3. Moderation (Optional)
+Uploads marked "pending"
+
+Admin approval triggers “approved” status
+
+Students notified via email or notification
+
+📊 Admin Panel /admin
+(Only if needed; can be skipped in Phase 1)
+
+Login as admin
+
+Dashboard with stats
+
+Pending uploads queue
+
+Approve/Reject
+
+Manage users
+
+Add/edit subjects/courses
+
+🧾 Database Schema (Relational)
+USERS
+js
+Copy
+Edit
+id, name, email, passwordHash, college, semester, course, role, createdAt
+PAPERS
+js
+Copy
+Edit
+id, title, file_url, uploader_id (FK), subject, course, semester, exam_type, status, like_count, download_count, createdAt
+LIKES
+js
+Copy
+Edit
+id, paper_id (FK), user_id (FK), createdAt
+DOWNLOADS
+js
+Copy
+Edit
+id, paper_id (FK), user_id (FK), createdAt
+SUBJECTS / SEMESTERS / COURSES / COLLEGES
+Static dropdowns to filter and classify uploads
+
+🧰 Recommended Tech Stack
+Part	Technology
+Frontend	React.js / Next.js + TailwindCSS
+Backend	Node.js (Express) / Firebase Functions
+Database	MongoDB / Firebase Firestore
+Auth	Firebase Auth / JWT
+Storage	Firebase Storage / AWS S3
+Hosting	Vercel / Firebase Hosting
+
+📦 Folder Structure (for React + Firebase)
+bash
+Copy
+Edit
+/src
+  /components
+  /pages
+    /dashboard
+    /browse
+    /auth
+  /services
+    firebase.js
+    auth.js
+    upload.js
+  /context
+    AuthContext.js
+  /utils
+    filters.js
+/public
+/functions (if using Firebase backend)
+📱 UX Details
+PDF Preview: Use pdf.js or react-pdf
+
+Progress Bar: For file uploads
+
+Notifications: On successful upload, download
+
+Mobile-first: Tailwind or Bootstrap responsive grids
+
+Accessibility: Use alt tags, keyboard nav, ARIA labels
+
+🧠 AI-Driven Enhancements (Optional Later)
+AI-based OCR of uploaded question papers
+
+Auto-tagging subjects & semesters from PDF
+
+Spam detection using AI
+
+Paper summarizer (optional)
+
+🧪 Testing
+Unit Tests: for upload logic, auth, DB
+
+UI Tests: use Cypress or Playwright
+
+Load Test: file uploads/downloads under stress
+
+🔄 Roadmap: Phase-wise Development
+Phase 1 (MVP)
+Student Auth
+
+Upload / Download Papers
+
+Paper Preview
+
+Filtering & Browse
+
+Dashboard & My Uploads
+
+Phase 2
+Like system
+
+Liked Papers
+
+Download tracking
+
+Admin Panel (optional)
+
+Notification system
+
+Phase 3
+Leaderboards
+
+AI features (auto tagging / spam detection)
+
+Mobile App (React Native)
