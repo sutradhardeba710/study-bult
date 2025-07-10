@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
-import { BookOpen, Download, Eye, Filter, Heart, Search, X, Share2, Clipboard } from 'lucide-react';
+import { BookOpen, Download, Eye, Heart, Search, X, Share2, Clipboard } from 'lucide-react';
 import { getPapers, likePaper, unlikePaper, isPaperLiked, addDownload } from '../services/papers';
 import { incrementDownloadCount } from '../services/upload';
 import { useAuth } from '../context/AuthContext';
@@ -7,7 +7,6 @@ import type { PaperData } from '../services/upload';
 import { useMeta } from '../context/MetaContext';
 import toast from 'react-hot-toast';
 import Fuse from 'fuse.js';
-import Select from 'react-select';
 import Button from '../components/Button';
 import { Document, Page, pdfjs } from 'react-pdf';
 import Skeleton from '../components/Skeleton';
@@ -18,12 +17,10 @@ const Browse = () => {
   const [papers, setPapers] = useState<PaperData[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
-  // 1. Remove filter state
-  const [showFilters, setShowFilters] = useState(false);
   const [selectedPaper, setSelectedPaper] = useState<PaperData | null>(null);
   const [showPreview, setShowPreview] = useState(false);
   const [likedPapers, setLikedPapers] = useState<Set<string>>(new Set());
-  const { colleges, semesters, courses, subjects, loading: metaLoading, examTypes } = useMeta();
+  const { loading: metaLoading } = useMeta();
   const [numPages, setNumPages] = useState<number | null>(null);
   const [pageNumber, setPageNumber] = useState(1);
   const [zoom, setZoom] = useState(1.0);
@@ -79,11 +76,6 @@ const Browse = () => {
     } finally {
       setLoading(false);
     }
-  };
-
-  // 2. Update handleFilterChange for single value
-  const handleFilterChange = (filterType: string, value: any) => {
-    // This function is no longer used as filters are removed
   };
 
   const fuse = useMemo(() => {
@@ -268,7 +260,6 @@ const Browse = () => {
           {/* Only keep the search bar and leaderboard */}
 
           {/* Leaderboard */}
-          {!showFilters && (
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="bg-white rounded-lg shadow border border-gray-200 p-4">

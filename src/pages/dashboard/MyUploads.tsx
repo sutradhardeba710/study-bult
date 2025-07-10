@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { getUserPapers, deletePaper } from '../../services/papers';
 import type { PaperData } from '../../services/upload';
-import { Download, Heart, Trash2, Eye, FileText, RefreshCw, Edit } from 'lucide-react';
+import { Download, Heart, Eye, FileText, RefreshCw } from 'lucide-react';
 import PDFThumbnail from '../../components/PDFThumbnail';
 import Skeleton from '../../components/Skeleton';
 import toast from 'react-hot-toast';
@@ -42,19 +42,6 @@ const MyUploads = () => {
   const handleRefresh = () => {
     setRefreshing(true);
     fetchPapers();
-  };
-
-  const handleDelete = async (paperId: string) => {
-    if (!confirm('Are you sure you want to delete this paper? This action cannot be undone.')) return;
-
-    try {
-      await deletePaper(paperId);
-      setPapers(papers.filter(paper => paper.id !== paperId));
-      toast.success('Paper deleted successfully!');
-    } catch (error) {
-      console.error('Error deleting paper:', error);
-      toast.error('Failed to delete paper. Please try again.');
-    }
   };
 
   const formatFileSize = (bytes: number) => {

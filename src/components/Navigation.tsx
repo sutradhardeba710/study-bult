@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { Menu, X, User, Upload, BookOpen, Home, LogOut, Shield, Grid } from 'lucide-react';
+import { X, User, Upload, BookOpen, Home, LogOut, Shield, Grid } from 'lucide-react';
 import Button from './Button';
 
 // Helper to render cropped avatar using canvas
@@ -46,7 +46,6 @@ const Navigation = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const { currentUser, userProfile, logout } = useAuth();
   const [avatarPreview, setAvatarPreview] = useState<string | undefined>(undefined);
-  const location = useLocation();
 
   useEffect(() => {
     if (userProfile?.avatarOriginal && userProfile.avatarCrop) {

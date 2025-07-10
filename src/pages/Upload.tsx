@@ -383,7 +383,7 @@ const Upload = () => {
                     {colleges.length === 0 ? (
                       <option value="">No colleges found</option>
                     ) : (
-                      colleges.map((college) => (
+                      (colleges as MetaItem[]).map((college) => (
                         <option key={typeof college === 'string' ? college : college.id}>{typeof college === 'string' ? college : college.name}</option>
                       ))
                     )}
@@ -415,7 +415,7 @@ const Upload = () => {
                     {semesters.length === 0 ? (
                       <option value="">No semesters found</option>
                     ) : (
-                      semesters.map((semester) => (
+                      (semesters as MetaItem[]).map((semester) => (
                         <option key={typeof semester === 'string' ? semester : semester.id}>{typeof semester === 'string' ? semester : semester.name}</option>
                       ))
                     )}
@@ -447,7 +447,7 @@ const Upload = () => {
                     {courses.length === 0 ? (
                       <option value="">No courses found</option>
                     ) : (
-                      courses.map((course) => (
+                      (courses as MetaItem[]).map((course) => (
                         <option key={typeof course === 'string' ? course : course.id}>{typeof course === 'string' ? course : course.name}</option>
                       ))
                     )}
@@ -479,7 +479,7 @@ const Upload = () => {
                     {subjects.length === 0 ? (
                       <option value="">No subjects found</option>
                     ) : (
-                      subjects.map((subject) => (
+                      (subjects as MetaItem[]).map((subject) => (
                         <option key={typeof subject === 'string' ? subject : subject.id}>{typeof subject === 'string' ? subject : subject.name}</option>
                       ))
                     )}
@@ -511,7 +511,7 @@ const Upload = () => {
                     {examTypes.length === 0 ? (
                       <option value="">No exam types found</option>
                     ) : (
-                      examTypes.map((type) => (
+                      (examTypes as MetaItem[]).map((type) => (
                         <option key={typeof type === 'string' ? type : type.id}>{typeof type === 'string' ? type : type.name}</option>
                       ))
                     )}

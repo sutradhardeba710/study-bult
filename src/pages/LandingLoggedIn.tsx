@@ -1,6 +1,6 @@
 import { useAuth } from '../context/AuthContext';
 import { useEffect, useState } from 'react';
-import { getUserPapers, getUserLikeEvents, getUserDownloads, getPapers, getPapersByIds } from '../services/papers';
+import { getUserPapers, getUserLikeEvents, getUserDownloads, getPapers } from '../services/papers';
 import { Upload, FileText, Download, Heart, User, ChevronRight, Info } from 'lucide-react';
 import Skeleton from '../components/Skeleton';
 import { Link } from 'react-router-dom';

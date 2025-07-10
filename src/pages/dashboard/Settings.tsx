@@ -72,7 +72,6 @@ const Settings = () => {
   const [cropperOpen, setCropperOpen] = useState(false);
   const [rawAvatar, setRawAvatar] = useState<string | undefined>(undefined);
   const [avatarPreview, setAvatarPreview] = useState<string | undefined>(undefined);
-  let avatarPreviewUrl: string | undefined = undefined;
 
   const colleges = [
     'Delhi University',

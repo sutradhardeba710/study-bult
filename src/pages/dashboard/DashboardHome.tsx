@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import { getUserPapers, getUserLikeEvents, getUserDownloads, getDownloadDate, getPapersByIds } from '../../services/papers';
+import { getUserPapers, getUserLikeEvents, getPapersByIds } from '../../services/papers';
 import { Upload, Download, Heart, FileText, TrendingUp, Download as DownloadIcon } from 'lucide-react';
 import { db } from '../../services/firebase';
 import { collection, query, where, getDocs } from 'firebase/firestore';

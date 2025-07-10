@@ -186,7 +186,7 @@ const AdminMeta: React.FC = () => {
               </thead>
               <DragDropContext onDragEnd={onDragEnd}>
                 <Droppable droppableId="meta-list">
-                  {(provided) => (
+                  {(provided, snapshot) => (
                     <tbody className="bg-white divide-y divide-gray-200" ref={provided.innerRef} {...provided.droppableProps}>
                       {items.map((item, index) => (
                         <Draggable key={item.id} draggableId={item.id!} index={index}>

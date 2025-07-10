@@ -326,7 +326,7 @@ const Register = () => {
                     {colleges.length === 0 ? (
                       <option value="">No colleges found</option>
                     ) : (
-                      colleges.map((college) => (
+                      (colleges as MetaItem[]).map((college) => (
                         <option key={typeof college === 'string' ? college : college.id}>{typeof college === 'string' ? college : college.name}</option>
                       ))
                     )}
@@ -364,7 +364,7 @@ const Register = () => {
                       {semesters.length === 0 ? (
                         <option value="">No semesters found</option>
                       ) : (
-                        semesters.map((semester) => (
+                        (semesters as MetaItem[]).map((semester) => (
                           <option key={typeof semester === 'string' ? semester : semester.id}>{typeof semester === 'string' ? semester : semester.name}</option>
                         ))
                       )}
@@ -400,7 +400,7 @@ const Register = () => {
                       {courses.length === 0 ? (
                         <option value="">No courses found</option>
                       ) : (
-                        courses.map((course) => (
+                        (courses as MetaItem[]).map((course) => (
                           <option key={typeof course === 'string' ? course : course.id}>{typeof course === 'string' ? course : course.name}</option>
                         ))
                       )}
