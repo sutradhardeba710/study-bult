@@ -316,7 +316,7 @@ const Register = () => {
                 <select
                   id="college"
                   name="college"
-                  value={formData.college}
+                  value={typeof formData.college === 'string' ? formData.college : formData.college?.id}
                   onChange={handleChange}
                   className={`appearance-none block w-full pl-10 pr-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm ${
                     errors.college ? 'border-red-300' : 'border-gray-300'
@@ -327,7 +327,7 @@ const Register = () => {
                       <option value="">No colleges found</option>
                     ) : (
                       colleges.map((college) => (
-                        <option key={college.id || college} value={college.name || college}>{college.name || college}</option>
+                        <option key={typeof college === 'string' ? college : college.id}>{typeof college === 'string' ? college : college.name}</option>
                       ))
                     )}
                 </select>
@@ -354,7 +354,7 @@ const Register = () => {
                 <select
                   id="semester"
                   name="semester"
-                  value={formData.semester}
+                  value={typeof formData.semester === 'string' ? formData.semester : formData.semester?.id}
                   onChange={handleChange}
                       className={`appearance-none block w-full pl-10 pr-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm ${
                     errors.semester ? 'border-red-300' : 'border-gray-300'
@@ -365,7 +365,7 @@ const Register = () => {
                         <option value="">No semesters found</option>
                       ) : (
                         semesters.map((semester) => (
-                          <option key={semester.id || semester} value={semester.name || semester}>{semester.name || semester}</option>
+                          <option key={typeof semester === 'string' ? semester : semester.id}>{typeof semester === 'string' ? semester : semester.name}</option>
                         ))
                       )}
                 </select>
@@ -390,7 +390,7 @@ const Register = () => {
                 <select
                   id="course"
                   name="course"
-                  value={formData.course}
+                  value={typeof formData.course === 'string' ? formData.course : formData.course?.id}
                   onChange={handleChange}
                       className={`appearance-none block w-full pl-10 pr-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm ${
                     errors.course ? 'border-red-300' : 'border-gray-300'
@@ -401,7 +401,7 @@ const Register = () => {
                         <option value="">No courses found</option>
                       ) : (
                         courses.map((course) => (
-                          <option key={course.id || course} value={course.name || course}>{course.name || course}</option>
+                          <option key={typeof course === 'string' ? course : course.id}>{typeof course === 'string' ? course : course.name}</option>
                         ))
                       )}
                 </select>

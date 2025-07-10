@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react';
 import AdminSidebar from '../../components/admin/AdminSidebar';
 import { getMetaItems, addMetaItem, updateMetaItem, deleteMetaItem, type MetaType, type MetaItem } from '../../services/meta';
 import { useMeta } from '../../context/MetaContext';
+// Add this at the top if types are missing
+// @ts-ignore
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import { GripVertical } from 'lucide-react';
 import toast from 'react-hot-toast';

@@ -10,7 +10,6 @@ import {
   User,
   BookOpen 
 } from 'lucide-react';
-import React from 'react';
 
 const DashboardSidebar = ({ onClose }: { onClose?: () => void }) => {
   const { userProfile, logout } = useAuth();
