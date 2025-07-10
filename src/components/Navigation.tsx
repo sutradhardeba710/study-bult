@@ -1,8 +1,8 @@
-import { useEffect, useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { X, User, Upload, BookOpen, Home, LogOut, Shield, Grid } from 'lucide-react';
 import Button from './Button';
+import { useState, useEffect } from 'react';
 
 // Helper to render cropped avatar using canvas
 function getCroppedAvatarUrl(imageUrl: string, crop: { x: number; y: number; width: number; height: number; zoom: number } | null | undefined, callback: (url: string) => void) {

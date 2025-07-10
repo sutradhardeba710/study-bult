@@ -2,8 +2,6 @@ import React, { useEffect, useState } from 'react';
 import AdminSidebar from '../../components/admin/AdminSidebar';
 import { getMetaItems, addMetaItem, updateMetaItem, deleteMetaItem, type MetaType, type MetaItem } from '../../services/meta';
 import { useMeta } from '../../context/MetaContext';
-// Add this at the top if types are missing
-// @ts-ignore
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import { GripVertical } from 'lucide-react';
 import toast from 'react-hot-toast';
@@ -186,11 +184,11 @@ const AdminMeta: React.FC = () => {
               </thead>
               <DragDropContext onDragEnd={onDragEnd}>
                 <Droppable droppableId="meta-list">
-                  {(provided, snapshot) => (
+                  {(provided) => (
                     <tbody className="bg-white divide-y divide-gray-200" ref={provided.innerRef} {...provided.droppableProps}>
                       {items.map((item, index) => (
                         <Draggable key={item.id} draggableId={item.id!} index={index}>
-                          {(provided, snapshot) => (
+                          {(provided) => (
                             <tr ref={provided.innerRef} {...provided.draggableProps} style={provided.draggableProps.style}>
                                   <td className="px-2 py-2 align-middle cursor-grab" {...provided.dragHandleProps}>
                                 <GripVertical className="w-4 h-4 text-gray-400" />

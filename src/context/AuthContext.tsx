@@ -9,7 +9,6 @@ import {
 import type { User } from 'firebase/auth';
 import { doc, setDoc, getDoc } from 'firebase/firestore';
 import { auth, db, isFirebaseConfigured } from '../services/firebase';
-import { handleFirebaseError } from '../utils/network';
 
 interface UserProfile {
   uid: string;
@@ -102,7 +101,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setUserProfile(userProfileData);
     } catch (error: any) {
       console.error('Registration error:', error);
-      throw new Error(handleFirebaseError(error));
+      throw new Error(error?.message || 'An unexpected error occurred.');
     }
   };
 
@@ -115,7 +114,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       await signInWithEmailAndPassword(auth, email, password);
     } catch (error: any) {
       console.error('Login error:', error);
-      throw new Error(handleFirebaseError(error));
+      throw new Error(error?.message || 'An unexpected error occurred.');
     }
   };
 

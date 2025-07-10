@@ -374,7 +374,7 @@ const Upload = () => {
                   id="college"
                   name="college"
                   value={formData.college}
-                  onChange={e => setFormData({ ...formData, college: typeof e.target.value === 'string' ? e.target.value : e.target.value.id })}
+                  onChange={handleChange}
                   className={`mt-1 block w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm ${
                     errors.college ? 'border-red-300' : 'border-gray-300'
                   }`}
@@ -383,8 +383,8 @@ const Upload = () => {
                     {colleges.length === 0 ? (
                       <option value="">No colleges found</option>
                     ) : (
-                      (colleges as MetaItem[]).map((college) => (
-                        <option key={typeof college === 'string' ? college : college.id}>{typeof college === 'string' ? college : college.name}</option>
+                      colleges.map((college) => (
+                        <option key={college.id} value={college.name}>{college.name}</option>
                       ))
                     )}
                 </select>
@@ -406,7 +406,7 @@ const Upload = () => {
                   id="semester"
                   name="semester"
                   value={formData.semester}
-                  onChange={e => setFormData({ ...formData, semester: typeof e.target.value === 'string' ? e.target.value : e.target.value.id })}
+                  onChange={handleChange}
                   className={`mt-1 block w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm ${
                     errors.semester ? 'border-red-300' : 'border-gray-300'
                   }`}
@@ -415,8 +415,8 @@ const Upload = () => {
                     {semesters.length === 0 ? (
                       <option value="">No semesters found</option>
                     ) : (
-                      (semesters as MetaItem[]).map((semester) => (
-                        <option key={typeof semester === 'string' ? semester : semester.id}>{typeof semester === 'string' ? semester : semester.name}</option>
+                      semesters.map((semester) => (
+                        <option key={semester.id} value={semester.name}>{semester.name}</option>
                       ))
                     )}
                 </select>
@@ -438,7 +438,7 @@ const Upload = () => {
                   id="course"
                   name="course"
                   value={formData.course}
-                  onChange={e => setFormData({ ...formData, course: typeof e.target.value === 'string' ? e.target.value : e.target.value.id })}
+                  onChange={handleChange}
                   className={`mt-1 block w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm ${
                     errors.course ? 'border-red-300' : 'border-gray-300'
                   }`}
@@ -447,8 +447,8 @@ const Upload = () => {
                     {courses.length === 0 ? (
                       <option value="">No courses found</option>
                     ) : (
-                      (courses as MetaItem[]).map((course) => (
-                        <option key={typeof course === 'string' ? course : course.id}>{typeof course === 'string' ? course : course.name}</option>
+                      courses.map((course) => (
+                        <option key={course.id} value={course.name}>{course.name}</option>
                       ))
                     )}
                 </select>
@@ -470,7 +470,7 @@ const Upload = () => {
                   id="subject"
                   name="subject"
                   value={formData.subject}
-                  onChange={e => setFormData({ ...formData, subject: typeof e.target.value === 'string' ? e.target.value : e.target.value.id })}
+                  onChange={handleChange}
                   className={`mt-1 block w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm ${
                     errors.subject ? 'border-red-300' : 'border-gray-300'
                   }`}
@@ -479,8 +479,8 @@ const Upload = () => {
                     {subjects.length === 0 ? (
                       <option value="">No subjects found</option>
                     ) : (
-                      (subjects as MetaItem[]).map((subject) => (
-                        <option key={typeof subject === 'string' ? subject : subject.id}>{typeof subject === 'string' ? subject : subject.name}</option>
+                      subjects.map((subject) => (
+                        <option key={subject.id} value={subject.name}>{subject.name}</option>
                       ))
                     )}
                 </select>
@@ -502,7 +502,7 @@ const Upload = () => {
                   id="examType"
                   name="examType"
                   value={formData.examType}
-                  onChange={e => setFormData({ ...formData, examType: typeof e.target.value === 'string' ? e.target.value : e.target.value.id })}
+                  onChange={handleChange}
                   className={`mt-1 block w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm ${
                     errors.examType ? 'border-red-300' : 'border-gray-300'
                   }`}
@@ -511,8 +511,8 @@ const Upload = () => {
                     {examTypes.length === 0 ? (
                       <option value="">No exam types found</option>
                     ) : (
-                      (examTypes as MetaItem[]).map((type) => (
-                        <option key={typeof type === 'string' ? type : type.id}>{typeof type === 'string' ? type : type.name}</option>
+                      examTypes.map((type) => (
+                        <option key={type.id} value={type.name}>{type.name}</option>
                       ))
                     )}
                 </select>

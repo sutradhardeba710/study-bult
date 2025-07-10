@@ -1,11 +1,10 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
-import { getUserPapers, deletePaper } from '../../services/papers';
+import { getUserPapers } from '../../services/papers';
 import type { PaperData } from '../../services/upload';
 import { Download, Heart, Eye, FileText, RefreshCw } from 'lucide-react';
 import PDFThumbnail from '../../components/PDFThumbnail';
 import Skeleton from '../../components/Skeleton';
-import toast from 'react-hot-toast';
 
 const MyUploads = () => {
   const { userProfile } = useAuth();

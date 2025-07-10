@@ -91,10 +91,7 @@ const Browse = () => {
     return fuse.search(searchTerm).map(result => result.item);
   }, [fuse, searchTerm, papers]);
 
-  const filteredPapers = fuzzyResults.filter(paper => {
-    // No filters applied, so all papers are shown
-    return true;
-  });
+  const filteredPapers = fuzzyResults;
 
   const handleDownload = async (paper: PaperData) => {
     if (!paper.id) return;
@@ -189,8 +186,8 @@ const Browse = () => {
   };
 
   // Leaderboard logic
-  const topLiked = [...papers].sort((a, b) => (b.likeCount || 0) - (a.likeCount || 0)).slice(0, 5);
-  const topDownloaded = [...papers].sort((a, b) => (b.downloadCount || 0) - (a.downloadCount || 0)).slice(0, 5);
+  // const topLiked = [...papers].sort((a, b) => (b.likeCount || 0) - (a.likeCount || 0)).slice(0, 5);
+  // const topDownloaded = [...papers].sort((a, b) => (b.downloadCount || 0) - (a.downloadCount || 0)).slice(0, 5);
 
   if (loading || metaLoading) {
     return (
@@ -260,7 +257,7 @@ const Browse = () => {
           {/* Only keep the search bar and leaderboard */}
 
           {/* Leaderboard */}
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-4">
+          {/* <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="bg-white rounded-lg shadow border border-gray-200 p-4">
                 <h2 className="text-lg font-bold text-primary-700 mb-3 flex items-center"><Heart className="w-5 h-5 mr-2 text-red-500" /> Most Liked Papers</h2>
@@ -297,8 +294,7 @@ const Browse = () => {
                 )}
               </div>
               </div>
-            </div>
-          )}
+            </div> */}
         </div>
       </div>
 

@@ -22,7 +22,7 @@ const createImage = (url: string): Promise<HTMLImageElement> => {
   });
 };
 
-async function getCroppedImg(imageSrc: string, croppedAreaPixels: { x: number; y: number; width: number; height: number }, zoom: number): Promise<Blob> {
+async function getCroppedImg(imageSrc: string, croppedAreaPixels: { x: number; y: number; width: number; height: number }): Promise<Blob> {
   const image = await createImage(imageSrc);
   const canvas = document.createElement('canvas');
   canvas.width = croppedAreaPixels.width;
@@ -74,7 +74,7 @@ const AvatarCropperModal: React.FC<AvatarCropperModalProps> = ({ open, image, on
     if (!image || !croppedAreaPixels) return;
     setProcessing(true);
     try {
-      const croppedBlob = await getCroppedImg(image, croppedAreaPixels, zoom);
+      const croppedBlob = await getCroppedImg(image, croppedAreaPixels);
       onCropComplete(croppedBlob, { ...croppedAreaPixels, zoom });
     } catch (err) {
       alert('Failed to crop image.');

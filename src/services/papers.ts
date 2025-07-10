@@ -28,7 +28,7 @@ export interface PaperFilter {
 
 export const getPapers = async (filters: PaperFilter = {}, limitCount: number = 20): Promise<PaperData[]> => {
   try {
-    let q = collection(db, 'papers');
+    const q = collection(db, 'papers');
     const constraints: any[] = [];
 
     // Apply filters

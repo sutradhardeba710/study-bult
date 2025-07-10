@@ -57,7 +57,7 @@ const AdminUsers: React.FC = () => {
           setLikes(likes);
           setDownloads(downloads);
         })
-        .catch((err) => {
+        .catch(() => {
           setActivityError('Failed to load user activity.');
         })
         .finally(() => setActivityLoading(false));

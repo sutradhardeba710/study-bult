@@ -42,7 +42,7 @@ export const MetaProvider = ({ children }: { children: ReactNode }) => {
       } catch {}
     }
     fetchMeta();
-    // eslint-disable-next-line
+     
   }, []);
 
   const fetchMeta = async () => {

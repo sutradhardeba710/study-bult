@@ -316,7 +316,7 @@ const Register = () => {
                 <select
                   id="college"
                   name="college"
-                  value={typeof formData.college === 'string' ? formData.college : formData.college?.id}
+                  value={formData.college}
                   onChange={handleChange}
                   className={`appearance-none block w-full pl-10 pr-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm ${
                     errors.college ? 'border-red-300' : 'border-gray-300'
@@ -326,8 +326,8 @@ const Register = () => {
                     {colleges.length === 0 ? (
                       <option value="">No colleges found</option>
                     ) : (
-                      (colleges as MetaItem[]).map((college) => (
-                        <option key={typeof college === 'string' ? college : college.id}>{typeof college === 'string' ? college : college.name}</option>
+                      colleges.map((college) => (
+                        <option key={college.id} value={college.name}>{college.name}</option>
                       ))
                     )}
                 </select>
@@ -354,7 +354,7 @@ const Register = () => {
                 <select
                   id="semester"
                   name="semester"
-                  value={typeof formData.semester === 'string' ? formData.semester : formData.semester?.id}
+                  value={formData.semester}
                   onChange={handleChange}
                       className={`appearance-none block w-full pl-10 pr-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm ${
                     errors.semester ? 'border-red-300' : 'border-gray-300'
@@ -364,8 +364,8 @@ const Register = () => {
                       {semesters.length === 0 ? (
                         <option value="">No semesters found</option>
                       ) : (
-                        (semesters as MetaItem[]).map((semester) => (
-                          <option key={typeof semester === 'string' ? semester : semester.id}>{typeof semester === 'string' ? semester : semester.name}</option>
+                        semesters.map((semester) => (
+                          <option key={semester.id} value={semester.name}>{semester.name}</option>
                         ))
                       )}
                 </select>
@@ -390,7 +390,7 @@ const Register = () => {
                 <select
                   id="course"
                   name="course"
-                  value={typeof formData.course === 'string' ? formData.course : formData.course?.id}
+                  value={formData.course}
                   onChange={handleChange}
                       className={`appearance-none block w-full pl-10 pr-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm ${
                     errors.course ? 'border-red-300' : 'border-gray-300'
@@ -400,8 +400,8 @@ const Register = () => {
                       {courses.length === 0 ? (
                         <option value="">No courses found</option>
                       ) : (
-                        (courses as MetaItem[]).map((course) => (
-                          <option key={typeof course === 'string' ? course : course.id}>{typeof course === 'string' ? course : course.name}</option>
+                        courses.map((course) => (
+                          <option key={course.id} value={course.name}>{course.name}</option>
                         ))
                       )}
                 </select>

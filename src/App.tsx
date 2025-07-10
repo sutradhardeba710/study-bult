@@ -3,12 +3,13 @@ import { AuthProvider } from './context/AuthContext';
 import { MetaProvider } from './context/MetaContext';
 import Navigation from './components/Navigation';
 import { Toaster } from 'react-hot-toast';
-import React, { Suspense, lazy } from 'react';
-import Error404 from './pages/Error404';
-import Footer from './components/Footer';
+import ReactGA from 'react-ga4';
 import AnalyticsTracker from './components/AnalyticsTracker';
 import ErrorBoundary from './components/ErrorBoundary';
 import NetworkStatusBanner from './components/NetworkStatusBanner';
+import { lazy, Suspense } from 'react';
+import Error404 from './pages/Error404';
+import Footer from './components/Footer';
 
 const Home = lazy(() => import('./pages/Home'));
 const Login = lazy(() => import('./pages/Login'));

@@ -56,7 +56,7 @@ const LandingLoggedIn = () => {
           type: 'download',
           title: d.title || 'Unknown',
           date: d.createdAt,
-          paperId: d.paperId,
+          paperId: d.id,
         }));
         const all = [...uploadActivities, ...likeActivities, ...downloadActivities].sort((a, b) => {
           const dateA = a.date?.toDate ? a.date.toDate() : new Date(a.date);
