@@ -99,26 +99,14 @@ const Browse = () => {
     try {
       // Increment download count
       await incrementDownloadCount(paper.id);
-      
       // Track user download if logged in
       if (userProfile?.uid) {
         await addDownload(paper.id, userProfile.uid);
       }
-      
-      // Create download link
-      const link = document.createElement('a');
-      link.href = paper.fileUrl;
-      link.download = paper.fileName || 'paper.pdf';
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      
-      // Update local state
-      setPapers(prev => prev.map(p => 
-        p.id === paper.id 
-          ? { ...p, downloadCount: (p.downloadCount || 0) + 1 }
-          : p
-      ));
+      // Open download in a new tab
+      if (paper.fileUrl) {
+        window.open(paper.fileUrl, '_blank', 'noopener,noreferrer');
+      }
       toast.success('Download started!', { id: toastId });
     } catch (error) {
       toast.error('Failed to download paper. Please try again.', { id: toastId });
@@ -309,7 +297,7 @@ const Browse = () => {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredPapers.map((paper) => (
-              <div key={paper.id} className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+              <div key={paper.id} className="bg-white rounded-lg shadow-sm border border-gray-200">
                 <div className="p-6">
                   <h3 className="text-lg font-semibold text-gray-900 mb-2 line-clamp-2">
                     {paper.title}
@@ -346,68 +334,85 @@ const Browse = () => {
                     </div>
                   </div>
 
-                  <div className="flex space-x-2">
-                    <button
-                      onClick={() => handlePreview(paper)}
-                      className="flex-1 flex items-center justify-center px-3 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50"
-                    >
-                      <Eye className="w-4 h-4 mr-2" />
-                      Preview
-                    </button>
-                    <button
-                      onClick={() => handleDownload(paper)}
-                      className="flex-1 flex items-center justify-center px-3 py-2 border border-transparent rounded-md text-sm font-medium text-white bg-primary-600 hover:bg-primary-700"
-                    >
-                      <Download className="w-4 h-4 mr-2" />
-                      Download
-                    </button>
-                    {userProfile && (
-                      <button
-                        onClick={() => handleLike(paper)}
-                        className={`px-3 py-2 rounded-md text-sm font-medium ${
-                          likedPapers.has(paper.id || '')
-                            ? 'text-red-600 bg-red-50 border border-red-200'
-                            : 'text-gray-600 bg-gray-50 border border-gray-200 hover:bg-gray-100'
-                        }`}
-                      >
-                        <Heart className={`w-4 h-4 ${likedPapers.has(paper.id || '') ? 'fill-current' : ''}`} />
-                      </button>
-                    )}
-                  </div>
+                  {/* Action buttons and share menu in a single relative container */}
                   <div className="relative">
-                    <button
-                                             onClick={() => setShareMenuOpen(shareMenuOpen === paper.id ? null : (paper.id || null))}
-                      className="flex-1 flex items-center justify-center px-3 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50"
-                      title="Share"
-                      type="button"
-                    >
-                      <Share2 className="w-4 h-4 mr-2" />
-                      Share
-                    </button>
-                    {shareMenuOpen === paper.id && (
-                      <div className="absolute z-10 right-0 mt-2 w-40 bg-white border border-gray-200 rounded shadow-lg p-2 flex flex-col gap-2">
+                    <div className="flex space-x-2">
+                      <button
+                        onClick={() => handlePreview(paper)}
+                        className="flex-1 flex items-center justify-center px-3 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50"
+                      >
+                        <Eye className="w-4 h-4 mr-2" />
+                        Preview
+                      </button>
+                      <button
+                        onClick={() => handleDownload(paper)}
+                        className="flex-1 flex items-center justify-center px-3 py-2 border border-transparent rounded-md text-sm font-medium text-white bg-primary-600 hover:bg-primary-700"
+                      >
+                        <Download className="w-4 h-4 mr-2" />
+                        Download
+                      </button>
+                      {userProfile && (
                         <button
-                          className="flex items-center gap-2 px-2 py-1 hover:bg-gray-100 rounded text-sm"
-                          onClick={() => {
-                            navigator.clipboard.writeText(window.location.origin + '/browse?paper=' + paper.id);
-                            toast.success('Link copied!');
-                            setShareMenuOpen(null);
-                          }}
+                          onClick={() => handleLike(paper)}
+                          className={`px-3 py-2 rounded-md text-sm font-medium ${
+                            likedPapers.has(paper.id || '')
+                              ? 'text-red-600 bg-red-50 border border-red-200'
+                              : 'text-gray-600 bg-gray-50 border border-gray-200 hover:bg-gray-100'
+                          }`}
                         >
-                          <Clipboard className="w-4 h-4" /> Copy Link
+                          <Heart className={`w-4 h-4 ${likedPapers.has(paper.id || '') ? 'fill-current' : ''}`} />
                         </button>
-                        <a
-                          href={`https://wa.me/?text=${encodeURIComponent('Check out this paper on StudyVault: ' + window.location.origin + '/browse?paper=' + paper.id)}`}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="flex items-center gap-2 px-2 py-1 hover:bg-gray-100 rounded text-sm"
-                          onClick={() => setShareMenuOpen(null)}
+                      )}
+                    </div>
+                    <div className="mt-2">
+                      <button
+                        onClick={() => setShareMenuOpen(shareMenuOpen === paper.id ? null : (paper.id || null))}
+                        className="flex-1 flex items-center justify-center px-3 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50"
+                        title="Share"
+                        type="button"
+                        aria-haspopup="menu"
+                        aria-expanded={shareMenuOpen === paper.id}
+                        aria-controls={`share-menu-${paper.id}`}
+                      >
+                        <Share2 className="w-4 h-4 mr-2" />
+                        Share
+                      </button>
+                      {shareMenuOpen === paper.id && (
+                        <div
+                          id={`share-menu-${paper.id}`}
+                          role="menu"
+                          aria-label="Share options"
+                          className="absolute right-0 top-full mt-2 z-50 w-44 bg-white border border-gray-200 rounded shadow-lg p-2 flex flex-col gap-2 animate-fade-in"
+                          style={{ minWidth: '10rem' }}
                         >
-                          <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M20.52 3.48A12.07 12.07 0 0 0 12 0C5.37 0 0 5.37 0 12c0 2.11.55 4.16 1.6 5.97L0 24l6.19-1.62A11.93 11.93 0 0 0 12 24c6.63 0 12-5.37 12-12 0-3.2-1.25-6.21-3.48-8.52zM12 22c-1.85 0-3.68-.5-5.25-1.44l-.38-.22-3.68.97.98-3.58-.25-.37A9.94 9.94 0 0 1 2 12c0-5.52 4.48-10 10-10s10 4.48 10 10-4.48 10-10 10zm5.2-7.6c-.28-.14-1.65-.81-1.9-.9-.25-.09-.43-.14-.61.14-.18.28-.7.9-.86 1.08-.16.18-.32.2-.6.07-.28-.14-1.18-.44-2.25-1.4-.83-.74-1.39-1.65-1.55-1.93-.16-.28-.02-.43.12-.57.12-.12.28-.32.42-.48.14-.16.18-.28.28-.46.09-.18.05-.34-.02-.48-.07-.14-.61-1.47-.84-2.01-.22-.53-.45-.46-.61-.47-.16-.01-.34-.01-.52-.01-.18 0-.48.07-.73.34-.25.27-.97.95-.97 2.3 0 1.35.99 2.65 1.13 2.83.14.18 1.95 2.98 4.74 4.06.66.28 1.18.45 1.58.58.66.21 1.26.18 1.73.11.53-.08 1.65-.67 1.88-1.32.23-.65.23-1.2.16-1.32-.07-.12-.25-.18-.53-.32z"/></svg>
-                          WhatsApp
-                        </a>
-                      </div>
-                    )}
+                          {/* Arrow indicator */}
+                          <div style={{ position: 'absolute', top: '-8px', right: '16px', width: 0, height: 0, borderLeft: '8px solid transparent', borderRight: '8px solid transparent', borderBottom: '8px solid #e5e7eb' }} aria-hidden="true"></div>
+                          <button
+                            className="flex items-center gap-2 px-2 py-1 hover:bg-gray-100 rounded text-sm"
+                            onClick={() => {
+                              navigator.clipboard.writeText(window.location.origin + '/browse?paper=' + paper.id);
+                              toast.success('Link copied!');
+                              setShareMenuOpen(null);
+                            }}
+                            role="menuitem"
+                          >
+                            <Clipboard className="w-4 h-4" /> Copy Link
+                          </button>
+                          <a
+                            href={`https://wa.me/?text=${encodeURIComponent('Check out this paper on StudyVault: ' + window.location.origin + '/browse?paper=' + paper.id)}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex items-center gap-2 px-2 py-1 hover:bg-gray-100 rounded text-sm"
+                            onClick={() => setShareMenuOpen(null)}
+                            role="menuitem"
+                          >
+                            {/* WhatsApp SVG */}
+                            <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M20.52 3.48A12.07 12.07 0 0 0 12 0C5.37 0 0 5.37 0 12c0 2.11.55 4.16 1.6 5.97L0 24l6.19-1.62A11.93 11.93 0 0 0 12 24c6.63 0 12-5.37 12-12 0-3.2-1.25-6.21-3.48-8.52zM12 22c-1.85 0-3.68-.5-5.25-1.44l-.38-.22-3.68.97.98-3.58-.25-.37A9.94 9.94 0 0 1 2 12c0-5.52 4.48-10 10-10s10 4.48 10 10-4.48 10-10 10zm5.2-7.6c-.28-.14-1.65-.81-1.9-.9-.25-.09-.43-.14-.61.14-.18.28-.7.9-.86 1.08-.16.18-.32.2-.6.07-.28-.14-1.18-.44-2.25-1.4-.83-.74-1.39-1.65-1.55-1.93-.16-.28-.02-.43.12-.57.12-.12.28-.32.42-.48.14-.16.18-.28.28-.46.09-.18.05-.34-.02-.48-.07-.14-.61-1.47-.84-2.01-.22-.53-.45-.46-.61-.47-.16-.01-.34-.01-.52-.01-.18 0-.48.07-.73.34-.25.27-.97.95-.97 2.3 0 1.35.99 2.65 1.13 2.83.14.18 1.95 2.98 4.74 4.06.66.28 1.18.45 1.58.58.66.21 1.26.18 1.73.11.53-.08 1.65-.67 1.88-1.32.23-.65.23-1.2.16-1.32-.07-.12-.25-.18-.53-.32z"/></svg>
+                            WhatsApp
+                          </a>
+                        </div>
+                      )}
+                    </div>
                   </div>
                 </div>
               </div>
