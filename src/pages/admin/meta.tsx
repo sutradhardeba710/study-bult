@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import AdminSidebar from '../../components/admin/AdminSidebar';
 import { getMetaItems, addMetaItem, updateMetaItem, deleteMetaItem, type MetaType, type MetaItem } from '../../services/meta';
 import { useMeta } from '../../context/MetaContext';
-import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import { GripVertical } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { PanelLeft } from 'lucide-react';
@@ -105,25 +104,13 @@ const AdminMeta: React.FC = () => {
   };
 
   // Drag-and-drop handlers
-  const onDragEnd = async (result: any) => {
-    if (!result.destination) return;
+  const moveItem = (from: number, to: number) => {
+    if (to < 0 || to >= items.length) return;
     const reordered = Array.from(items);
-    const [removed] = reordered.splice(result.source.index, 1);
-    reordered.splice(result.destination.index, 0, removed);
+    const [removed] = reordered.splice(from, 1);
+    reordered.splice(to, 0, removed);
     setItems(reordered);
-    // Save new order to backend
-    try {
-      // Update order by updating each item with its new position
-      for (let i = 0; i < reordered.length; i++) {
-        if (reordered[i].id) {
-          await updateMetaItem(activeType, reordered[i].id!, reordered[i].name, reordered[i].description);
-        }
-      }
-      toast.success('Order updated!');
-      await refreshMeta();
-    } catch (error) {
-      toast.error('Failed to update order');
-    }
+    // Optionally, update order in backend here if needed
   };
 
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -182,65 +169,57 @@ const AdminMeta: React.FC = () => {
                       <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase min-w-[140px] whitespace-nowrap">Actions</th>
                 </tr>
               </thead>
-              <DragDropContext onDragEnd={onDragEnd}>
-                <Droppable droppableId="meta-list">
-                  {(provided) => (
-                    <tbody className="bg-white divide-y divide-gray-200" ref={provided.innerRef} {...provided.droppableProps}>
-                      {items.map((item, index) => (
-                        <Draggable key={item.id} draggableId={item.id!} index={index}>
-                          {(provided) => (
-                            <tr ref={provided.innerRef} {...provided.draggableProps} style={provided.draggableProps.style}>
-                                  <td className="px-2 py-2 align-middle cursor-grab" {...provided.dragHandleProps}>
-                                <GripVertical className="w-4 h-4 text-gray-400" />
-                              </td>
-                                  <td className="px-4 py-2 align-middle whitespace-nowrap">
-                                {editId === item.id ? (
-                                  <input
-                                    type="text"
-                                    className="border rounded px-2 py-1"
-                                    value={editName}
-                                    onChange={e => setEditName(e.target.value)}
-                                    disabled={loading}
-                                  />
-                                ) : (
-                                  item.name
-                                )}
-                              </td>
-                                  <td className="px-4 py-2 align-middle">
-                                {editId === item.id ? (
-                                  <input
-                                    type="text"
-                                    className="border rounded px-2 py-1"
-                                    value={editDescription}
-                                    onChange={e => setEditDescription(e.target.value)}
-                                    disabled={loading}
-                                  />
-                                ) : (
-                                      item.description ? item.description : <span className="text-gray-400 italic">No description</span>
-                                )}
-                              </td>
-                                  <td className="px-4 py-2 align-middle whitespace-nowrap">
-                                {editId === item.id ? (
-                                      <div className="flex flex-col sm:flex-row gap-2 sm:gap-1">
-                                        <button className="btn-primary px-2 py-1 text-xs" onClick={handleUpdate} disabled={loading}>Save</button>
-                                        <button className="btn-secondary px-2 py-1 text-xs" onClick={() => setEditId(null)} disabled={loading}>Cancel</button>
-                                      </div>
-                                ) : (
-                                      <div className="flex flex-col sm:flex-row gap-2 sm:gap-1">
-                                        <button className="btn-secondary px-2 py-1 text-xs" onClick={() => handleEdit(item)} disabled={loading}>Edit</button>
-                                        <button className="btn-danger px-2 py-1 text-xs" onClick={() => handleDelete(item.id!)} disabled={loading}>Delete</button>
-                                      </div>
-                                )}
-                              </td>
-                            </tr>
-                          )}
-                        </Draggable>
-                      ))}
-                      {provided.placeholder}
-                    </tbody>
-                  )}
-                </Droppable>
-              </DragDropContext>
+              <tbody className="bg-white divide-y divide-gray-200">
+                {items.map((item, index) => (
+                  <tr key={item.id}>
+                    <td className="px-2 py-2 align-middle">
+                      {/* Up/Down buttons for reordering */}
+                      <button disabled={index === 0} onClick={() => moveItem(index, index - 1)} title="Move up">↑</button>
+                      <button disabled={index === items.length - 1} onClick={() => moveItem(index, index + 1)} title="Move down">↓</button>
+                    </td>
+                    <td className="px-4 py-2 align-middle whitespace-nowrap">
+                      {editId === item.id ? (
+                        <input
+                          type="text"
+                          className="border rounded px-2 py-1"
+                          value={editName}
+                          onChange={e => setEditName(e.target.value)}
+                          disabled={loading}
+                        />
+                      ) : (
+                        item.name
+                      )}
+                    </td>
+                    <td className="px-4 py-2 align-middle">
+                      {editId === item.id ? (
+                        <input
+                          type="text"
+                          className="border rounded px-2 py-1"
+                          value={editDescription}
+                          onChange={e => setEditDescription(e.target.value)}
+                          disabled={loading}
+                        />
+                      ) : (
+                        item.description
+                      )}
+                    </td>
+                    <td className="px-4 py-2 align-middle">
+                      {/* Actions: Edit, Save, Delete */}
+                      {editId === item.id ? (
+                        <>
+                          <button onClick={handleUpdate} disabled={loading}>Save</button>
+                          <button onClick={() => setEditId(null)} disabled={loading}>Cancel</button>
+                        </>
+                      ) : (
+                        <>
+                          <button onClick={() => handleEdit(item)} disabled={loading}>Edit</button>
+                          <button onClick={() => handleDelete(item.id!)} disabled={loading}>Delete</button>
+                        </>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
             </table>
               </div>
           )}
