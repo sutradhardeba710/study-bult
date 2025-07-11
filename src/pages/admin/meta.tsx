@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import AdminSidebar from '../../components/admin/AdminSidebar';
 import { getMetaItems, addMetaItem, updateMetaItem, deleteMetaItem, type MetaType, type MetaItem } from '../../services/meta';
 import { useMeta } from '../../context/MetaContext';
-import { GripVertical } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { PanelLeft } from 'lucide-react';
 
