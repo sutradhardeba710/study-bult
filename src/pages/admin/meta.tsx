@@ -169,56 +169,56 @@ const AdminMeta: React.FC = () => {
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
-                {items.map((item, index) => (
+                      {items.map((item, index) => (
                   <tr key={item.id}>
                     <td className="px-2 py-2 align-middle">
                       {/* Up/Down buttons for reordering */}
                       <button disabled={index === 0} onClick={() => moveItem(index, index - 1)} title="Move up">↑</button>
                       <button disabled={index === items.length - 1} onClick={() => moveItem(index, index + 1)} title="Move down">↓</button>
-                    </td>
+                              </td>
                     <td className="px-4 py-2 align-middle whitespace-nowrap">
-                      {editId === item.id ? (
-                        <input
-                          type="text"
-                          className="border rounded px-2 py-1"
-                          value={editName}
-                          onChange={e => setEditName(e.target.value)}
-                          disabled={loading}
-                        />
-                      ) : (
-                        item.name
-                      )}
-                    </td>
+                                {editId === item.id ? (
+                                  <input
+                                    type="text"
+                                    className="border rounded px-2 py-1"
+                                    value={editName}
+                                    onChange={e => setEditName(e.target.value)}
+                                    disabled={loading}
+                                  />
+                                ) : (
+                                  item.name
+                                )}
+                              </td>
                     <td className="px-4 py-2 align-middle">
-                      {editId === item.id ? (
-                        <input
-                          type="text"
-                          className="border rounded px-2 py-1"
-                          value={editDescription}
-                          onChange={e => setEditDescription(e.target.value)}
-                          disabled={loading}
-                        />
-                      ) : (
+                                {editId === item.id ? (
+                                  <input
+                                    type="text"
+                                    className="border rounded px-2 py-1"
+                                    value={editDescription}
+                                    onChange={e => setEditDescription(e.target.value)}
+                                    disabled={loading}
+                                  />
+                                ) : (
                         item.description
-                      )}
-                    </td>
+                                )}
+                              </td>
                     <td className="px-4 py-2 align-middle">
                       {/* Actions: Edit, Save, Delete */}
-                      {editId === item.id ? (
-                        <>
+                                {editId === item.id ? (
+                                  <>
                           <button onClick={handleUpdate} disabled={loading}>Save</button>
                           <button onClick={() => setEditId(null)} disabled={loading}>Cancel</button>
-                        </>
-                      ) : (
-                        <>
+                                  </>
+                                ) : (
+                                  <>
                           <button onClick={() => handleEdit(item)} disabled={loading}>Edit</button>
                           <button onClick={() => handleDelete(item.id!)} disabled={loading}>Delete</button>
-                        </>
-                      )}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
+                                  </>
+                                )}
+                              </td>
+                            </tr>
+                      ))}
+                    </tbody>
             </table>
               </div>
           )}
