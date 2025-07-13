@@ -8,9 +8,10 @@ import { useMeta } from '../context/MetaContext';
 import toast from 'react-hot-toast';
 import Fuse from 'fuse.js';
 import Button from '../components/Button';
-import { Document, Page, pdfjs } from 'react-pdf';
 import Skeleton from '../components/Skeleton';
-pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.js`;
+import PdfViewer from '../components/PdfViewer';
+
+// No longer needed as we're using the pdfProxy service
 
 const Browse = () => {
   const { userProfile } = useAuth();
@@ -21,10 +22,9 @@ const Browse = () => {
   const [showPreview, setShowPreview] = useState(false);
   const [likedPapers, setLikedPapers] = useState<Set<string>>(new Set());
   const { loading: metaLoading } = useMeta();
-  const [numPages, setNumPages] = useState<number | null>(null);
-  const [pageNumber, setPageNumber] = useState(1);
-  const [zoom, setZoom] = useState(1.0);
   const [shareMenuOpen, setShareMenuOpen] = useState<string | null>(null);
+  
+  // No longer needed as we're using Google PDF Viewer
 
   useEffect(() => {
     fetchPapers();
@@ -281,7 +281,7 @@ const Browse = () => {
                   </ul>
                 )}
               </div>
-              </div>
+            </div>
             </div> */}
         </div>
       </div>
@@ -336,48 +336,48 @@ const Browse = () => {
 
                   {/* Action buttons and share menu in a single relative container */}
                   <div className="relative">
-                    <div className="flex space-x-2">
+                  <div className="flex space-x-2">
+                    <button
+                      onClick={() => handlePreview(paper)}
+                      className="flex-1 flex items-center justify-center px-3 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50"
+                    >
+                      <Eye className="w-4 h-4 mr-2" />
+                      Preview
+                    </button>
+                    <button
+                      onClick={() => handleDownload(paper)}
+                      className="flex-1 flex items-center justify-center px-3 py-2 border border-transparent rounded-md text-sm font-medium text-white bg-primary-600 hover:bg-primary-700"
+                    >
+                      <Download className="w-4 h-4 mr-2" />
+                      Download
+                    </button>
+                    {userProfile && (
                       <button
-                        onClick={() => handlePreview(paper)}
-                        className="flex-1 flex items-center justify-center px-3 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50"
+                        onClick={() => handleLike(paper)}
+                        className={`px-3 py-2 rounded-md text-sm font-medium ${
+                          likedPapers.has(paper.id || '')
+                            ? 'text-red-600 bg-red-50 border border-red-200'
+                            : 'text-gray-600 bg-gray-50 border border-gray-200 hover:bg-gray-100'
+                        }`}
                       >
-                        <Eye className="w-4 h-4 mr-2" />
-                        Preview
+                        <Heart className={`w-4 h-4 ${likedPapers.has(paper.id || '') ? 'fill-current' : ''}`} />
                       </button>
-                      <button
-                        onClick={() => handleDownload(paper)}
-                        className="flex-1 flex items-center justify-center px-3 py-2 border border-transparent rounded-md text-sm font-medium text-white bg-primary-600 hover:bg-primary-700"
-                      >
-                        <Download className="w-4 h-4 mr-2" />
-                        Download
-                      </button>
-                      {userProfile && (
-                        <button
-                          onClick={() => handleLike(paper)}
-                          className={`px-3 py-2 rounded-md text-sm font-medium ${
-                            likedPapers.has(paper.id || '')
-                              ? 'text-red-600 bg-red-50 border border-red-200'
-                              : 'text-gray-600 bg-gray-50 border border-gray-200 hover:bg-gray-100'
-                          }`}
-                        >
-                          <Heart className={`w-4 h-4 ${likedPapers.has(paper.id || '') ? 'fill-current' : ''}`} />
-                        </button>
-                      )}
-                    </div>
+                    )}
+                  </div>
                     <div className="mt-2">
-                      <button
+                    <button
                         onClick={() => setShareMenuOpen(shareMenuOpen === paper.id ? null : (paper.id || null))}
-                        className="flex-1 flex items-center justify-center px-3 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50"
-                        title="Share"
-                        type="button"
+                      className="flex-1 flex items-center justify-center px-3 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50"
+                      title="Share"
+                      type="button"
                         aria-haspopup="menu"
                         aria-expanded={shareMenuOpen === paper.id}
                         aria-controls={`share-menu-${paper.id}`}
-                      >
-                        <Share2 className="w-4 h-4 mr-2" />
-                        Share
-                      </button>
-                      {shareMenuOpen === paper.id && (
+                    >
+                      <Share2 className="w-4 h-4 mr-2" />
+                      Share
+                    </button>
+                    {shareMenuOpen === paper.id && (
                         <div
                           id={`share-menu-${paper.id}`}
                           role="menu"
@@ -387,31 +387,31 @@ const Browse = () => {
                         >
                           {/* Arrow indicator */}
                           <div style={{ position: 'absolute', top: '-8px', right: '16px', width: 0, height: 0, borderLeft: '8px solid transparent', borderRight: '8px solid transparent', borderBottom: '8px solid #e5e7eb' }} aria-hidden="true"></div>
-                          <button
-                            className="flex items-center gap-2 px-2 py-1 hover:bg-gray-100 rounded text-sm"
-                            onClick={() => {
-                              navigator.clipboard.writeText(window.location.origin + '/browse?paper=' + paper.id);
-                              toast.success('Link copied!');
-                              setShareMenuOpen(null);
-                            }}
+                        <button
+                          className="flex items-center gap-2 px-2 py-1 hover:bg-gray-100 rounded text-sm"
+                          onClick={() => {
+                            navigator.clipboard.writeText(window.location.origin + '/browse?paper=' + paper.id);
+                            toast.success('Link copied!');
+                            setShareMenuOpen(null);
+                          }}
                             role="menuitem"
-                          >
-                            <Clipboard className="w-4 h-4" /> Copy Link
-                          </button>
-                          <a
-                            href={`https://wa.me/?text=${encodeURIComponent('Check out this paper on StudyVault: ' + window.location.origin + '/browse?paper=' + paper.id)}`}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="flex items-center gap-2 px-2 py-1 hover:bg-gray-100 rounded text-sm"
-                            onClick={() => setShareMenuOpen(null)}
+                        >
+                          <Clipboard className="w-4 h-4" /> Copy Link
+                        </button>
+                        <a
+                          href={`https://wa.me/?text=${encodeURIComponent('Check out this paper on StudyVault: ' + window.location.origin + '/browse?paper=' + paper.id)}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex items-center gap-2 px-2 py-1 hover:bg-gray-100 rounded text-sm"
+                          onClick={() => setShareMenuOpen(null)}
                             role="menuitem"
-                          >
+                        >
                             {/* WhatsApp SVG */}
-                            <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M20.52 3.48A12.07 12.07 0 0 0 12 0C5.37 0 0 5.37 0 12c0 2.11.55 4.16 1.6 5.97L0 24l6.19-1.62A11.93 11.93 0 0 0 12 24c6.63 0 12-5.37 12-12 0-3.2-1.25-6.21-3.48-8.52zM12 22c-1.85 0-3.68-.5-5.25-1.44l-.38-.22-3.68.97.98-3.58-.25-.37A9.94 9.94 0 0 1 2 12c0-5.52 4.48-10 10-10s10 4.48 10 10-4.48 10-10 10zm5.2-7.6c-.28-.14-1.65-.81-1.9-.9-.25-.09-.43-.14-.61.14-.18.28-.7.9-.86 1.08-.16.18-.32.2-.6.07-.28-.14-1.18-.44-2.25-1.4-.83-.74-1.39-1.65-1.55-1.93-.16-.28-.02-.43.12-.57.12-.12.28-.32.42-.48.14-.16.18-.28.28-.46.09-.18.05-.34-.02-.48-.07-.14-.61-1.47-.84-2.01-.22-.53-.45-.46-.61-.47-.16-.01-.34-.01-.52-.01-.18 0-.48.07-.73.34-.25.27-.97.95-.97 2.3 0 1.35.99 2.65 1.13 2.83.14.18 1.95 2.98 4.74 4.06.66.28 1.18.45 1.58.58.66.21 1.26.18 1.73.11.53-.08 1.65-.67 1.88-1.32.23-.65.23-1.2.16-1.32-.07-.12-.25-.18-.53-.32z"/></svg>
-                            WhatsApp
-                          </a>
-                        </div>
-                      )}
+                          <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M20.52 3.48A12.07 12.07 0 0 0 12 0C5.37 0 0 5.37 0 12c0 2.11.55 4.16 1.6 5.97L0 24l6.19-1.62A11.93 11.93 0 0 0 12 24c6.63 0 12-5.37 12-12 0-3.2-1.25-6.21-3.48-8.52zM12 22c-1.85 0-3.68-.5-5.25-1.44l-.38-.22-3.68.97.98-3.58-.25-.37A9.94 9.94 0 0 1 2 12c0-5.52 4.48-10 10-10s10 4.48 10 10-4.48 10-10 10zm5.2-7.6c-.28-.14-1.65-.81-1.9-.9-.25-.09-.43-.14-.61.14-.18.28-.7.9-.86 1.08-.16.18-.32.2-.6.07-.28-.14-1.18-.44-2.25-1.4-.83-.74-1.39-1.65-1.55-1.93-.16-.28-.02-.43.12-.57.12-.12.28-.32.42-.48.14-.16.18-.28.28-.46.09-.18.05-.34-.02-.48-.07-.14-.61-1.47-.84-2.01-.22-.53-.45-.46-.61-.47-.16-.01-.34-.01-.52-.01-.18 0-.48.07-.73.34-.25.27-.97.95-.97 2.3 0 1.35.99 2.65 1.13 2.83.14.18 1.95 2.98 4.74 4.06.66.28 1.18.45 1.58.58.66.21 1.26.18 1.73.11.53-.08 1.65-.67 1.88-1.32.23-.65.23-1.2.16-1.32-.07-.12-.25-.18-.53-.32z"/></svg>
+                          WhatsApp
+                        </a>
+                      </div>
+                    )}
                     </div>
                   </div>
                 </div>
@@ -424,7 +424,7 @@ const Browse = () => {
       {/* PDF Preview Modal */}
       {showPreview && selectedPaper && (
         <div
-          className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
+          className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4 overflow-hidden pdf-preview-modal"
           role="dialog"
           aria-modal="true"
           aria-labelledby="pdf-preview-title"
@@ -432,35 +432,12 @@ const Browse = () => {
           onClick={closePreview}
           onKeyDown={e => {
             if (e.key === 'Escape') closePreview();
-            // Trap tab key
-            if (e.key === 'Tab') {
-              // Focus management for modal
-              const modal = document.querySelector('[role="dialog"]') as HTMLElement;
-              const focusableEls = modal?.querySelectorAll(
-                'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
-              );
-              if (focusableEls && focusableEls.length > 0) {
-                const first = focusableEls[0] as HTMLElement;
-                const last = focusableEls[focusableEls.length - 1] as HTMLElement;
-                if (e.shiftKey) {
-                  if (document.activeElement === first) {
-                    e.preventDefault();
-                    last.focus();
-                  }
-                } else {
-                  if (document.activeElement === last) {
-                    e.preventDefault();
-                    first.focus();
-                  }
-                }
-              }
-            }
           }}
-
         >
           <div
-            className="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] flex flex-col"
+            className="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] flex flex-col pdf-preview-modal-content"
             onClick={e => e.stopPropagation()}
+            style={{ height: '90vh' }}
           >
             <div className="flex items-center justify-between p-4 border-b border-gray-200">
               <h3 id="pdf-preview-title" className="text-lg font-semibold text-gray-900">{selectedPaper.title}</h3>
@@ -472,24 +449,12 @@ const Browse = () => {
                 <X className="w-6 h-6" />
               </button>
             </div>
-            <div className="flex-1 p-4 flex flex-col items-center justify-center bg-gray-50">
-              <Document
-                file={selectedPaper.fileUrl}
-                onLoadSuccess={({ numPages }) => setNumPages(numPages)}
-                loading={<div className="text-center text-gray-400">Loading PDF...</div>}
-                className="w-full flex flex-col items-center"
-              >
-                <Page pageNumber={pageNumber} scale={zoom} width={600} renderTextLayer={false} renderAnnotationLayer={false} />
-              </Document>
-              <div className="flex items-center justify-center gap-2 mt-4">
-                <Button type="button" variant="secondary" onClick={() => setPageNumber(p => Math.max(1, p - 1))} disabled={pageNumber <= 1}>Prev</Button>
-                <span className="text-sm">Page {pageNumber} of {numPages || '?'}</span>
-                <Button type="button" variant="secondary" onClick={() => setPageNumber(p => Math.min(numPages || 1, p + 1))} disabled={numPages ? pageNumber >= numPages : true}>Next</Button>
-                <Button type="button" variant="secondary" onClick={() => setZoom(z => Math.max(0.5, z - 0.1))} disabled={zoom <= 0.5}>-</Button>
-                <span className="text-sm">Zoom: {(zoom * 100).toFixed(0)}%</span>
-                <Button type="button" variant="secondary" onClick={() => setZoom(z => Math.min(2, z + 0.1))} disabled={zoom >= 2}>+</Button>
-                <Button type="button" variant="secondary" onClick={() => setZoom(1.0)} disabled={zoom === 1.0}>Reset</Button>
-              </div>
+            <div className="flex-1 p-4 flex flex-col bg-gray-50 overflow-hidden pdf-preview-modal-body">
+              <PdfViewer 
+                fileUrl={selectedPaper.fileUrl} 
+                title={selectedPaper.title}
+                onDownload={() => handleDownload(selectedPaper)}
+              />
             </div>
             <div className="p-4 border-t border-gray-200 flex justify-between items-center">
               <div className="text-sm text-gray-600">

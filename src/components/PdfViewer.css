@@ -1,0 +1,172 @@
+/* PDF Viewer Custom Styles */
+
+.pdf-viewer-container {
+  --primary-color: #4f46e5;
+  --primary-hover: #4338ca;
+  --bg-color: #f9fafb;
+  --border-color: #e5e7eb;
+  --shadow-color: rgba(0, 0, 0, 0.1);
+  
+  background-color: var(--bg-color);
+  border-radius: 0.5rem;
+  overflow: hidden;
+  box-shadow: 0 4px 6px var(--shadow-color);
+  transition: all 0.3s ease;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+.pdf-viewer-container.fullscreen {
+  border-radius: 0;
+}
+
+/* Toolbar styling */
+.pdf-toolbar {
+  border-bottom: 1px solid var(--border-color);
+  background: linear-gradient(to bottom, #ffffff, #f9fafb);
+}
+
+/* Button hover effects */
+.pdf-toolbar button:hover:not(:disabled) {
+  background-color: rgba(79, 70, 229, 0.1);
+}
+
+/* Custom Google viewer container */
+.custom-google-viewer {
+  position: relative;
+  overflow: hidden;
+  border-radius: 0.25rem;
+  background-color: var(--bg-color);
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Loading animation */
+.pdf-loading-spinner {
+  border-color: var(--primary-color);
+  border-right-color: transparent;
+}
+
+/* Page controls */
+.page-controls {
+  background: white;
+  border: 1px solid var(--border-color);
+  border-radius: 0.25rem;
+  box-shadow: 0 2px 4px var(--shadow-color);
+}
+
+/* Zoom controls */
+.zoom-controls {
+  background: white;
+  border: 1px solid var(--border-color);
+  border-radius: 0.25rem;
+}
+
+/* Mobile floating button */
+.mobile-controls-toggle {
+  background-color: var(--primary-color);
+  box-shadow: 0 4px 6px rgba(79, 70, 229, 0.4);
+  transition: transform 0.2s ease;
+}
+
+.mobile-controls-toggle:hover {
+  transform: scale(1.05);
+}
+
+/* Custom scrollbar for the PDF container */
+.pdf-content {
+  scrollbar-width: thin;
+  scrollbar-color: #cbd5e1 transparent;
+  flex: 1;
+  overflow: auto;
+  position: relative;
+}
+
+.pdf-content::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.pdf-content::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.pdf-content::-webkit-scrollbar-thumb {
+  background-color: #cbd5e1;
+  border-radius: 4px;
+}
+
+.pdf-content::-webkit-scrollbar-thumb:hover {
+  background-color: #94a3b8;
+}
+
+/* Animation for page transitions */
+@keyframes pageTransition {
+  0% {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.page-transition {
+  animation: pageTransition 0.3s ease;
+}
+
+/* Responsive adjustments */
+@media (max-width: 640px) {
+  .pdf-toolbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .toolbar-actions {
+    justify-content: space-between;
+    margin-top: 0.5rem;
+  }
+}
+
+/* Print-friendly styles */
+@media print {
+  .pdf-toolbar,
+  .mobile-controls-toggle {
+    display: none !important;
+  }
+  
+  .pdf-content {
+    height: auto !important;
+    overflow: visible !important;
+  }
+} 
+
+/* Fix for Google PDF Viewer iframe */
+.custom-google-viewer iframe {
+  width: 100%;
+  height: 100%;
+  border: 0;
+  display: block;
+  overflow: auto;
+}
+
+/* Fix for modal scrolling */
+.pdf-preview-modal {
+  overflow: hidden;
+}
+
+.pdf-preview-modal-content {
+  display: flex;
+  flex-direction: column;
+  max-height: 90vh;
+}
+
+.pdf-preview-modal-body {
+  flex: 1;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+} 
