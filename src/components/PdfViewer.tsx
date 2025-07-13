@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Download, ExternalLink, Maximize, Minimize, ChevronLeft, ChevronRight, ZoomIn, ZoomOut, Printer, RotateCw, Share2, Search, BookOpen } from 'lucide-react';
+import { Download, ExternalLink, Maximize, Minimize, ChevronLeft, ChevronRight, ZoomIn, ZoomOut, Printer, Search, BookOpen } from 'lucide-react';
 import GooglePdfViewer from './GooglePdfViewer';
 import Button from './Button';
 import './PdfViewer.css';

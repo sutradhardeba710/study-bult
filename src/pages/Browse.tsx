@@ -7,7 +7,6 @@ import type { PaperData } from '../services/upload';
 import { useMeta } from '../context/MetaContext';
 import toast from 'react-hot-toast';
 import Fuse from 'fuse.js';
-import Button from '../components/Button';
 import Skeleton from '../components/Skeleton';
 import PdfViewer from '../components/PdfViewer';
 
