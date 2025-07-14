@@ -9,6 +9,7 @@ import {
 import type { User } from 'firebase/auth';
 import { doc, setDoc, getDoc } from 'firebase/firestore';
 import { auth, db, isFirebaseConfigured } from '../services/firebase';
+import { signInWithGoogle, signInWithGoogleRedirect, getGoogleRedirectResult } from '../services/google';
 
 interface UserProfile {
   uid: string;
@@ -36,6 +37,9 @@ interface AuthContextType {
   loading: boolean;
   register: (email: string, password: string, profile: Omit<UserProfile, 'uid' | 'createdAt'>) => Promise<void>;
   login: (email: string, password: string) => Promise<void>;
+  loginWithGoogle: () => Promise<User>;
+  loginWithGoogleRedirect: () => void;
+  checkGoogleRedirect: () => Promise<User | null>;
   logout: () => Promise<void>;
   updateUserProfile: (profile: Partial<UserProfile>) => Promise<void>;
 }
@@ -118,6 +122,40 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
+  const loginWithGoogle = async () => {
+    if (!isFirebaseConfigured) {
+      throw new Error('Firebase is not properly configured. Please check your environment variables.');
+    }
+    
+    try {
+      return await signInWithGoogle();
+    } catch (error: any) {
+      console.error('Google login error:', error);
+      throw new Error(error?.message || 'An unexpected error occurred during Google login.');
+    }
+  };
+
+  const loginWithGoogleRedirect = () => {
+    if (!isFirebaseConfigured) {
+      throw new Error('Firebase is not properly configured. Please check your environment variables.');
+    }
+    
+    signInWithGoogleRedirect();
+  };
+
+  const checkGoogleRedirect = async () => {
+    if (!isFirebaseConfigured) {
+      throw new Error('Firebase is not properly configured. Please check your environment variables.');
+    }
+    
+    try {
+      return await getGoogleRedirectResult();
+    } catch (error: any) {
+      console.error('Google redirect result error:', error);
+      throw new Error(error?.message || 'An unexpected error occurred processing Google sign-in.');
+    }
+  };
+
   const logout = async () => {
     if (!isFirebaseConfigured) {
       throw new Error('Firebase is not properly configured. Please check your environment variables.');
@@ -188,6 +226,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     loading,
     register,
     login,
+    loginWithGoogle,
+    loginWithGoogleRedirect,
+    checkGoogleRedirect,
     logout,
     updateUserProfile
   };
