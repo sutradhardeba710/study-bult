@@ -17,7 +17,7 @@ const PDFThumbnail: React.FC<PDFThumbnailProps> = ({ width = 40, height = 56 }) 
       style={{ width, height }} 
       className="flex items-center justify-center bg-gray-100 rounded overflow-hidden"
     >
-      <FileText className="w-2/3 h-2/3 text-gray-400" />
+        <FileText className="w-2/3 h-2/3 text-gray-400" />
     </div>
   );
 };
