@@ -1,7 +1,6 @@
-import { signInWithPopup, signInWithRedirect, getRedirectResult, deleteUser } from 'firebase/auth';
-import { doc, getDoc, setDoc, deleteDoc } from 'firebase/firestore';
+import { signInWithPopup, signInWithRedirect, getRedirectResult } from 'firebase/auth';
+import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { auth, db, googleProvider } from './firebase';
-import { sendWelcomeEmail } from './email';
 import type { UserProfile } from '../context/AuthContext';
 
 // Add custom parameters to Google Auth Provider

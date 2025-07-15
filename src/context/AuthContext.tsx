@@ -39,15 +39,23 @@ export interface UserProfile {
   } | null;
 }
 
+// Define the Google auth result type
+export interface GoogleAuthResult {
+  user: User;
+  profile: UserProfile;
+  isNewUser: boolean;
+  isProfileComplete: boolean;
+}
+
 interface AuthContextType {
   currentUser: User | null;
   userProfile: UserProfile | null;
   loading: boolean;
   register: (email: string, password: string, profile: Omit<UserProfile, 'uid' | 'createdAt'>) => Promise<void>;
   login: (email: string, password: string) => Promise<void>;
-  loginWithGoogle: () => Promise<User>;
+  loginWithGoogle: () => Promise<GoogleAuthResult>;
   loginWithGoogleRedirect: () => void;
-  checkGoogleRedirect: () => Promise<User | null>;
+  checkGoogleRedirect: () => Promise<GoogleAuthResult | null>;
   logout: () => Promise<void>;
   updateUserProfile: (profile: Partial<UserProfile>) => Promise<void>;
   updateUserProfileAfterGoogleSignIn: (profile: UserProfile, updatedFields: Partial<UserProfile>) => Promise<UserProfile>;
