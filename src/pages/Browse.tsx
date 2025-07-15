@@ -462,7 +462,13 @@ const Browse = () => {
                 <p>Exam Type: {selectedPaper.examType}</p>
                 <p>File Size: {selectedPaper.fileSize ? (selectedPaper.fileSize / 1024 / 1024).toFixed(2) + ' MB' : 'N/A'}</p>
                 <p>Likes: {selectedPaper.likeCount || 0} | Downloads: {selectedPaper.downloadCount || 0}</p>
-                <p>Uploaded by: {selectedPaper.uploaderName} on {new Date(selectedPaper.createdAt).toLocaleDateString()}</p>
+                <p>Uploaded by: {selectedPaper.uploaderName} on {
+                  selectedPaper.createdAt && typeof selectedPaper.createdAt === 'object' && typeof selectedPaper.createdAt.toDate === 'function'
+                    ? selectedPaper.createdAt.toDate().toLocaleDateString()
+                    : (typeof selectedPaper.createdAt === 'string' || typeof selectedPaper.createdAt === 'number')
+                      ? new Date(selectedPaper.createdAt).toLocaleDateString()
+                      : 'N/A'
+                }</p>
               </div>
               <div className="flex space-x-2">
                 <button
