@@ -5,15 +5,21 @@ import {
   signOut, 
   onAuthStateChanged,
   updateProfile,
-  deleteUser
+  deleteUser,
+  sendPasswordResetEmail as firebaseSendPasswordResetEmail
 } from 'firebase/auth';
 import type { User } from 'firebase/auth';
 import { doc, setDoc, getDoc, deleteDoc } from 'firebase/firestore';
 import { auth, db, isFirebaseConfigured } from '../services/firebase';
 import { signInWithGoogle, signInWithGoogleRedirect, getGoogleRedirectResult } from '../services/google';
-import { sendWelcomeEmail, sendLoginNotificationEmail, sendAccountDeletedEmail, sendCredentialsEmail, getDeviceInfo, isEmailConfigured } from '../services/email';
+import { 
+  sendWelcomeEmail, 
+  sendLoginNotificationEmail, 
+  sendAccountDeletionEmail,
+  sendPasswordResetEmail 
+} from '../services/email';
 
-interface UserProfile {
+export interface UserProfile {
   uid: string;
   email: string;
   name: string;
@@ -38,13 +44,14 @@ interface AuthContextType {
   userProfile: UserProfile | null;
   loading: boolean;
   register: (email: string, password: string, profile: Omit<UserProfile, 'uid' | 'createdAt'>) => Promise<void>;
-  login: (email: string, password: string, userAgent?: string) => Promise<void>;
+  login: (email: string, password: string) => Promise<void>;
   loginWithGoogle: () => Promise<User>;
   loginWithGoogleRedirect: () => void;
   checkGoogleRedirect: () => Promise<User | null>;
   logout: () => Promise<void>;
   updateUserProfile: (profile: Partial<UserProfile>) => Promise<void>;
   deleteAccount: () => Promise<void>;
+  resetPassword: (email: string) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -107,18 +114,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       await setDoc(doc(db, 'users', user.uid), userProfileData);
       setUserProfile(userProfileData);
       
-      // Send welcome and credentials emails
-      if (isEmailConfigured()) {
-        await sendWelcomeEmail(userProfileData);
-        await sendCredentialsEmail(userProfileData, password);
-      }
+      // Send welcome email with account details
+      await sendWelcomeEmail(userProfileData, password);
     } catch (error: any) {
       console.error('Registration error:', error);
       throw new Error(error?.message || 'An unexpected error occurred.');
     }
   };
 
-  const login = async (email: string, password: string, userAgent?: string) => {
+  const login = async (email: string, password: string) => {
     if (!isFirebaseConfigured) {
       throw new Error('Firebase is not properly configured. Please check your environment variables.');
     }
@@ -127,15 +131,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
       
-      // Send login notification email
-      if (isEmailConfigured() && user) {
-        // Get user profile for email
-        const userDoc = await getDoc(doc(db, 'users', user.uid));
-        if (userDoc.exists()) {
-          const userProfile = userDoc.data() as UserProfile;
-          const deviceInfo = userAgent ? getDeviceInfo(userAgent) : 'Unknown device';
-          await sendLoginNotificationEmail(userProfile, deviceInfo);
-        }
+      // Get user profile
+      const userDoc = await getDoc(doc(db, 'users', user.uid));
+      if (userDoc.exists()) {
+        const userProfile = userDoc.data() as UserProfile;
+        
+        // Send login notification email
+        await sendLoginNotificationEmail(userProfile, {
+          time: new Date(),
+          // You could add more details like IP, device, etc. using a third-party service
+        });
       }
     } catch (error: any) {
       console.error('Login error:', error);
@@ -149,7 +154,23 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
     
     try {
-      return await signInWithGoogle();
+      const user = await signInWithGoogle();
+      
+      // Check if this is a new user (first login)
+      const userRef = doc(db, 'users', user.uid);
+      const userSnap = await getDoc(userRef);
+      
+      if (userSnap.exists()) {
+        // Existing user - send login notification
+        await sendLoginNotificationEmail(userSnap.data() as UserProfile, {
+          time: new Date(),
+        });
+      } else {
+        // New user - this should be handled in the Google service
+        // The welcome email is sent there after creating the profile
+      }
+      
+      return user;
     } catch (error: any) {
       console.error('Google login error:', error);
       throw new Error(error?.message || 'An unexpected error occurred during Google login.');
@@ -210,6 +231,58 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       throw error;
     }
   };
+  
+  const deleteAccount = async () => {
+    if (!currentUser || !userProfile) return;
+    
+    if (!isFirebaseConfigured) {
+      throw new Error('Firebase is not properly configured. Please check your environment variables.');
+    }
+    
+    try {
+      // Store user information before deletion
+      const { email, name } = userProfile;
+      
+      // Delete user data from Firestore
+      await deleteDoc(doc(db, 'users', currentUser.uid));
+      
+      // Delete user authentication
+      await deleteUser(currentUser);
+      
+      // Send account deletion confirmation email
+      await sendAccountDeletionEmail(email, name);
+      
+      // Clear local state
+      setCurrentUser(null);
+      setUserProfile(null);
+    } catch (error) {
+      console.error('Delete account error:', error);
+      throw error;
+    }
+  };
+  
+  const resetPassword = async (email: string) => {
+    if (!isFirebaseConfigured) {
+      throw new Error('Firebase is not properly configured. Please check your environment variables.');
+    }
+    
+    try {
+      // Firebase will send an email with a password reset link
+      await firebaseSendPasswordResetEmail(auth, email);
+      
+      // We can also send our custom email with the same link
+      const actionCodeSettings = {
+        url: `${window.location.origin}/login`,
+        handleCodeInApp: true,
+      };
+      
+      const resetLink = `${window.location.origin}/reset-password?email=${encodeURIComponent(email)}`;
+      await sendPasswordResetEmail(email, resetLink);
+    } catch (error) {
+      console.error('Reset password error:', error);
+      throw error;
+    }
+  };
 
   useEffect(() => {
     if (!isFirebaseConfigured) {
@@ -241,40 +314,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return unsubscribe;
   }, []);
 
-  // Delete user account
-  const deleteAccount = async () => {
-    if (!currentUser || !userProfile) {
-      throw new Error('No user is currently logged in.');
-    }
-    
-    if (!isFirebaseConfigured) {
-      throw new Error('Firebase is not properly configured. Please check your environment variables.');
-    }
-    
-    try {
-      // Store user profile for email notification
-      const userProfileCopy = { ...userProfile };
-      
-      // Delete user data from Firestore
-      await deleteDoc(doc(db, 'users', currentUser.uid));
-      
-      // Delete Firebase Auth user
-      await deleteUser(currentUser);
-      
-      // Send account deletion email
-      if (isEmailConfigured()) {
-        await sendAccountDeletedEmail(userProfileCopy);
-      }
-      
-      // Clear local state
-      setCurrentUser(null);
-      setUserProfile(null);
-    } catch (error: any) {
-      console.error('Account deletion error:', error);
-      throw new Error(error?.message || 'Failed to delete account. Please try again.');
-    }
-  };
-
   const value: AuthContextType = {
     currentUser,
     userProfile,
@@ -286,7 +325,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     checkGoogleRedirect,
     logout,
     updateUserProfile,
-    deleteAccount
+    deleteAccount,
+    resetPassword
   };
 
   return (

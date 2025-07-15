@@ -1,10 +1,12 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
-import { Pencil, User, Shield, Trash2 } from 'lucide-react';
+import { Pencil, User, Shield, Trash2, AlertTriangle } from 'lucide-react';
 import Skeleton from '../../components/Skeleton';
 import toast from 'react-hot-toast';
 import AvatarCropperModal from '../../components/AvatarCropperModal';
 import Select from 'react-select';
+import { useNavigate } from 'react-router-dom';
+import Modal from '../../components/Modal';
 
 // Helper to render cropped avatar using canvas
 function getCroppedAvatarUrl(imageUrl: string, crop: { x: number; y: number; width: number; height: number; zoom: number } | undefined, callback: (url: string) => void) {
@@ -46,8 +48,12 @@ function getCroppedAvatarUrl(imageUrl: string, crop: { x: number; y: number; wid
 
 const Settings = () => {
   const { userProfile, updateUserProfile, deleteAccount } = useAuth();
+  const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
+  const [isDeleteLoading, setIsDeleteLoading] = useState(false);
   const [message, setMessage] = useState('');
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [deleteConfirmation, setDeleteConfirmation] = useState('');
   const [formData, setFormData] = useState<{
     name: string;
     email: string;
@@ -198,6 +204,26 @@ const Settings = () => {
     toast.success('Avatar removed.');
   };
 
+  const handleDeleteAccount = async () => {
+    if (deleteConfirmation !== userProfile?.email) {
+      toast.error('Email confirmation does not match');
+      return;
+    }
+
+    setIsDeleteLoading(true);
+    try {
+      await deleteAccount();
+      toast.success('Your account has been deleted');
+      navigate('/');
+    } catch (error: any) {
+      console.error('Error deleting account:', error);
+      toast.error(error.message || 'Failed to delete account. Please try again.');
+    } finally {
+      setIsDeleteLoading(false);
+      setShowDeleteModal(false);
+    }
+  };
+
   useEffect(() => {
     // Prefer local formData values for preview if present, else fall back to userProfile
     const original = formData.avatarOriginal || userProfile?.avatarOriginal;
@@ -249,82 +275,84 @@ const Settings = () => {
   }
 
   return (
-    <div className="max-w-2xl mx-auto space-y-6">
+    <div className="max-w-2xl mx-auto space-y-6 pb-10">
       <div>
         <h1 className="text-2xl font-bold text-gray-900">Settings</h1>
         <p className="text-gray-600">Manage your account settings and preferences</p>
       </div>
 
+      {/* Profile Section */}
       <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
         <div className="flex items-center space-x-3 mb-6">
-          <div className="relative w-16 h-16">
-            {avatarPreview ? (
-              <img src={avatarPreview} alt="Avatar" className="w-16 h-16 rounded-full object-cover object-center border-2 border-primary-400" />
-            ) : (
-              <div className="w-16 h-16 bg-primary-100 rounded-full flex items-center justify-center text-2xl font-bold text-primary-600">
-                {userProfile?.name?.[0] || <User className="w-8 h-8" />}
-              </div>
-            )}
-            {/* Remove avatar button */}
-            {formData.avatarOriginal && (
-              <button type="button" onClick={handleRemoveAvatar} className="absolute -top-2 -right-2 bg-white border border-gray-300 rounded-full p-1 text-xs text-gray-500 hover:text-red-600 shadow">
-                &times;
-              </button>
-            )}
-            {/* Edit (crop) avatar button */}
-            {formData.avatarOriginal && (
-              <button
-                type="button"
-                onClick={() => {
-                  setRawAvatar(formData.avatarOriginal);
-                  setCropperOpen(true);
-                }}
-                className="absolute bottom-0 left-0 bg-primary-600 text-white rounded-full p-1 border-2 border-white shadow hover:bg-primary-700 transition"
-                title="Edit avatar"
-                disabled={avatarUploading}
-              >
-                <Pencil className="w-4 h-4" />
-              </button>
-            )}
-            {/* Upload new avatar button */}
-            <button
-              type="button"
-              onClick={() => fileInputRef.current?.click()}
-              className="absolute bottom-0 right-0 bg-primary-600 text-white rounded-full p-1 border-2 border-white shadow hover:bg-primary-700 transition"
-              title="Change avatar"
-              disabled={avatarUploading}
-            >
-              <User className="w-4 h-4" />
-            </button>
-            <input
-              type="file"
-              accept="image/*"
-              ref={fileInputRef}
-              className="hidden"
-              onChange={handleAvatarChange}
-              disabled={avatarUploading}
-            />
+          <div className="w-10 h-10 bg-primary-100 rounded-full flex items-center justify-center">
+            <User className="w-5 h-5 text-primary-600" />
           </div>
           <div>
-            <h2 className="text-lg font-semibold text-gray-900">Profile Information</h2>
-            <p className="text-sm text-gray-600">Update your personal information</p>
+            <h2 className="text-lg font-medium text-gray-900">Profile Information</h2>
+            <p className="text-sm text-gray-500">Update your personal information</p>
           </div>
         </div>
 
-        {message && (
-          <div className={`mb-4 p-4 rounded-md ${
-            message.includes('successfully') 
-              ? 'bg-green-50 border border-green-200 text-green-700'
-              : 'bg-red-50 border border-red-200 text-red-700'
-          }`}>
-            <p className="text-sm">{message}</p>
+        <form onSubmit={handleSubmit}>
+          {/* Avatar section */}
+          <div className="mb-6">
+            <label className="block text-sm font-medium text-gray-700 mb-2">Profile Picture</label>
+            <div className="flex items-center space-x-4">
+              <div className="relative">
+                <div className="w-24 h-24 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden">
+                  {avatarPreview ? (
+                    <img 
+                      src={avatarPreview} 
+                      alt="Avatar preview" 
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <User className="w-12 h-12 text-gray-400" />
+                  )}
+                </div>
+                <button
+                  type="button"
+                  onClick={() => fileInputRef.current?.click()}
+                  className="absolute bottom-0 right-0 bg-white rounded-full p-1 shadow-md border border-gray-200"
+                  disabled={avatarUploading}
+                >
+                  <Pencil className="w-4 h-4 text-gray-600" />
+                </button>
+              </div>
+              <div>
+                <input 
+                  type="file" 
+                  ref={fileInputRef} 
+                  onChange={handleAvatarChange} 
+                  className="hidden" 
+                  accept="image/*" 
+                />
+                <button
+                  type="button"
+                  onClick={() => fileInputRef.current?.click()}
+                  className="text-sm font-medium text-primary-600 hover:text-primary-700"
+                  disabled={avatarUploading}
+                >
+                  {avatarUploading ? 'Uploading...' : 'Change picture'}
+                </button>
+                {formData.avatarOriginal && (
+                  <button
+                    type="button"
+                    onClick={handleRemoveAvatar}
+                    className="text-sm font-medium text-red-600 hover:text-red-700 ml-4"
+                    disabled={avatarUploading}
+                  >
+                    Remove
+                  </button>
+                )}
+              </div>
+            </div>
           </div>
-        )}
 
-        <form onSubmit={handleSubmit} className="space-y-6">
+          {/* Rest of the form fields */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <label htmlFor="name" className="block text-sm font-medium text-gray-700">
+              <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
                 Full Name
               </label>
               <input
@@ -333,13 +361,11 @@ const Settings = () => {
                 name="name"
                 value={formData.name}
                 onChange={handleChange}
-                className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm"
-                placeholder="Enter your full name"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
               />
             </div>
-
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+              <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
                 Email Address
               </label>
               <input
@@ -347,161 +373,178 @@ const Settings = () => {
                 id="email"
                 name="email"
                 value={formData.email}
-                onChange={handleChange}
-                className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm"
-                placeholder="Enter your email"
+                disabled
+                className="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50 cursor-not-allowed"
               />
             </div>
-
             <div>
-              <label htmlFor="college" className="block text-sm font-medium text-gray-700">
-                College
+              <label htmlFor="college" className="block text-sm font-medium text-gray-700 mb-1">
+                College/University
               </label>
-              <Select
+              <select
                 id="college"
                 name="college"
-                options={colleges.map(c => ({ value: c, label: c }))}
-                value={formData.college ? { value: formData.college, label: formData.college } : null}
-                onChange={option => setFormData(prev => ({ ...prev, college: option?.value || '' }))}
-                placeholder="Select College"
-                classNamePrefix="react-select"
-              />
+                value={formData.college}
+                onChange={handleChange}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
+              >
+                <option value="">Select College</option>
+                {colleges.map(college => (
+                  <option key={college} value={college}>{college}</option>
+                ))}
+              </select>
             </div>
-
             <div>
-              <label htmlFor="semester" className="block text-sm font-medium text-gray-700">
-                Semester
+              <label htmlFor="semester" className="block text-sm font-medium text-gray-700 mb-1">
+                Current Semester
               </label>
-              <Select
+              <select
                 id="semester"
                 name="semester"
-                options={semesters.map(s => ({ value: s, label: s }))}
-                value={formData.semester ? { value: formData.semester, label: formData.semester } : null}
-                onChange={option => setFormData(prev => ({ ...prev, semester: option?.value || '' }))}
-                placeholder="Select Semester"
-                classNamePrefix="react-select"
-              />
+                value={formData.semester}
+                onChange={handleChange}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
+              >
+                <option value="">Select Semester</option>
+                {semesters.map(semester => (
+                  <option key={semester} value={semester}>{semester}</option>
+                ))}
+              </select>
             </div>
-
             <div className="md:col-span-2">
-              <label htmlFor="course" className="block text-sm font-medium text-gray-700">
-                Course
+              <label htmlFor="course" className="block text-sm font-medium text-gray-700 mb-1">
+                Course/Program
               </label>
-              <Select
+              <select
                 id="course"
                 name="course"
-                options={courses.map(c => ({ value: c, label: c }))}
-                value={formData.course ? { value: formData.course, label: formData.course } : null}
-                onChange={option => setFormData(prev => ({ ...prev, course: option?.value || '' }))}
-                placeholder="Select Course"
-                classNamePrefix="react-select"
-              />
+                value={formData.course}
+                onChange={handleChange}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
+              >
+                <option value="">Select Course</option>
+                {courses.map(course => (
+                  <option key={course} value={course}>{course}</option>
+                ))}
+              </select>
             </div>
           </div>
 
-          <div className="flex justify-end">
+          {message && (
+            <div className={`mt-4 p-3 rounded-md ${message.includes('success') ? 'bg-green-50 text-green-800' : 'bg-red-50 text-red-800'}`}>
+              {message}
+            </div>
+          )}
+
+          <div className="flex justify-end mt-6">
             <button
               type="submit"
               disabled={isLoading}
-              className="btn-primary disabled:opacity-50 disabled:cursor-not-allowed"
+              className="px-4 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 transition-colors"
             >
-              {isLoading ? (
-                <div className="flex items-center">
-                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                  Updating...
-                </div>
-              ) : (
-                'Update Profile'
-              )}
+              {isLoading ? 'Updating...' : 'Update Profile'}
             </button>
           </div>
         </form>
       </div>
 
-      {/* Security Section */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-        <div className="flex items-center space-x-3 mb-6">
-          <div className="w-10 h-10 bg-yellow-100 rounded-full flex items-center justify-center">
-            <Shield className="w-5 h-5 text-yellow-600" />
-          </div>
-          <div>
-            <h2 className="text-lg font-semibold text-gray-900">Security</h2>
-            <p className="text-sm text-gray-600">Manage your account security</p>
-          </div>
-        </div>
-
-        <div className="space-y-4">
-          <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
-            <div>
-              <h3 className="text-sm font-medium text-gray-900">Change Password</h3>
-              <p className="text-sm text-gray-600">Update your password to keep your account secure</p>
-            </div>
-            <button className="btn-secondary text-sm">
-              Change Password
-            </button>
-          </div>
-
-          <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
-            <div>
-              <h3 className="text-sm font-medium text-gray-900">Two-Factor Authentication</h3>
-              <p className="text-sm text-gray-600">Add an extra layer of security to your account</p>
-            </div>
-            <button className="btn-secondary text-sm">
-              Enable 2FA
-            </button>
-          </div>
-        </div>
-      </div>
-
-      {/* Danger Zone */}
+      {/* Danger Zone Section */}
       <div className="bg-white rounded-lg shadow-sm border border-red-200 p-6">
         <div className="flex items-center space-x-3 mb-6">
           <div className="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center">
-            <Trash2 className="w-5 h-5 text-red-600" />
+            <Shield className="w-5 h-5 text-red-600" />
           </div>
           <div>
-            <h2 className="text-lg font-semibold text-gray-900">Danger Zone</h2>
-            <p className="text-sm text-gray-600">Irreversible and destructive actions</p>
+            <h2 className="text-lg font-medium text-gray-900">Danger Zone</h2>
+            <p className="text-sm text-gray-500">Irreversible account actions</p>
           </div>
         </div>
 
-        <div className="flex items-center justify-between p-4 border border-red-200 rounded-lg bg-red-50">
-          <div>
-            <h3 className="text-sm font-medium text-gray-900">Delete Account</h3>
-            <p className="text-sm text-gray-600">
-              Permanently delete your account and all associated data. This action cannot be undone.
-            </p>
+        <div className="border border-red-200 rounded-md p-4 bg-red-50">
+          <div className="flex items-start justify-between">
+            <div>
+              <h3 className="text-md font-medium text-gray-900">Delete Account</h3>
+              <p className="text-sm text-gray-600 mt-1">
+                Permanently delete your account and all associated data. This action cannot be undone.
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={() => setShowDeleteModal(true)}
+              className="px-3 py-1.5 bg-white border border-red-300 text-red-600 text-sm rounded-md hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition-colors"
+            >
+              Delete Account
+            </button>
           </div>
-          <button 
-            onClick={async () => {
-              if (window.confirm('Are you sure you want to delete your account? This action cannot be undone.')) {
-                try {
-                  setIsLoading(true);
-                  await deleteAccount();
-                  toast.success('Your account has been successfully deleted.');
-                  window.location.href = '/';
-                } catch (error: any) {
-                  console.error('Error deleting account:', error);
-                  toast.error(error.message || 'Failed to delete account. Please try again.');
-                  setIsLoading(false);
-                }
-              }
-            }}
-            disabled={isLoading}
-            className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            {isLoading ? 'Processing...' : 'Delete Account'}
-          </button>
         </div>
       </div>
-      <AvatarCropperModal
-        open={cropperOpen}
-        image={rawAvatar}
-        onClose={() => { setCropperOpen(false); setRawAvatar(undefined); }}
-        onCropComplete={(blob, cropParams) => handleCropComplete(blob, cropParams)}
-        loading={avatarUploading}
-        initialCrop={formData.avatarCrop}
-      />
+
+      {/* Delete Account Confirmation Modal */}
+      <Modal
+        isOpen={showDeleteModal}
+        onClose={() => setShowDeleteModal(false)}
+        title="Delete Account"
+      >
+        <div className="p-6">
+          <div className="flex items-center space-x-3 mb-4 text-red-600">
+            <AlertTriangle className="w-6 h-6" />
+            <h3 className="text-lg font-medium">This action cannot be undone</h3>
+          </div>
+          
+          <p className="text-gray-700 mb-4">
+            Deleting your account will permanently remove all your data, including:
+          </p>
+          
+          <ul className="list-disc pl-5 mb-6 text-gray-700 space-y-1">
+            <li>Your profile information</li>
+            <li>Your uploaded papers</li>
+            <li>Your liked papers</li>
+            <li>All other account data</li>
+          </ul>
+          
+          <p className="text-gray-700 mb-6">
+            To confirm deletion, please type your email address: <strong>{userProfile?.email}</strong>
+          </p>
+          
+          <input
+            type="email"
+            value={deleteConfirmation}
+            onChange={(e) => setDeleteConfirmation(e.target.value)}
+            placeholder="Enter your email"
+            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 mb-6"
+          />
+          
+          <div className="flex justify-end space-x-3">
+            <button
+              type="button"
+              onClick={() => setShowDeleteModal(false)}
+              className="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-colors"
+            >
+              Cancel
+            </button>
+            <button
+              type="button"
+              onClick={handleDeleteAccount}
+              disabled={deleteConfirmation !== userProfile?.email || isDeleteLoading}
+              className={`px-4 py-2 bg-red-600 text-white rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition-colors ${
+                deleteConfirmation !== userProfile?.email
+                  ? 'opacity-50 cursor-not-allowed'
+                  : 'hover:bg-red-700'
+              }`}
+            >
+              {isDeleteLoading ? 'Deleting...' : 'Delete Account'}
+            </button>
+          </div>
+        </div>
+      </Modal>
+
+      {cropperOpen && rawAvatar && (
+        <AvatarCropperModal
+          imageUrl={rawAvatar}
+          onComplete={handleCropComplete}
+          onCancel={() => setCropperOpen(false)}
+        />
+      )}
     </div>
   );
 };

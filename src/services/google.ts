@@ -1,16 +1,11 @@
-import { 
-  GoogleAuthProvider, 
-  signInWithPopup,
-  signInWithRedirect,
-  getRedirectResult
-} from 'firebase/auth';
+import { signInWithPopup, signInWithRedirect, getRedirectResult } from 'firebase/auth';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { auth, db } from './firebase';
+import { GoogleAuthProvider } from 'firebase/auth';
+import { sendWelcomeEmail } from './email';
 
-// Google Authentication Provider
+// Initialize Google Auth Provider
 const googleProvider = new GoogleAuthProvider();
-
-// Configure Google Auth Provider
 googleProvider.setCustomParameters({
   prompt: 'select_account'
 });
@@ -40,6 +35,9 @@ export const signInWithGoogle = async () => {
       };
       
       await setDoc(userRef, newUserProfile);
+      
+      // Send welcome email for new users
+      await sendWelcomeEmail(newUserProfile);
     }
     
     return user;
@@ -49,12 +47,12 @@ export const signInWithGoogle = async () => {
   }
 };
 
-// Sign in with Google using Redirect (better for mobile)
+// Sign in with Google using Redirect
 export const signInWithGoogleRedirect = () => {
-  return signInWithRedirect(auth, googleProvider);
+  signInWithRedirect(auth, googleProvider);
 };
 
-// Get the result from redirect sign-in
+// Get the result of the redirect sign-in
 export const getGoogleRedirectResult = async () => {
   try {
     const result = await getRedirectResult(auth);
@@ -80,6 +78,9 @@ export const getGoogleRedirectResult = async () => {
         };
         
         await setDoc(userRef, newUserProfile);
+        
+        // Send welcome email for new users
+        await sendWelcomeEmail(newUserProfile);
       }
       
       return user;

@@ -12,7 +12,6 @@ A modern web platform for students to share and access question papers from vari
 - **Like System**: Like and save favorite papers
 - **Dashboard**: Personal dashboard with uploads, likes, and statistics
 - **Profile Management**: Update personal information and settings
-- **Email Notifications**: Receive emails for account activities (registration, login, deletion)
 
 ### Technical Features
 - **Modern UI**: Built with React, TypeScript, and TailwindCSS
@@ -58,7 +57,7 @@ A modern web platform for students to share and access question papers from vari
    - Set up Storage
    - Get your Firebase config
 
-4. **Configure Firebase and Email**
+4. **Configure Firebase**
    - Open `src/services/firebase.ts`
    - Replace the placeholder config with your actual Firebase configuration:
    ```typescript
@@ -71,16 +70,6 @@ A modern web platform for students to share and access question papers from vari
      appId: "your-app-id"
    };
    ```
-   - Create a `.env` file in the root directory with your email configuration:
-   ```
-   VITE_EMAIL_HOST=smtp.gmail.com
-   VITE_EMAIL_PORT=587
-   VITE_EMAIL_USER=your-email@gmail.com
-   VITE_EMAIL_PASS=your-app-password
-   VITE_EMAIL_FROM=noreply@studyvault.com
-   VITE_APP_URL=http://localhost:5173
-   ```
-   - See `EMAIL_SETUP.md` for detailed instructions on setting up email
 
 5. **Set up Firestore Security Rules**
    ```javascript
@@ -153,19 +142,10 @@ src/
 │       └── Settings.tsx
 ├── services/           # API and external services
 │   ├── firebase.ts     # Firebase configuration
-│   ├── email.ts        # Email notification service
-│   ├── google.ts       # Google services integration
 │   ├── upload.ts       # File upload service
 │   └── papers.ts       # Paper management service
 └── utils/              # Utility functions
 ```
-
-## Documentation 📚
-
-- `EMAIL_SETUP.md` - Instructions for setting up email functionality
-- `EMAIL_QUICKSTART.md` - Quick start guide for testing email features
-- `EMAIL_IMPLEMENTATION_GUIDE.md` - Technical details of the email implementation
-- `EMAIL_README.md` - Comprehensive documentation of the email system
 
 ## Database Schema 🗄️
 
@@ -250,7 +230,7 @@ src/
 
 ### Phase 2 (Next)
 - [ ] Admin panel for content moderation
-- [x] Email notifications
+- [ ] Email notifications
 - [ ] Advanced search and filtering
 - [ ] Paper categories and tags
 - [ ] User ratings and reviews

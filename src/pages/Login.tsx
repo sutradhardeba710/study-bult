@@ -83,8 +83,7 @@ const Login = () => {
     setAuthError('');
     
     try {
-      // Pass user agent for device tracking in email notifications
-      await login(formData.email, formData.password, navigator.userAgent);
+      await login(formData.email, formData.password);
       navigate('/dashboard');
     } catch (error: any) {
       console.error('Login error:', error);
@@ -235,7 +234,7 @@ const Login = () => {
 
               <div className="text-sm">
                 <Link
-                  to="/forgot-password"
+                  to="/reset-password"
                   className="font-medium text-primary-600 hover:text-primary-500"
                 >
                   Forgot your password?

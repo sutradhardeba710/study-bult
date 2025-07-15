@@ -14,6 +14,7 @@ import { initRecaptcha, loadGoogleMaps, addSearchConsoleVerification } from './s
 const Home = lazy(() => import('./pages/Home'));
 const Login = lazy(() => import('./pages/Login'));
 const Register = lazy(() => import('./pages/Register'));
+const ResetPassword = lazy(() => import('./pages/ResetPassword'));
 const Browse = lazy(() => import('./pages/Browse'));
 const Upload = lazy(() => import('./pages/Upload'));
 const Dashboard = lazy(() => import('./pages/Dashboard'));
@@ -80,7 +81,8 @@ function App() {
                   <Routes>
                     <Route path="/" element={<Home />} />
                     <Route path="/login" element={<Login />} />
-                    <Route path="/register" element={<Register />} />
+<Route path="/register" element={<Register />} />
+<Route path="/reset-password" element={<ResetPassword />} />
                     <Route path="/browse" element={<Browse />} />
                     <Route path="/upload" element={<Upload />} />
                     <Route path="/dashboard/*" element={<Dashboard />} />
