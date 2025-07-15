@@ -4,8 +4,8 @@ import Modal from './Modal'; // Assume you have a Modal component, or use a simp
 import Button from './Button';
 
 interface AvatarCropperModalProps {
-  open: boolean;
-  image?: string;
+  isOpen: boolean;
+  imageUrl?: string;
   onClose: () => void;
   onCropComplete: (croppedBlob: Blob, cropParams: { x: number; y: number; width: number; height: number; zoom: number }) => void;
   loading?: boolean;
@@ -50,7 +50,7 @@ async function getCroppedImg(imageSrc: string, croppedAreaPixels: { x: number; y
   });
 }
 
-const AvatarCropperModal: React.FC<AvatarCropperModalProps> = ({ open, image, onClose, onCropComplete, loading, initialCrop }) => {
+const AvatarCropperModal: React.FC<AvatarCropperModalProps> = ({ isOpen, imageUrl, onClose, onCropComplete, loading, initialCrop }) => {
   const [crop, setCrop] = useState<{ x: number; y: number }>(initialCrop ? { x: initialCrop.x, y: initialCrop.y } : { x: 0, y: 0 });
   const [zoom, setZoom] = useState<number>(initialCrop?.zoom || 1);
   const [croppedAreaPixels, setCroppedAreaPixels] = useState<any>(initialCrop ? { x: initialCrop.x, y: initialCrop.y, width: initialCrop.width, height: initialCrop.height } : null);
@@ -62,7 +62,7 @@ const AvatarCropperModal: React.FC<AvatarCropperModalProps> = ({ open, image, on
       setZoom(initialCrop.zoom);
       setCroppedAreaPixels({ x: initialCrop.x, y: initialCrop.y, width: initialCrop.width, height: initialCrop.height });
     }
-  }, [initialCrop, image]);
+  }, [initialCrop, imageUrl]);
 
   const onCropChange = (c: any) => setCrop(c);
   const onZoomChange = (z: number) => setZoom(z);
@@ -71,10 +71,10 @@ const AvatarCropperModal: React.FC<AvatarCropperModalProps> = ({ open, image, on
   }, []);
 
   const handleCrop = async () => {
-    if (!image || !croppedAreaPixels) return;
+    if (!imageUrl || !croppedAreaPixels) return;
     setProcessing(true);
     try {
-      const croppedBlob = await getCroppedImg(image, croppedAreaPixels);
+      const croppedBlob = await getCroppedImg(imageUrl, croppedAreaPixels);
       onCropComplete(croppedBlob, { ...croppedAreaPixels, zoom });
     } catch (err) {
       alert('Failed to crop image.');
@@ -83,15 +83,14 @@ const AvatarCropperModal: React.FC<AvatarCropperModalProps> = ({ open, image, on
     }
   };
 
-  if (!open || !image) return null;
+  if (!isOpen || !imageUrl) return null;
 
   return (
-    <Modal open={open} onClose={onClose}>
+    <Modal isOpen={isOpen} onClose={onClose} title="Crop your avatar">
       <div className="p-4 w-full max-w-md mx-auto">
-        <h2 className="text-lg font-semibold mb-4">Crop your avatar</h2>
         <div className="relative w-full h-64 bg-gray-100 rounded-md overflow-hidden mb-4">
           <Cropper
-            image={image}
+            image={imageUrl}
             crop={crop}
             zoom={zoom}
             aspect={1}
@@ -127,4 +126,5 @@ const AvatarCropperModal: React.FC<AvatarCropperModalProps> = ({ open, image, on
   );
 };
 
-export default AvatarCropperModal; 
+export default AvatarCropperModal;
+export type { AvatarCropperModalProps }; 

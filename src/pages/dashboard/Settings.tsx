@@ -1,10 +1,10 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
-import { Pencil, User, Shield, Trash2, AlertTriangle } from 'lucide-react';
+import { useMeta } from '../../context/MetaContext';
+import { Pencil, User, Shield, AlertTriangle } from 'lucide-react';
 import Skeleton from '../../components/Skeleton';
 import toast from 'react-hot-toast';
 import AvatarCropperModal from '../../components/AvatarCropperModal';
-import Select from 'react-select';
 import { useNavigate } from 'react-router-dom';
 import Modal from '../../components/Modal';
 
@@ -48,6 +48,7 @@ function getCroppedAvatarUrl(imageUrl: string, crop: { x: number; y: number; wid
 
 const Settings = () => {
   const { userProfile, updateUserProfile, deleteAccount } = useAuth();
+  const { colleges, semesters, courses, loading: metaLoading } = useMeta();
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
   const [isDeleteLoading, setIsDeleteLoading] = useState(false);
@@ -79,26 +80,27 @@ const Settings = () => {
   const [rawAvatar, setRawAvatar] = useState<string | undefined>(undefined);
   const [avatarPreview, setAvatarPreview] = useState<string | undefined>(undefined);
 
-  const colleges = [
-    'Delhi University',
-    'Mumbai University',
-    'Calcutta University',
-    'Madras University',
-    'Pune University',
-    'Other'
-  ];
-
-  const semesters = ['1st Semester', '2nd Semester', '3rd Semester', '4th Semester', '5th Semester', '6th Semester', '7th Semester', '8th Semester'];
-
-  const courses = [
-    'Computer Science Engineering',
-    'Electrical Engineering',
-    'Mechanical Engineering',
-    'Civil Engineering',
-    'Information Technology',
-    'Electronics & Communication',
-    'Other'
-  ];
+  // Update form data when userProfile changes
+  useEffect(() => {
+    if (userProfile) {
+      setFormData({
+        name: userProfile.name || '',
+        email: userProfile.email || '',
+        college: userProfile.college || '',
+        semester: userProfile.semester || '',
+        course: userProfile.course || '',
+        avatarOriginal: userProfile.avatarOriginal || '',
+        avatarCrop: userProfile.avatarCrop ?? undefined,
+      });
+    }
+  }, [userProfile]);
+  
+  // Log meta data for debugging
+  useEffect(() => {
+    console.log('Meta data loaded:', { colleges, semesters, courses });
+    console.log('User profile:', userProfile);
+    console.log('Form data:', formData);
+  }, [colleges, semesters, courses, userProfile, formData]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -300,24 +302,24 @@ const Settings = () => {
             <div className="flex items-center space-x-4">
               <div className="relative">
                 <div className="w-24 h-24 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden">
-                  {avatarPreview ? (
+            {avatarPreview ? (
                     <img 
                       src={avatarPreview} 
                       alt="Avatar preview" 
                       className="w-full h-full object-cover"
                     />
-                  ) : (
+            ) : (
                     <User className="w-12 h-12 text-gray-400" />
                   )}
-                </div>
-                <button
-                  type="button"
+              </div>
+              <button
+                type="button"
                   onClick={() => fileInputRef.current?.click()}
                   className="absolute bottom-0 right-0 bg-white rounded-full p-1 shadow-md border border-gray-200"
-                  disabled={avatarUploading}
-                >
+                disabled={avatarUploading}
+              >
                   <Pencil className="w-4 h-4 text-gray-600" />
-                </button>
+              </button>
               </div>
               <div>
                 <input 
@@ -327,26 +329,26 @@ const Settings = () => {
                   className="hidden" 
                   accept="image/*" 
                 />
-                <button
-                  type="button"
-                  onClick={() => fileInputRef.current?.click()}
+            <button
+              type="button"
+              onClick={() => fileInputRef.current?.click()}
                   className="text-sm font-medium text-primary-600 hover:text-primary-700"
-                  disabled={avatarUploading}
-                >
+              disabled={avatarUploading}
+            >
                   {avatarUploading ? 'Uploading...' : 'Change picture'}
-                </button>
+            </button>
                 {formData.avatarOriginal && (
                   <button
                     type="button"
                     onClick={handleRemoveAvatar}
                     className="text-sm font-medium text-red-600 hover:text-red-700 ml-4"
-                    disabled={avatarUploading}
+              disabled={avatarUploading}
                   >
                     Remove
                   </button>
                 )}
-              </div>
-            </div>
+          </div>
+        </div>
           </div>
 
           {/* Rest of the form fields */}
@@ -377,56 +379,73 @@ const Settings = () => {
                 className="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50 cursor-not-allowed"
               />
             </div>
+            {/* College dropdown */}
             <div>
               <label htmlFor="college" className="block text-sm font-medium text-gray-700 mb-1">
                 College/University
               </label>
-              <select
-                id="college"
-                name="college"
-                value={formData.college}
-                onChange={handleChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
-              >
-                <option value="">Select College</option>
-                {colleges.map(college => (
-                  <option key={college} value={college}>{college}</option>
-                ))}
-              </select>
+              {metaLoading ? (
+                <Skeleton variant="rect" width="100%" height={40} className="mb-2" />
+              ) : (
+                <select
+                  id="college"
+                  name="college"
+                  value={formData.college}
+                  onChange={handleChange}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
+                >
+                  <option value="">Select College</option>
+                  {colleges.map(college => (
+                    <option key={college.id} value={college.name}>{college.name}</option>
+                  ))}
+                </select>
+              )}
             </div>
+
+            {/* Semester dropdown */}
             <div>
               <label htmlFor="semester" className="block text-sm font-medium text-gray-700 mb-1">
                 Current Semester
               </label>
-              <select
-                id="semester"
-                name="semester"
-                value={formData.semester}
-                onChange={handleChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
-              >
-                <option value="">Select Semester</option>
-                {semesters.map(semester => (
-                  <option key={semester} value={semester}>{semester}</option>
-                ))}
-              </select>
+              {metaLoading ? (
+                <Skeleton variant="rect" width="100%" height={40} className="mb-2" />
+              ) : (
+                <select
+                  id="semester"
+                  name="semester"
+                  value={formData.semester}
+                  onChange={handleChange}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
+                >
+                  <option value="">Select Semester</option>
+                  {semesters.map(semester => (
+                    <option key={semester.id} value={semester.name}>{semester.name}</option>
+                  ))}
+                </select>
+              )}
             </div>
-            <div className="md:col-span-2">
+
+            {/* Course dropdown */}
+            <div>
               <label htmlFor="course" className="block text-sm font-medium text-gray-700 mb-1">
                 Course/Program
               </label>
-              <select
-                id="course"
-                name="course"
-                value={formData.course}
-                onChange={handleChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
-              >
-                <option value="">Select Course</option>
-                {courses.map(course => (
-                  <option key={course} value={course}>{course}</option>
-                ))}
-              </select>
+              {metaLoading ? (
+                <Skeleton variant="rect" width="100%" height={40} className="mb-2" />
+              ) : (
+                <select
+                  id="course"
+                  name="course"
+                  value={formData.course}
+                  onChange={handleChange}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
+                >
+                  <option value="">Select Course</option>
+                  {courses.map(course => (
+                    <option key={course.id} value={course.name}>{course.name}</option>
+                  ))}
+                </select>
+              )}
             </div>
           </div>
 
@@ -501,7 +520,7 @@ const Settings = () => {
             <li>Your liked papers</li>
             <li>All other account data</li>
           </ul>
-          
+
           <p className="text-gray-700 mb-6">
             To confirm deletion, please type your email address: <strong>{userProfile?.email}</strong>
           </p>
@@ -539,11 +558,12 @@ const Settings = () => {
       </Modal>
 
       {cropperOpen && rawAvatar && (
-        <AvatarCropperModal
+      <AvatarCropperModal
+          isOpen={cropperOpen}
           imageUrl={rawAvatar}
-          onComplete={handleCropComplete}
-          onCancel={() => setCropperOpen(false)}
-        />
+          onCropComplete={handleCropComplete}
+          onClose={() => setCropperOpen(false)}
+      />
       )}
     </div>
   );

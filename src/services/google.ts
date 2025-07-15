@@ -1,14 +1,18 @@
-import { signInWithPopup, signInWithRedirect, getRedirectResult } from 'firebase/auth';
-import { doc, getDoc, setDoc } from 'firebase/firestore';
-import { auth, db } from './firebase';
-import { GoogleAuthProvider } from 'firebase/auth';
+import { signInWithPopup, signInWithRedirect, getRedirectResult, deleteUser } from 'firebase/auth';
+import { doc, getDoc, setDoc, deleteDoc } from 'firebase/firestore';
+import { auth, db, googleProvider } from './firebase';
 import { sendWelcomeEmail } from './email';
+import type { UserProfile } from '../context/AuthContext';
 
-// Initialize Google Auth Provider
-const googleProvider = new GoogleAuthProvider();
+// Add custom parameters to Google Auth Provider
 googleProvider.setCustomParameters({
   prompt: 'select_account'
 });
+
+// Check if user profile has required fields
+export const isProfileComplete = (profile: UserProfile): boolean => {
+  return !!(profile.college && profile.semester && profile.course);
+};
 
 // Sign in with Google using Popup
 export const signInWithGoogle = async () => {
@@ -20,27 +24,47 @@ export const signInWithGoogle = async () => {
     const userRef = doc(db, 'users', user.uid);
     const userSnap = await getDoc(userRef);
     
-    // If user doesn't exist, create a new profile
+    // If user doesn't exist, create a temporary profile
     if (!userSnap.exists()) {
-      const newUserProfile = {
+      const newUserProfile: UserProfile = {
         uid: user.uid,
         email: user.email || '',
         name: user.displayName || '',
         college: '',
         semester: '',
         course: '',
-        role: 'student',
+        role: 'student' as const,
         createdAt: new Date(),
         avatar: user.photoURL || undefined
       };
       
+      // Create a temporary profile - we'll only send the welcome email
+      // after the profile is completed
       await setDoc(userRef, newUserProfile);
       
-      // Send welcome email for new users
-      await sendWelcomeEmail(newUserProfile);
+      return {
+        user,
+        profile: newUserProfile,
+        isNewUser: true,
+        isProfileComplete: false
+      };
+    } else {
+      // Existing user
+      const profile = userSnap.data() as UserProfile;
+      const profileComplete = isProfileComplete(profile);
+      
+      // If the profile is complete, send a login notification
+      if (profileComplete) {
+        // We'll handle the login notification in the AuthContext
+      }
+      
+      return {
+        user,
+        profile,
+        isNewUser: false,
+        isProfileComplete: profileComplete
+      };
     }
-    
-    return user;
   } catch (error) {
     console.error('Error signing in with Google:', error);
     throw error;
@@ -63,27 +87,47 @@ export const getGoogleRedirectResult = async () => {
       const userRef = doc(db, 'users', user.uid);
       const userSnap = await getDoc(userRef);
       
-      // If user doesn't exist, create a new profile
+      // If user doesn't exist, create a temporary profile
       if (!userSnap.exists()) {
-        const newUserProfile = {
+        const newUserProfile: UserProfile = {
           uid: user.uid,
           email: user.email || '',
           name: user.displayName || '',
           college: '',
           semester: '',
           course: '',
-          role: 'student',
+          role: 'student' as const,
           createdAt: new Date(),
           avatar: user.photoURL || undefined
         };
         
+        // Create a temporary profile - we'll only send the welcome email
+        // after the profile is completed
         await setDoc(userRef, newUserProfile);
         
-        // Send welcome email for new users
-        await sendWelcomeEmail(newUserProfile);
+        return {
+          user,
+          profile: newUserProfile,
+          isNewUser: true,
+          isProfileComplete: false
+        };
+      } else {
+        // Existing user
+        const profile = userSnap.data() as UserProfile;
+        const profileComplete = isProfileComplete(profile);
+        
+        // If the profile is complete, send a login notification
+        if (profileComplete) {
+          // We'll handle the login notification in the AuthContext
+        }
+        
+        return {
+          user,
+          profile,
+          isNewUser: false,
+          isProfileComplete: profileComplete
+        };
       }
-      
-      return user;
     }
     return null;
   } catch (error) {

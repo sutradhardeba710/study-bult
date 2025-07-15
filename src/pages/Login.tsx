@@ -3,6 +3,8 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { Eye, EyeOff, Mail, Lock, BookOpen } from 'lucide-react';
 import Button from '../components/Button';
+import GoogleProfileCompletion from '../components/GoogleProfileCompletion';
+import type { UserProfile } from '../context/AuthContext';
 
 const Login = () => {
   const [formData, setFormData] = useState({
@@ -14,6 +16,8 @@ const Login = () => {
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [authError, setAuthError] = useState('');
+  const [showProfileCompletion, setShowProfileCompletion] = useState(false);
+  const [googleUserProfile, setGoogleUserProfile] = useState<UserProfile | null>(null);
 
   const { login, loginWithGoogle, checkGoogleRedirect } = useAuth();
   const navigate = useNavigate();
@@ -22,9 +26,14 @@ const Login = () => {
   useEffect(() => {
     const handleRedirectResult = async () => {
       try {
-        const user = await checkGoogleRedirect();
-        if (user) {
-          navigate('/dashboard');
+        const result = await checkGoogleRedirect();
+        if (result) {
+          if (!result.isProfileComplete) {
+            setGoogleUserProfile(result.profile);
+            setShowProfileCompletion(true);
+          } else {
+            navigate('/dashboard');
+          }
         }
       } catch (error) {
         console.error('Error handling redirect result:', error);
@@ -106,8 +115,13 @@ const Login = () => {
     setAuthError('');
     
     try {
-      await loginWithGoogle();
-      navigate('/dashboard');
+      const result = await loginWithGoogle();
+      if (!result.isProfileComplete) {
+        setGoogleUserProfile(result.profile);
+        setShowProfileCompletion(true);
+      } else {
+        navigate('/dashboard');
+      }
     } catch (error: any) {
       console.error('Google login error:', error);
       setAuthError('Failed to sign in with Google. Please try again.');
@@ -116,8 +130,27 @@ const Login = () => {
     }
   };
 
+  const handleProfileCompletionCancel = () => {
+    setShowProfileCompletion(false);
+    setGoogleUserProfile(null);
+    // The user will be signed out in the GoogleProfileCompletion component
+  };
+
+  const handleProfileCompletionSuccess = () => {
+    setShowProfileCompletion(false);
+    setGoogleUserProfile(null);
+    navigate('/dashboard');
+  };
+
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
+      {showProfileCompletion && googleUserProfile && (
+        <GoogleProfileCompletion 
+          user={googleUserProfile} 
+          onComplete={handleProfileCompletionSuccess}
+          onCancel={handleProfileCompletionCancel}
+        />
+      )}
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
         <div className="flex justify-center">
           <Link to="/" className="flex items-center space-x-2">

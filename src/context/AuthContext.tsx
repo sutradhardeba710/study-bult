@@ -50,6 +50,7 @@ interface AuthContextType {
   checkGoogleRedirect: () => Promise<User | null>;
   logout: () => Promise<void>;
   updateUserProfile: (profile: Partial<UserProfile>) => Promise<void>;
+  updateUserProfileAfterGoogleSignIn: (profile: UserProfile, updatedFields: Partial<UserProfile>) => Promise<UserProfile>;
   deleteAccount: () => Promise<void>;
   resetPassword: (email: string) => Promise<void>;
 }
@@ -154,23 +155,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
     
     try {
-      const user = await signInWithGoogle();
+      const result = await signInWithGoogle();
       
-      // Check if this is a new user (first login)
-      const userRef = doc(db, 'users', user.uid);
-      const userSnap = await getDoc(userRef);
-      
-      if (userSnap.exists()) {
-        // Existing user - send login notification
-        await sendLoginNotificationEmail(userSnap.data() as UserProfile, {
+      // Check if this is a new user or if profile is incomplete
+      if (result.isNewUser || !result.isProfileComplete) {
+        // For new users, the profile is already created in the Google service
+        return result;
+      } else {
+        // Existing user with complete profile - send login notification
+        await sendLoginNotificationEmail(result.profile, {
           time: new Date(),
         });
-      } else {
-        // New user - this should be handled in the Google service
-        // The welcome email is sent there after creating the profile
+        return result;
       }
-      
-      return user;
     } catch (error: any) {
       console.error('Google login error:', error);
       throw new Error(error?.message || 'An unexpected error occurred during Google login.');
@@ -271,15 +268,36 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       await firebaseSendPasswordResetEmail(auth, email);
       
       // We can also send our custom email with the same link
-      const actionCodeSettings = {
-        url: `${window.location.origin}/login`,
-        handleCodeInApp: true,
-      };
-      
       const resetLink = `${window.location.origin}/reset-password?email=${encodeURIComponent(email)}`;
       await sendPasswordResetEmail(email, resetLink);
     } catch (error) {
       console.error('Reset password error:', error);
+      throw error;
+    }
+  };
+
+  // Add this function to update user profile and send welcome email
+  const updateUserProfileAfterGoogleSignIn = async (profile: UserProfile, updatedFields: Partial<UserProfile>) => {
+    if (!isFirebaseConfigured) {
+      throw new Error('Firebase is not properly configured. Please check your environment variables.');
+    }
+    
+    try {
+      const userRef = doc(db, 'users', profile.uid);
+      
+      // Update the profile with the provided fields
+      const updatedProfile = { ...profile, ...updatedFields };
+      await setDoc(userRef, updatedProfile, { merge: true });
+      
+      // Send welcome email only after profile is completed
+      if (profile.email) {
+        await sendWelcomeEmail(updatedProfile);
+      }
+      
+      setUserProfile(updatedProfile);
+      return updatedProfile;
+    } catch (error) {
+      console.error('Error updating profile after Google sign-in:', error);
       throw error;
     }
   };
@@ -325,6 +343,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     checkGoogleRedirect,
     logout,
     updateUserProfile,
+    updateUserProfileAfterGoogleSignIn, // Add this to the context value
     deleteAccount,
     resetPassword
   };

@@ -1,5 +1,4 @@
-import nodemailer from 'nodemailer';
-import { UserProfile } from '../context/AuthContext';
+import type { UserProfile } from '../context/AuthContext';
 
 // Email configuration
 const emailConfig = {
@@ -13,22 +12,59 @@ const emailConfig = {
   from: import.meta.env.VITE_EMAIL_FROM || 'StudyVault <noreply@studyvault.com>',
 };
 
-// Create transporter
-const transporter = nodemailer.createTransport({
-  host: emailConfig.host,
-  port: emailConfig.port,
-  secure: emailConfig.secure,
-  auth: emailConfig.auth,
-});
+// API URL for email service
+const API_URL = 'http://localhost:5000/api/send-email';
+
+// Send email through backend API
+const sendMailViaAPI = async (mailOptions: any) => {
+  try {
+    console.log('Attempting to send email via API:', {
+      to: mailOptions.to,
+      subject: mailOptions.subject
+    });
+    
+    const response = await fetch(API_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        to: mailOptions.to,
+        subject: mailOptions.subject,
+        html: mailOptions.html,
+      }),
+    });
+
+    console.log('API response status:', response.status);
+    
+    if (!response.ok) {
+      const errorData = await response.json();
+      console.error('Email API error response:', errorData);
+      throw new Error(errorData.error || 'Failed to send email');
+    }
+
+    const result = await response.json();
+    console.log('Email sent via API successfully:', result);
+    return result;
+  } catch (error) {
+    console.error('Error sending email via API:', error);
+    throw error;
+  }
+};
 
 /**
  * Test the email connection
  */
 export const testEmailConnection = async () => {
   try {
-    await transporter.verify();
-    console.log('Email service connection successful');
-    return true;
+    const response = await fetch('http://localhost:5000');
+    if (response.ok) {
+      console.log('Email service connection test successful');
+      return true;
+    } else {
+      console.error('Email service connection failed');
+      return false;
+    }
   } catch (error) {
     console.error('Email service connection failed:', error);
     return false;
@@ -40,7 +76,7 @@ export const testEmailConnection = async () => {
  */
 export const sendWelcomeEmail = async (user: UserProfile, password?: string) => {
   try {
-    await transporter.sendMail({
+    await sendMailViaAPI({
       from: emailConfig.from,
       to: user.email,
       subject: 'Welcome to StudyVault!',
@@ -85,7 +121,7 @@ export const sendLoginNotificationEmail = async (user: UserProfile, loginDetails
   location?: string;
 }) => {
   try {
-    await transporter.sendMail({
+    await sendMailViaAPI({
       from: emailConfig.from,
       to: user.email,
       subject: 'New Login to Your StudyVault Account',
@@ -123,7 +159,7 @@ export const sendLoginNotificationEmail = async (user: UserProfile, loginDetails
  */
 export const sendAccountDeletionEmail = async (email: string, name: string) => {
   try {
-    await transporter.sendMail({
+    await sendMailViaAPI({
       from: emailConfig.from,
       to: email,
       subject: 'Your StudyVault Account Has Been Deleted',
@@ -157,7 +193,7 @@ export const sendAccountDeletionEmail = async (email: string, name: string) => {
  */
 export const sendPasswordResetEmail = async (email: string, resetLink: string) => {
   try {
-    await transporter.sendMail({
+    await sendMailViaAPI({
       from: emailConfig.from,
       to: email,
       subject: 'Reset Your StudyVault Password',
