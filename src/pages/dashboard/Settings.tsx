@@ -45,7 +45,7 @@ function getCroppedAvatarUrl(imageUrl: string, crop: { x: number; y: number; wid
 }
 
 const Settings = () => {
-  const { userProfile, updateUserProfile } = useAuth();
+  const { userProfile, updateUserProfile, deleteAccount } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
   const [message, setMessage] = useState('');
   const [formData, setFormData] = useState<{
@@ -472,8 +472,25 @@ const Settings = () => {
               Permanently delete your account and all associated data. This action cannot be undone.
             </p>
           </div>
-          <button className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors">
-            Delete Account
+          <button 
+            onClick={async () => {
+              if (window.confirm('Are you sure you want to delete your account? This action cannot be undone.')) {
+                try {
+                  setIsLoading(true);
+                  await deleteAccount();
+                  toast.success('Your account has been successfully deleted.');
+                  window.location.href = '/';
+                } catch (error: any) {
+                  console.error('Error deleting account:', error);
+                  toast.error(error.message || 'Failed to delete account. Please try again.');
+                  setIsLoading(false);
+                }
+              }
+            }}
+            disabled={isLoading}
+            className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {isLoading ? 'Processing...' : 'Delete Account'}
           </button>
         </div>
       </div>

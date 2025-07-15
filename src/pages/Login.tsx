@@ -83,7 +83,8 @@ const Login = () => {
     setAuthError('');
     
     try {
-      await login(formData.email, formData.password);
+      // Pass user agent for device tracking in email notifications
+      await login(formData.email, formData.password, navigator.userAgent);
       navigate('/dashboard');
     } catch (error: any) {
       console.error('Login error:', error);

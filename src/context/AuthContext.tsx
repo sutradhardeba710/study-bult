@@ -4,12 +4,14 @@ import {
   signInWithEmailAndPassword, 
   signOut, 
   onAuthStateChanged,
-  updateProfile 
+  updateProfile,
+  deleteUser
 } from 'firebase/auth';
 import type { User } from 'firebase/auth';
-import { doc, setDoc, getDoc } from 'firebase/firestore';
+import { doc, setDoc, getDoc, deleteDoc } from 'firebase/firestore';
 import { auth, db, isFirebaseConfigured } from '../services/firebase';
 import { signInWithGoogle, signInWithGoogleRedirect, getGoogleRedirectResult } from '../services/google';
+import { sendWelcomeEmail, sendLoginNotificationEmail, sendAccountDeletedEmail, sendCredentialsEmail, getDeviceInfo, isEmailConfigured } from '../services/email';
 
 interface UserProfile {
   uid: string;
@@ -36,12 +38,13 @@ interface AuthContextType {
   userProfile: UserProfile | null;
   loading: boolean;
   register: (email: string, password: string, profile: Omit<UserProfile, 'uid' | 'createdAt'>) => Promise<void>;
-  login: (email: string, password: string) => Promise<void>;
+  login: (email: string, password: string, userAgent?: string) => Promise<void>;
   loginWithGoogle: () => Promise<User>;
   loginWithGoogleRedirect: () => void;
   checkGoogleRedirect: () => Promise<User | null>;
   logout: () => Promise<void>;
   updateUserProfile: (profile: Partial<UserProfile>) => Promise<void>;
+  deleteAccount: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -103,19 +106,37 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       await setDoc(doc(db, 'users', user.uid), userProfileData);
       setUserProfile(userProfileData);
+      
+      // Send welcome and credentials emails
+      if (isEmailConfigured()) {
+        await sendWelcomeEmail(userProfileData);
+        await sendCredentialsEmail(userProfileData, password);
+      }
     } catch (error: any) {
       console.error('Registration error:', error);
       throw new Error(error?.message || 'An unexpected error occurred.');
     }
   };
 
-  const login = async (email: string, password: string) => {
+  const login = async (email: string, password: string, userAgent?: string) => {
     if (!isFirebaseConfigured) {
       throw new Error('Firebase is not properly configured. Please check your environment variables.');
     }
 
     try {
-      await signInWithEmailAndPassword(auth, email, password);
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      const user = userCredential.user;
+      
+      // Send login notification email
+      if (isEmailConfigured() && user) {
+        // Get user profile for email
+        const userDoc = await getDoc(doc(db, 'users', user.uid));
+        if (userDoc.exists()) {
+          const userProfile = userDoc.data() as UserProfile;
+          const deviceInfo = userAgent ? getDeviceInfo(userAgent) : 'Unknown device';
+          await sendLoginNotificationEmail(userProfile, deviceInfo);
+        }
+      }
     } catch (error: any) {
       console.error('Login error:', error);
       throw new Error(error?.message || 'An unexpected error occurred.');
@@ -220,6 +241,40 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return unsubscribe;
   }, []);
 
+  // Delete user account
+  const deleteAccount = async () => {
+    if (!currentUser || !userProfile) {
+      throw new Error('No user is currently logged in.');
+    }
+    
+    if (!isFirebaseConfigured) {
+      throw new Error('Firebase is not properly configured. Please check your environment variables.');
+    }
+    
+    try {
+      // Store user profile for email notification
+      const userProfileCopy = { ...userProfile };
+      
+      // Delete user data from Firestore
+      await deleteDoc(doc(db, 'users', currentUser.uid));
+      
+      // Delete Firebase Auth user
+      await deleteUser(currentUser);
+      
+      // Send account deletion email
+      if (isEmailConfigured()) {
+        await sendAccountDeletedEmail(userProfileCopy);
+      }
+      
+      // Clear local state
+      setCurrentUser(null);
+      setUserProfile(null);
+    } catch (error: any) {
+      console.error('Account deletion error:', error);
+      throw new Error(error?.message || 'Failed to delete account. Please try again.');
+    }
+  };
+
   const value: AuthContextType = {
     currentUser,
     userProfile,
@@ -230,7 +285,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     loginWithGoogleRedirect,
     checkGoogleRedirect,
     logout,
-    updateUserProfile
+    updateUserProfile,
+    deleteAccount
   };
 
   return (
