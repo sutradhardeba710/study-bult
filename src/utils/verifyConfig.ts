@@ -8,6 +8,7 @@ interface ConfigStatus {
   missingVariables: string[];
   invalidVariables: string[];
   message: string;
+  envSource: 'env.local' | 'process' | 'unknown';
 }
 
 export const verifyFirebaseConfig = (): ConfigStatus => {
@@ -39,8 +40,12 @@ export const verifyFirebaseConfig = (): ConfigStatus => {
   
   const isValid = missingVariables.length === 0 && invalidVariables.length === 0;
   
+  // Determine environment source
+  // In Vite, import.meta.env.MODE will be 'development' in dev and 'production' in prod
+  const envSource = import.meta.env.VITE_ENV_SOURCE || 'unknown';
+  
   let message = isValid 
-    ? 'Firebase configuration is valid.' 
+    ? `Firebase configuration is valid (source: ${envSource}).` 
     : 'Firebase configuration issues detected:';
     
   if (missingVariables.length > 0) {
@@ -52,14 +57,15 @@ export const verifyFirebaseConfig = (): ConfigStatus => {
   }
   
   if (!isValid) {
-    message += '\n\nPlease check your environment variables in your deployment settings.';
+    message += '\n\nPlease check your .env.local file or deployment configuration.';
   }
   
   return {
     isValid,
     missingVariables,
     invalidVariables,
-    message
+    message,
+    envSource: envSource as 'env.local' | 'process' | 'unknown'
   };
 };
 

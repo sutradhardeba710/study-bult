@@ -5,7 +5,7 @@
  * It's useful for CI/CD pipelines and deployment verification.
  */
 
-import { readFileSync } from 'fs';
+import { readFileSync, existsSync } from 'fs';
 import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
 
@@ -47,6 +47,10 @@ function isPlaceholder(value) {
 // Load .env file if it exists
 function loadEnvFile(filePath) {
   try {
+    if (!existsSync(filePath)) {
+      return {};
+    }
+    
     const envContent = readFileSync(filePath, 'utf8');
     const envVars = {};
     
@@ -68,11 +72,16 @@ function loadEnvFile(filePath) {
 
 // Check environment variables
 function checkEnvironment() {
-  // Try to load .env files
+  // Try to load .env files - prioritize .env.local
   const rootDir = join(__dirname, '..');
+  const envLocalPath = join(rootDir, '.env.local');
+  
+  // Check if .env.local exists
+  const hasEnvLocal = existsSync(envLocalPath);
+  
+  // Load environment variables
   const envVars = {
-    ...loadEnvFile(join(rootDir, '.env')),
-    ...loadEnvFile(join(rootDir, '.env.local')),
+    ...(hasEnvLocal ? loadEnvFile(envLocalPath) : loadEnvFile(join(rootDir, '.env'))),
     ...process.env
   };
   
@@ -100,6 +109,13 @@ function checkEnvironment() {
   // Print results
   console.log('\n=== Environment Variables Check ===\n');
   
+  // Print which env file is being used
+  if (hasEnvLocal) {
+    console.log('✅ Using .env.local for environment variables');
+  } else {
+    console.log('⚠️ .env.local not found, using .env or process environment');
+  }
+  
   Object.entries(requiredVars).forEach(([category, vars]) => {
     console.log(`\n${category.toUpperCase()} Configuration:`);
     console.log('-'.repeat(category.length + 14));
@@ -119,7 +135,7 @@ function checkEnvironment() {
   console.log('\n=== Summary ===');
   if (hasIssues) {
     console.log('❌ Some environment variables are missing or invalid.');
-    console.log('   Please check your .env files or deployment configuration.');
+    console.log('   Please check your .env.local file or deployment configuration.');
     process.exit(1);
   } else {
     console.log('✅ All environment variables are properly configured.');

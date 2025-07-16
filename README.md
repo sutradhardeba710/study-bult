@@ -118,25 +118,50 @@ A modern web platform for students to share and access question papers from vari
 8. **Open your browser**
    Navigate to `http://localhost:5173`
 
-## Vercel Deployment
+## Environment Variables
 
-When deploying to Vercel, make sure to add the following environment variables in your Vercel project settings:
+StudyVault uses `.env.local` for environment variables. This file is not tracked by Git for security reasons.
 
-1. Go to your Vercel project dashboard
-2. Navigate to Settings > Environment Variables
-3. Add all the required environment variables:
-
+1. Copy the example environment file:
+```bash
+cp env.local.example .env.local
 ```
-VITE_FIREBASE_API_KEY=your-api-key
+
+2. Edit `.env.local` and fill in your actual values:
+```
+# Firebase Configuration
+VITE_FIREBASE_API_KEY=your-actual-api-key
 VITE_FIREBASE_AUTH_DOMAIN=your-project.firebaseapp.com
 VITE_FIREBASE_PROJECT_ID=your-project-id
 VITE_FIREBASE_STORAGE_BUCKET=your-project.appspot.com
 VITE_FIREBASE_MESSAGING_SENDER_ID=your-sender-id
 VITE_FIREBASE_APP_ID=your-app-id
+
+# Email Configuration
+VITE_EMAIL_HOST=smtp.example.com
+VITE_EMAIL_PORT=587
+VITE_EMAIL_USER=your-email@example.com
+VITE_EMAIL_PASS=your-password
+VITE_EMAIL_FROM=StudyVault <noreply@studyvault.com>
+
+# Google Services
+VITE_GOOGLE_ANALYTICS_ID=G-XXXXXXXXXX
 ```
 
-4. Make sure to add any other environment variables your app needs (email configuration, etc.)
-5. Redeploy your application after setting up the environment variables
+3. You can verify your environment variables with:
+```bash
+npm run check-env
+```
+
+> **Note:** The application only uses `.env.local` and ignores other environment files like `.env` for simplicity and security.
+
+## Vercel Deployment
+
+When deploying to Vercel, make sure to add all the environment variables from your `.env.local` file:
+
+1. Go to your Vercel project dashboard
+2. Navigate to Settings > Environment Variables
+3. Add all the required environment variables from your `.env.local` file
 
 ### Important: Authorized Domains for Firebase Authentication
 
