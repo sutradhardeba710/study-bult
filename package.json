@@ -9,8 +9,7 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "generate-sitemap": "node scripts/generate-sitemap.js",
-    "prebuild": "npm run generate-sitemap",
-    "check-env": "node scripts/check-env.js"
+    "prebuild": "npm run generate-sitemap"
   },
   "dependencies": {
     "@firebase/app": "^0.13.2",

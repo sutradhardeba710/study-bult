@@ -143,7 +143,7 @@ const Login = () => {
       } else if (error.code === 'auth/network-request-failed') {
         setAuthError('Network error. Please check your internet connection.');
       } else {
-        setAuthError('Failed to sign in with Google. Please try again.');
+      setAuthError('Failed to sign in with Google. Please try again.');
       }
     } finally {
       setIsGoogleLoading(false);
