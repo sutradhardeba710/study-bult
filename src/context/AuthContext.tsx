@@ -84,10 +84,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (cached) {
       try {
         setUserProfile(JSON.parse(cached));
-        setLoading(false);
-      } catch {}
+      } catch (error) {
+        console.error('Error parsing cached user profile:', error);
+        localStorage.removeItem('userProfile');
+      }
     }
-    // Continue with auth state listener
+    // Auth state listener is set up in another useEffect
   }, []);
 
   // Save userProfile to localStorage whenever it changes
@@ -317,7 +319,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       return;
     }
 
+    console.log('Setting up auth state listener');
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      console.log('Auth state changed:', user ? `User: ${user.uid}` : 'No user');
       setCurrentUser(user);
       
       if (user) {
@@ -325,13 +329,20 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         try {
           const userDoc = await getDoc(doc(db, 'users', user.uid));
           if (userDoc.exists()) {
-            setUserProfile(userDoc.data() as UserProfile);
+            const profileData = userDoc.data() as UserProfile;
+            console.log('User profile loaded from Firestore');
+            setUserProfile(profileData);
+            // Update localStorage
+            localStorage.setItem('userProfile', JSON.stringify(profileData));
+          } else {
+            console.warn('User authenticated but no profile found in Firestore');
           }
         } catch (error) {
           console.error('Error fetching user profile:', error);
         }
       } else {
         setUserProfile(null);
+        localStorage.removeItem('userProfile');
       }
       
       setLoading(false);
