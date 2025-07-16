@@ -4,7 +4,6 @@ import { useAuth } from '../context/AuthContext';
 import { Eye, EyeOff, Mail, Lock, BookOpen } from 'lucide-react';
 import Button from '../components/Button';
 import GoogleProfileCompletion from '../components/GoogleProfileCompletion';
-import GoogleAuthTroubleshooting from '../components/GoogleAuthTroubleshooting';
 import type { UserProfile } from '../context/AuthContext';
 
 const Login = () => {
@@ -19,8 +18,6 @@ const Login = () => {
   const [authError, setAuthError] = useState('');
   const [showProfileCompletion, setShowProfileCompletion] = useState(false);
   const [googleUserProfile, setGoogleUserProfile] = useState<UserProfile | null>(null);
-  const [showGoogleTroubleshooting, setShowGoogleTroubleshooting] = useState(false);
-  const [googleAuthError, setGoogleAuthError] = useState('');
 
   const { login, loginWithGoogle, checkGoogleRedirect } = useAuth();
   const navigate = useNavigate();
@@ -38,18 +35,14 @@ const Login = () => {
             navigate('/dashboard');
           }
         }
-      } catch (error: any) {
+      } catch (error) {
         console.error('Error handling redirect result:', error);
-        setGoogleAuthError(error.message || 'Failed to sign in with Google');
-        setShowGoogleTroubleshooting(true);
+        setAuthError('Failed to sign in with Google. Please try again.');
       }
     };
 
     handleRedirectResult();
   }, [checkGoogleRedirect, navigate]);
-
-  // Check if we're on Vercel deployment
-  const isVercelDomain = window.location.hostname.includes('vercel.app');
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -138,9 +131,20 @@ const Login = () => {
       }
     } catch (error: any) {
       console.error('Google login error:', error);
-      // Show troubleshooting modal instead of just an error message
-      setGoogleAuthError(error.message || 'Failed to sign in with Google');
-      setShowGoogleTroubleshooting(true);
+      // Improved error handling for Google sign-in
+      if (error.code === 'auth/popup-closed-by-user') {
+        setAuthError('Sign-in popup was closed. Please try again.');
+      } else if (error.code === 'auth/unauthorized-domain') {
+        setAuthError('This domain is not authorized for authentication. Please contact the administrator.');
+      } else if (error.code === 'auth/cancelled-popup-request') {
+        setAuthError('Multiple popup requests were triggered. Please try again.');
+      } else if (error.code === 'auth/popup-blocked') {
+        setAuthError('Sign-in popup was blocked by your browser. Please allow popups for this site.');
+      } else if (error.code === 'auth/network-request-failed') {
+        setAuthError('Network error. Please check your internet connection.');
+      } else {
+      setAuthError('Failed to sign in with Google. Please try again.');
+      }
     } finally {
       setIsGoogleLoading(false);
     }
@@ -158,10 +162,6 @@ const Login = () => {
     navigate('/dashboard');
   };
 
-  const closeTroubleshooting = () => {
-    setShowGoogleTroubleshooting(false);
-  };
-
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
       {showProfileCompletion && googleUserProfile && (
@@ -171,14 +171,6 @@ const Login = () => {
           onCancel={handleProfileCompletionCancel}
         />
       )}
-
-      {showGoogleTroubleshooting && (
-        <GoogleAuthTroubleshooting 
-          onClose={closeTroubleshooting}
-          error={googleAuthError}
-        />
-      )}
-
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
         <div className="flex justify-center">
           <Link to="/" className="flex items-center space-x-2">
@@ -209,41 +201,6 @@ const Login = () => {
               <p className="text-sm text-red-600">{authError}</p>
             </div>
           )}
-
-          {/* Google Sign In Button */}
-          <div className="mb-6">
-            <Button
-              type="button"
-              variant="outline"
-              className="w-full inline-flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-500 hover:bg-gray-50"
-              onClick={handleGoogleSignIn}
-              loading={isGoogleLoading}
-              disabled={isLoading || isGoogleLoading}
-            >
-              <svg className="w-5 h-5" aria-hidden="true" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M12.545 10.239v3.821h5.445c-0.712 2.315-2.647 3.972-5.445 3.972-3.332 0-6.033-2.701-6.033-6.032s2.701-6.032 6.033-6.032c1.498 0 2.866 0.549 3.921 1.453l2.814-2.814c-1.79-1.677-4.184-2.702-6.735-2.702-5.522 0-10 4.478-10 10s4.478 10 10 10c8.396 0 10.249-7.85 9.449-11.666l-9.449 0z" />
-              </svg>
-              <span className="ml-2">Sign in with Google</span>
-            </Button>
-            
-            {isVercelDomain && (
-              <p className="mt-2 text-xs text-amber-600 text-center">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 inline mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-                Google Sign-In may require domain authorization for this Vercel deployment
-              </p>
-            )}
-          </div>
-
-          <div className="relative mb-6">
-            <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-gray-300" />
-            </div>
-            <div className="relative flex justify-center text-sm">
-              <span className="px-2 bg-white text-gray-500">Or sign in with email</span>
-            </div>
-          </div>
 
           <form className="space-y-6" onSubmit={handleSubmit}>
             <div>
@@ -350,6 +307,33 @@ const Login = () => {
               </Button>
             </div>
           </form>
+
+          <div className="mt-6">
+            <div className="relative">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t border-gray-300" />
+              </div>
+              <div className="relative flex justify-center text-sm">
+                <span className="px-2 bg-white text-gray-500">Or continue with</span>
+              </div>
+            </div>
+
+            <div className="mt-6">
+              <Button
+                type="button"
+                variant="outline"
+                className="w-full inline-flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-500 hover:bg-gray-50"
+                onClick={handleGoogleSignIn}
+                loading={isGoogleLoading}
+                disabled={isLoading || isGoogleLoading}
+              >
+                <svg className="w-5 h-5" aria-hidden="true" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M12.545 10.239v3.821h5.445c-0.712 2.315-2.647 3.972-5.445 3.972-3.332 0-6.033-2.701-6.033-6.032s2.701-6.032 6.033-6.032c1.498 0 2.866 0.549 3.921 1.453l2.814-2.814c-1.79-1.677-4.184-2.702-6.735-2.702-5.522 0-10 4.478-10 10s4.478 10 10 10c8.396 0 10.249-7.85 9.449-11.666l-9.449 0z" />
+                </svg>
+                <span className="ml-2">Sign in with Google</span>
+              </Button>
+            </div>
+          </div>
         </div>
       </div>
     </div>

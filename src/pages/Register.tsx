@@ -6,7 +6,6 @@ import { Eye, EyeOff, Mail, Lock, User, BookOpen, GraduationCap } from 'lucide-r
 import Button from '../components/Button';
 import Skeleton from '../components/Skeleton';
 import GoogleProfileCompletion from '../components/GoogleProfileCompletion';
-import GoogleAuthTroubleshooting from '../components/GoogleAuthTroubleshooting';
 import type { UserProfile } from '../context/AuthContext';
 
 const Register = () => {
@@ -27,15 +26,10 @@ const Register = () => {
   const [authError, setAuthError] = useState('');
   const [showProfileCompletion, setShowProfileCompletion] = useState(false);
   const [googleUserProfile, setGoogleUserProfile] = useState<UserProfile | null>(null);
-  const [showGoogleTroubleshooting, setShowGoogleTroubleshooting] = useState(false);
-  const [googleAuthError, setGoogleAuthError] = useState('');
 
   const { register, loginWithGoogle, checkGoogleRedirect } = useAuth();
   const navigate = useNavigate();
   const { colleges, semesters, courses, loading: metaLoading } = useMeta();
-
-  // Check if we're on Vercel deployment
-  const isVercelDomain = window.location.hostname.includes('vercel.app');
 
   // Check for Google redirect result on component mount
   useEffect(() => {
@@ -50,10 +44,9 @@ const Register = () => {
             navigate('/dashboard');
           }
         }
-      } catch (error: any) {
+      } catch (error) {
         console.error('Error handling redirect result:', error);
-        setGoogleAuthError(error.message || 'Failed to sign in with Google');
-        setShowGoogleTroubleshooting(true);
+        setAuthError('Failed to sign in with Google. Please try again.');
       }
     };
 
@@ -175,8 +168,7 @@ const Register = () => {
       }
     } catch (error: any) {
       console.error('Google login error:', error);
-      setGoogleAuthError(error.message || 'Failed to sign in with Google');
-      setShowGoogleTroubleshooting(true);
+      setAuthError('Failed to sign in with Google. Please try again.');
     } finally {
       setIsGoogleLoading(false);
     }
@@ -194,10 +186,6 @@ const Register = () => {
     navigate('/dashboard');
   };
 
-  const closeTroubleshooting = () => {
-    setShowGoogleTroubleshooting(false);
-  };
-
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
       {showProfileCompletion && googleUserProfile && (
@@ -205,13 +193,6 @@ const Register = () => {
           user={googleUserProfile} 
           onComplete={handleProfileCompletionSuccess}
           onCancel={handleProfileCompletionCancel}
-        />
-      )}
-      
-      {showGoogleTroubleshooting && (
-        <GoogleAuthTroubleshooting 
-          onClose={closeTroubleshooting}
-          error={googleAuthError}
         />
       )}
       
@@ -261,15 +242,6 @@ const Register = () => {
               </svg>
               <span className="ml-2">Sign up with Google</span>
             </Button>
-            
-            {isVercelDomain && (
-              <p className="mt-2 text-xs text-amber-600 text-center">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 inline mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-                Google Sign-Up may require domain authorization for this Vercel deployment
-              </p>
-            )}
           </div>
 
           <div className="relative mb-6">
