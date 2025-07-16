@@ -118,6 +118,38 @@ A modern web platform for students to share and access question papers from vari
 8. **Open your browser**
    Navigate to `http://localhost:5173`
 
+## Vercel Deployment
+
+When deploying to Vercel, make sure to add the following environment variables in your Vercel project settings:
+
+1. Go to your Vercel project dashboard
+2. Navigate to Settings > Environment Variables
+3. Add all the required environment variables:
+
+```
+VITE_FIREBASE_API_KEY=your-api-key
+VITE_FIREBASE_AUTH_DOMAIN=your-project.firebaseapp.com
+VITE_FIREBASE_PROJECT_ID=your-project-id
+VITE_FIREBASE_STORAGE_BUCKET=your-project.appspot.com
+VITE_FIREBASE_MESSAGING_SENDER_ID=your-sender-id
+VITE_FIREBASE_APP_ID=your-app-id
+```
+
+4. Make sure to add any other environment variables your app needs (email configuration, etc.)
+5. Redeploy your application after setting up the environment variables
+
+### Important: Authorized Domains for Firebase Authentication
+
+To fix the "auth/unauthorized-domain" error when using Google Sign-In:
+
+1. Go to the [Firebase Console](https://console.firebase.google.com/)
+2. Select your project
+3. Go to Authentication → Settings → Authorized domains
+4. Add your Vercel domain (e.g., `your-app.vercel.app`) to the list of authorized domains
+5. Save changes
+
+This will allow Google authentication to work properly on your deployed Vercel site.
+
 ## Project Structure 📁
 
 ```

@@ -1,21 +1,16 @@
-import { StrictMode } from 'react'
-import { createRoot } from 'react-dom/client'
-import './index.css'
+import React from 'react'
+import ReactDOM from 'react-dom/client'
 import App from './App.tsx'
-// Import Sentry but don't initialize it with the placeholder DSN
-// Uncomment and configure with a real DSN when ready for production
-// import * as Sentry from '@sentry/react';
-// Sentry.init({
-//   dsn: 'YOUR_ACTUAL_SENTRY_DSN',
-//   integrations: [Sentry.browserTracingIntegration()],
-//   tracesSampleRate: 0.2, // Lower for production
-// });
+import './index.css'
+import { createConfigDebugElement } from './utils/verifyConfig';
 
-// Email service is now mocked for browser compatibility
-console.log('StudyVault starting...');
+// Verify Firebase configuration in development or when debug is enabled
+if (import.meta.env.DEV || import.meta.env.VITE_SHOW_CONFIG_DEBUG === 'true') {
+  createConfigDebugElement();
+}
 
-createRoot(document.getElementById('root')!).render(
-  <StrictMode>
+ReactDOM.createRoot(document.getElementById('root')!).render(
+  <React.StrictMode>
     <App />
-  </StrictMode>,
+  </React.StrictMode>,
 )

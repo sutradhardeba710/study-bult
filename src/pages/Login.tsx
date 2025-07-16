@@ -96,12 +96,19 @@ const Login = () => {
       navigate('/dashboard');
     } catch (error: any) {
       console.error('Login error:', error);
+      // Improved error handling with more specific messages
       if (error.code === 'auth/user-not-found') {
         setAuthError('No account found with this email address');
-      } else if (error.code === 'auth/wrong-password') {
-        setAuthError('Incorrect password');
+      } else if (error.code === 'auth/wrong-password' || error.code === 'auth/invalid-credential') {
+        setAuthError('Invalid email or password. Please check your credentials.');
       } else if (error.code === 'auth/invalid-email') {
-        setAuthError('Invalid email address');
+        setAuthError('Invalid email address format');
+      } else if (error.code === 'auth/too-many-requests') {
+        setAuthError('Too many unsuccessful login attempts. Please try again later or reset your password.');
+      } else if (error.code === 'auth/network-request-failed') {
+        setAuthError('Network error. Please check your internet connection.');
+      } else if (error.message?.includes('Firebase is not properly configured')) {
+        setAuthError('Authentication service is not properly configured. Please contact support.');
       } else {
         setAuthError('Failed to sign in. Please try again.');
       }
@@ -124,7 +131,20 @@ const Login = () => {
       }
     } catch (error: any) {
       console.error('Google login error:', error);
-      setAuthError('Failed to sign in with Google. Please try again.');
+      // Improved error handling for Google sign-in
+      if (error.code === 'auth/popup-closed-by-user') {
+        setAuthError('Sign-in popup was closed. Please try again.');
+      } else if (error.code === 'auth/unauthorized-domain') {
+        setAuthError('This domain is not authorized for authentication. Please contact the administrator.');
+      } else if (error.code === 'auth/cancelled-popup-request') {
+        setAuthError('Multiple popup requests were triggered. Please try again.');
+      } else if (error.code === 'auth/popup-blocked') {
+        setAuthError('Sign-in popup was blocked by your browser. Please allow popups for this site.');
+      } else if (error.code === 'auth/network-request-failed') {
+        setAuthError('Network error. Please check your internet connection.');
+      } else {
+        setAuthError('Failed to sign in with Google. Please try again.');
+      }
     } finally {
       setIsGoogleLoading(false);
     }
