@@ -6,8 +6,9 @@ import fs from 'fs'
 
 // https://vite.dev/config/
 export default defineConfig(({ mode }) => {
-  // Load env file based on mode
-  const env = loadEnv(mode, process.cwd(), '')
+  // Load env file based on mode - we don't use this directly but it ensures
+  // Vite loads the environment variables properly
+  loadEnv(mode, process.cwd(), '')
   
   // Check if .env.local exists
   const hasEnvLocal = fs.existsSync(path.resolve(process.cwd(), '.env.local'))

@@ -5,7 +5,7 @@ import { getStorage } from 'firebase/storage';
 
 // Your Firebase configuration
 // Replace with your actual Firebase config or use environment variables
-const firebaseConfig = {
+const firebaseConfig: { [key: string]: any } = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY || "your-api-key",
   authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN || "your-project.firebaseapp.com",
   projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID || "your-project-id",
