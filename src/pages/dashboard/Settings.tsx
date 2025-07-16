@@ -388,8 +388,8 @@ const Settings = () => {
                 <Skeleton variant="rect" width="100%" height={40} className="mb-2" />
               ) : (
                 <select
-                  id="college"
-                  name="college"
+                id="college"
+                name="college"
                   value={formData.college}
                   onChange={handleChange}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
@@ -411,8 +411,8 @@ const Settings = () => {
                 <Skeleton variant="rect" width="100%" height={40} className="mb-2" />
               ) : (
                 <select
-                  id="semester"
-                  name="semester"
+                id="semester"
+                name="semester"
                   value={formData.semester}
                   onChange={handleChange}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
@@ -434,8 +434,8 @@ const Settings = () => {
                 <Skeleton variant="rect" width="100%" height={40} className="mb-2" />
               ) : (
                 <select
-                  id="course"
-                  name="course"
+                id="course"
+                name="course"
                   value={formData.course}
                   onChange={handleChange}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
