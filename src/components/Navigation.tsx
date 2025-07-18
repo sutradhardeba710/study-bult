@@ -122,13 +122,13 @@ const Navigation = () => {
             {currentUser ? (
               <div className="flex items-center space-x-4">
                 <div 
-                  className="relative" 
+                  className="relative profile-dropdown-container" 
                   ref={dropdownRef}
-                  onMouseEnter={() => setProfileDropdownOpen(true)}
-                  onMouseLeave={() => setProfileDropdownOpen(false)}
                 >
                   <div 
                     className="flex items-center space-x-2 focus:outline-none group cursor-pointer"
+                    onClick={() => setProfileDropdownOpen(!profileDropdownOpen)}
+                    onMouseEnter={() => setProfileDropdownOpen(true)}
                     aria-expanded={profileDropdownOpen}
                     aria-haspopup="true"
                   >
@@ -149,7 +149,10 @@ const Navigation = () => {
 
                   {/* Profile Dropdown */}
                   {profileDropdownOpen && (
-                    <div className="absolute right-0 mt-2 w-56 origin-top-right bg-white border border-gray-200 divide-y divide-gray-100 rounded-md shadow-lg z-10 animate-fadeIn">
+                    <div 
+                      className="absolute right-0 mt-2 w-56 origin-top-right bg-white border border-gray-200 divide-y divide-gray-100 rounded-md shadow-lg z-10 animate-fadeIn"
+                      onMouseLeave={() => setProfileDropdownOpen(false)}
+                    >
                       <div className="px-4 py-3">
                         <p className="text-sm font-medium text-gray-900 truncate">{userProfile?.name}</p>
                         <p className="text-sm text-gray-500 truncate">{userProfile?.email}</p>

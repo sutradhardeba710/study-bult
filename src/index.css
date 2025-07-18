@@ -99,3 +99,18 @@ body {
 .animate-fadeIn {
   animation: fadeIn 0.15s ease-out forwards;
 }
+
+/* Fix dropdown hover gap issue */
+.profile-dropdown-container > div + div.animate-fadeIn {
+  margin-top: 0.5rem;
+}
+
+.profile-dropdown-container::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  height: 16px;
+  background: transparent;
+}
