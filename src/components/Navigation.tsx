@@ -1,8 +1,8 @@
 import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { X, User, Upload, BookOpen, Home, LogOut, Shield, Grid } from 'lucide-react';
+import { X, User, Upload, BookOpen, Home, LogOut, Shield, Grid, Settings, UserCircle } from 'lucide-react';
 import Button from './Button';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 
 // Helper to render cropped avatar using canvas
 function getCroppedAvatarUrl(imageUrl: string, crop: { x: number; y: number; width: number; height: number; zoom: number } | null | undefined, callback: (url: string) => void) {
@@ -46,6 +46,8 @@ const Navigation = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const { currentUser, userProfile, logout } = useAuth();
   const [avatarPreview, setAvatarPreview] = useState<string | undefined>(undefined);
+  const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (userProfile?.avatarOriginal && userProfile.avatarCrop) {
@@ -56,6 +58,20 @@ const Navigation = () => {
       setAvatarPreview(undefined);
     }
   }, [userProfile?.avatarOriginal, JSON.stringify(userProfile?.avatarCrop ?? {})]);
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setProfileDropdownOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
 
   const navigation = [
     { name: 'Home', href: currentUser ? '/browse' : '/', icon: Home },
@@ -68,6 +84,7 @@ const Navigation = () => {
     try {
       await logout();
       setIsMobileMenuOpen(false);
+      setProfileDropdownOpen(false);
     } catch (error) {
       console.error('Logout error:', error);
     }
@@ -104,32 +121,65 @@ const Navigation = () => {
           <div className="hidden md:flex items-center space-x-4">
             {currentUser ? (
               <div className="flex items-center space-x-4">
-                <div className="flex items-center space-x-2">
-                  {userProfile ? (
-                    <div className="w-8 h-8 bg-primary-100 rounded-full flex items-center justify-center overflow-hidden">
+                <div className="relative" ref={dropdownRef}>
+                  <button 
+                    className="flex items-center space-x-2 focus:outline-none group"
+                    onClick={() => setProfileDropdownOpen(!profileDropdownOpen)}
+                    aria-expanded={profileDropdownOpen}
+                    aria-haspopup="true"
+                  >
+                    <div className="w-10 h-10 bg-primary-100 rounded-full flex items-center justify-center overflow-hidden ring-2 ring-transparent group-hover:ring-primary-200 transition-all">
                       {avatarPreview ? (
-                        <img src={avatarPreview} alt="Avatar" className="w-8 h-8 rounded-full object-cover" />
+                        <img src={avatarPreview} alt="Avatar" className="w-10 h-10 rounded-full object-cover" />
                       ) : (
-                        <User className="w-4 h-4 text-primary-600" />
+                        <User className="w-5 h-5 text-primary-600" />
                       )}
                     </div>
-                  ) : (
-                    <div className="w-8 h-8 bg-primary-100 rounded-full flex items-center justify-center overflow-hidden">
-                    <User className="w-4 h-4 text-primary-600" />
-                  </div>
+                    <span className="text-sm font-medium text-gray-700 group-hover:text-primary-600 transition-colors">
+                      {userProfile?.name || 'User'}
+                    </span>
+                    <svg className={`w-4 h-4 text-gray-500 transition-transform ${profileDropdownOpen ? 'transform rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </button>
+
+                  {/* Profile Dropdown */}
+                  {profileDropdownOpen && (
+                    <div className="absolute right-0 mt-2 w-56 origin-top-right bg-white border border-gray-200 divide-y divide-gray-100 rounded-md shadow-lg z-10 animate-fadeIn">
+                      <div className="px-4 py-3">
+                        <p className="text-sm font-medium text-gray-900 truncate">{userProfile?.name}</p>
+                        <p className="text-sm text-gray-500 truncate">{userProfile?.email}</p>
+                      </div>
+                      <div className="py-1">
+                        <Link 
+                          to="/dashboard" 
+                          className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-primary-600"
+                          onClick={() => setProfileDropdownOpen(false)}
+                        >
+                          <User className="w-4 h-4 mr-2" />
+                          Dashboard
+                        </Link>
+                        <Link 
+                          to="/dashboard/settings" 
+                          className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-primary-600"
+                          onClick={() => setProfileDropdownOpen(false)}
+                        >
+                          <Settings className="w-4 h-4 mr-2" />
+                          Settings
+                        </Link>
+                      </div>
+                      <div className="py-1">
+                        <button
+                          onClick={handleLogout}
+                          className="flex w-full items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-red-600"
+                        >
+                          <LogOut className="w-4 h-4 mr-2" />
+                          Logout
+                        </button>
+                      </div>
+                    </div>
                   )}
-                  <span className="text-sm font-medium text-gray-700">
-                    {userProfile?.name || 'User'}
-                  </span>
                 </div>
-                <Button
-                  onClick={handleLogout}
-                  variant="outline"
-                  className="flex items-center space-x-1 text-gray-700 hover:text-red-600"
-                >
-                  <LogOut className="w-4 h-4" />
-                  <span>Logout</span>
-                </Button>
               </div>
             ) : (
               <>
@@ -151,38 +201,36 @@ const Navigation = () => {
 
           {/* Mobile menu button */}
           <div className="md:hidden flex items-center">
-            <Button
+            <button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              variant="outline"
-              className="text-gray-700 hover:text-primary-600 p-2 rounded-md"
-              aria-label={isMobileMenuOpen ? 'Close global menu' : 'Open global menu'}
-              title={isMobileMenuOpen ? 'Close global menu' : 'Open global menu'}
+              className="inline-flex items-center justify-center p-2 rounded-md text-gray-700 hover:text-primary-600 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-primary-500"
             >
+              <span className="sr-only">Open main menu</span>
               {isMobileMenuOpen ? (
-                <X className="w-6 h-6" />
+                <X className="block h-6 w-6" />
               ) : (
-                <Grid className="w-6 h-6" />
+                <svg className="block h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16" />
+                </svg>
               )}
-            </Button>
+            </button>
           </div>
         </div>
       </div>
 
-      {/* Mobile Navigation */}
+      {/* Mobile menu */}
       {isMobileMenuOpen && (
         <div className="md:hidden">
-          <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3 bg-white border-t border-gray-200">
+          <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
             {navigation.map((item) => (
               <Link
                 key={item.name}
                 to={item.href}
-                className="text-gray-700 hover:text-primary-600 block px-3 py-2 rounded-md text-base font-medium transition-colors duration-200"
+                className="flex items-center space-x-2 text-gray-700 hover:text-primary-600 hover:bg-gray-50 block px-3 py-2 rounded-md text-base font-medium transition-colors duration-200"
                 onClick={() => setIsMobileMenuOpen(false)}
               >
-                <div className="flex items-center space-x-2">
-                  <item.icon className="w-5 h-5" />
-                  <span>{item.name}</span>
-                </div>
+                <item.icon className="w-5 h-5" />
+                <span>{item.name}</span>
               </Link>
             ))}
             <div className="pt-4 space-y-2">
@@ -190,13 +238,25 @@ const Navigation = () => {
                 <>
                   <div className="px-3 py-2 border-t border-gray-200">
                     <div className="flex items-center space-x-2 mb-2">
-                      <div className="w-6 h-6 bg-primary-100 rounded-full flex items-center justify-center">
-                        <User className="w-3 h-3 text-primary-600" />
+                      <div className="w-8 h-8 bg-primary-100 rounded-full flex items-center justify-center overflow-hidden">
+                        {avatarPreview ? (
+                          <img src={avatarPreview} alt="Avatar" className="w-8 h-8 rounded-full object-cover" />
+                        ) : (
+                          <User className="w-4 h-4 text-primary-600" />
+                        )}
                       </div>
                       <span className="text-sm font-medium text-gray-700">
                         {userProfile?.name || 'User'}
                       </span>
                     </div>
+                    <Link
+                      to="/dashboard/settings"
+                      className="block w-full text-left flex items-center space-x-2 px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-md mb-2"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                    >
+                      <Settings className="w-4 h-4" />
+                      <span>Settings</span>
+                    </Link>
                     <Button
                       onClick={handleLogout}
                       variant="outline"
