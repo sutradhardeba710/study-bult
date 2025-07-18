@@ -121,10 +121,14 @@ const Navigation = () => {
           <div className="hidden md:flex items-center space-x-4">
             {currentUser ? (
               <div className="flex items-center space-x-4">
-                <div className="relative" ref={dropdownRef}>
-                  <button 
-                    className="flex items-center space-x-2 focus:outline-none group"
-                    onClick={() => setProfileDropdownOpen(!profileDropdownOpen)}
+                <div 
+                  className="relative" 
+                  ref={dropdownRef}
+                  onMouseEnter={() => setProfileDropdownOpen(true)}
+                  onMouseLeave={() => setProfileDropdownOpen(false)}
+                >
+                  <div 
+                    className="flex items-center space-x-2 focus:outline-none group cursor-pointer"
                     aria-expanded={profileDropdownOpen}
                     aria-haspopup="true"
                   >
@@ -141,7 +145,7 @@ const Navigation = () => {
                     <svg className={`w-4 h-4 text-gray-500 transition-transform ${profileDropdownOpen ? 'transform rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                     </svg>
-                  </button>
+                  </div>
 
                   {/* Profile Dropdown */}
                   {profileDropdownOpen && (
