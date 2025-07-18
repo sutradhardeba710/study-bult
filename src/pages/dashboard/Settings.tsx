@@ -1,29 +1,34 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { useMeta } from '../../context/MetaContext';
-import { Pencil, User, Shield, AlertTriangle } from 'lucide-react';
-import Skeleton from '../../components/Skeleton';
-import toast from 'react-hot-toast';
+import { User, Shield, AlertTriangle, Pencil, Edit } from 'lucide-react';
 import AvatarCropperModal from '../../components/AvatarCropperModal';
-import { useNavigate } from 'react-router-dom';
+import Skeleton from '../../components/Skeleton';
 import Modal from '../../components/Modal';
+import toast from 'react-hot-toast';
 
 // Helper to render cropped avatar using canvas
 function getCroppedAvatarUrl(imageUrl: string, crop: { x: number; y: number; width: number; height: number; zoom: number } | undefined, callback: (url: string) => void) {
   if (!imageUrl || !crop) {
-    callback(imageUrl);
+    callback('');
     return;
   }
-  const img = new window.Image();
-  img.crossOrigin = 'anonymous';
-  img.onload = () => {
+
+  const image = new Image();
+  image.crossOrigin = 'anonymous';
+  image.onload = () => {
     const canvas = document.createElement('canvas');
     canvas.width = crop.width;
     canvas.height = crop.height;
     const ctx = canvas.getContext('2d');
-    if (!ctx) return callback(imageUrl);
+    if (!ctx) {
+      callback('');
+      return;
+    }
+
     ctx.drawImage(
-      img,
+      image,
       crop.x,
       crop.y,
       crop.width,
@@ -33,54 +38,42 @@ function getCroppedAvatarUrl(imageUrl: string, crop: { x: number; y: number; wid
       crop.width,
       crop.height
     );
-    canvas.toBlob(blob => {
-      if (blob) {
-        const url = URL.createObjectURL(blob);
-        callback(url);
-      } else {
-        callback(imageUrl);
-      }
-    }, 'image/jpeg', 0.95);
+
+    callback(canvas.toDataURL('image/jpeg'));
   };
-  img.onerror = () => callback(imageUrl);
-  img.src = imageUrl;
+  image.onerror = () => {
+    callback('');
+  };
+  image.src = imageUrl;
 }
 
 const Settings = () => {
-  const { userProfile, updateUserProfile, deleteAccount } = useAuth();
-  const { colleges, semesters, courses, loading: metaLoading } = useMeta();
+  const { user, userProfile, updateUserProfile, deleteAccount } = useAuth();
+  const { colleges, courses, semesters, loading: metaLoading } = useMeta();
   const navigate = useNavigate();
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    college: '',
+    semester: '',
+    course: '',
+    avatarOriginal: '',
+    avatarCrop: undefined as { x: number; y: number; width: number; height: number; zoom: number } | undefined,
+  });
+
   const [isLoading, setIsLoading] = useState(false);
-  const [isDeleteLoading, setIsDeleteLoading] = useState(false);
   const [message, setMessage] = useState('');
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [deleteConfirmation, setDeleteConfirmation] = useState('');
-  const [formData, setFormData] = useState<{
-    name: string;
-    email: string;
-    college: string;
-    semester: string;
-    course: string;
-    avatarOriginal: string;
-    avatarCrop: { x: number; y: number; width: number; height: number; zoom: number } | undefined;
-  }>(
-    {
-    name: userProfile?.name || '',
-    email: userProfile?.email || '',
-    college: userProfile?.college || '',
-    semester: userProfile?.semester || '',
-      course: userProfile?.course || '',
-      avatarOriginal: userProfile?.avatarOriginal || '',
-      avatarCrop: userProfile?.avatarCrop ?? undefined,
-    }
-  );
-  const [avatarUploading, setAvatarUploading] = useState(false);
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [isDeleteLoading, setIsDeleteLoading] = useState(false);
   const [cropperOpen, setCropperOpen] = useState(false);
+  const [avatarUploading, setAvatarUploading] = useState(false);
+  const [editExistingAvatar, setEditExistingAvatar] = useState(false);
   const [rawAvatar, setRawAvatar] = useState<string | undefined>(undefined);
   const [avatarPreview, setAvatarPreview] = useState<string | undefined>(undefined);
 
-  // Update form data when userProfile changes
   useEffect(() => {
     if (userProfile) {
       setFormData({
@@ -94,20 +87,10 @@ const Settings = () => {
       });
     }
   }, [userProfile]);
-  
-  // Log meta data for debugging
-  useEffect(() => {
-    console.log('Meta data loaded:', { colleges, semesters, courses });
-    console.log('User profile:', userProfile);
-    console.log('Form data:', formData);
-  }, [colleges, semesters, courses, userProfile, formData]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
+    setFormData(prev => ({ ...prev, [name]: value }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -116,25 +99,14 @@ const Settings = () => {
     setMessage('');
 
     try {
-      // Validate required fields
-      if (!formData.name.trim()) {
-        throw new Error('Name is required.');
-      }
-      if (!formData.email.trim()) {
-        throw new Error('Email is required.');
-      }
-      if (!formData.college.trim()) {
-        throw new Error('College is required.');
-      }
-      if (!formData.semester.trim()) {
-        throw new Error('Semester is required.');
-      }
-      if (!formData.course.trim()) {
-        throw new Error('Course is required.');
-      }
-
-      // Only now update the profile globally
-      await updateUserProfile(formData);
+      await updateUserProfile({
+        name: formData.name,
+        college: formData.college,
+        semester: formData.semester,
+        course: formData.course,
+        avatarOriginal: formData.avatarOriginal,
+        avatarCrop: formData.avatarCrop,
+      });
       setMessage('Profile updated successfully!');
       toast.success('Profile updated successfully!');
     } catch (error: any) {
@@ -173,12 +145,21 @@ const Settings = () => {
       setFormData(prev => ({ ...prev, avatarOriginal: data.secure_url }));
       // Open cropper with the new image
       setRawAvatar(data.secure_url);
+      setEditExistingAvatar(false);
       setCropperOpen(true);
     } catch (err: any) {
       toast.error(err.message || 'Failed to upload avatar.');
     } finally {
       setAvatarUploading(false);
       if (fileInputRef.current) fileInputRef.current.value = '';
+    }
+  };
+
+  const handleEditExistingAvatar = () => {
+    if (formData.avatarOriginal) {
+      setRawAvatar(formData.avatarOriginal);
+      setEditExistingAvatar(true);
+      setCropperOpen(true);
     }
   };
 
@@ -302,26 +283,26 @@ const Settings = () => {
             <div className="flex items-center space-x-4">
               <div className="relative">
                 <div className="w-24 h-24 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden">
-            {avatarPreview ? (
+                  {avatarPreview ? (
                     <img 
                       src={avatarPreview} 
                       alt="Avatar preview" 
                       className="w-full h-full object-cover"
                     />
-            ) : (
+                  ) : (
                     <User className="w-12 h-12 text-gray-400" />
                   )}
-              </div>
-              <button
-                type="button"
+                </div>
+                <button
+                  type="button"
                   onClick={() => fileInputRef.current?.click()}
                   className="absolute bottom-0 right-0 bg-white rounded-full p-1 shadow-md border border-gray-200"
-                disabled={avatarUploading}
-              >
+                  disabled={avatarUploading}
+                >
                   <Pencil className="w-4 h-4 text-gray-600" />
-              </button>
+                </button>
               </div>
-              <div>
+              <div className="flex flex-col">
                 <input 
                   type="file" 
                   ref={fileInputRef} 
@@ -329,26 +310,40 @@ const Settings = () => {
                   className="hidden" 
                   accept="image/*" 
                 />
-            <button
-              type="button"
-              onClick={() => fileInputRef.current?.click()}
+                <button
+                  type="button"
+                  onClick={() => fileInputRef.current?.click()}
                   className="text-sm font-medium text-primary-600 hover:text-primary-700"
-              disabled={avatarUploading}
-            >
+                  disabled={avatarUploading}
+                >
                   {avatarUploading ? 'Uploading...' : 'Change picture'}
-            </button>
+                </button>
+                
                 {formData.avatarOriginal && (
-                  <button
-                    type="button"
-                    onClick={handleRemoveAvatar}
-                    className="text-sm font-medium text-red-600 hover:text-red-700 ml-4"
-              disabled={avatarUploading}
-                  >
-                    Remove
-                  </button>
+                  <>
+                    <button
+                      type="button"
+                      onClick={handleEditExistingAvatar}
+                      className="text-sm font-medium text-blue-600 hover:text-blue-700 mt-2"
+                      disabled={avatarUploading}
+                    >
+                      <span className="flex items-center">
+                        <Edit className="w-3 h-3 mr-1" />
+                        Edit/Crop
+                      </span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={handleRemoveAvatar}
+                      className="text-sm font-medium text-red-600 hover:text-red-700 mt-2"
+                      disabled={avatarUploading}
+                    >
+                      Remove
+                    </button>
+                  </>
                 )}
-          </div>
-        </div>
+              </div>
+            </div>
           </div>
 
           {/* Rest of the form fields */}
@@ -558,12 +553,14 @@ const Settings = () => {
       </Modal>
 
       {cropperOpen && rawAvatar && (
-      <AvatarCropperModal
+        <AvatarCropperModal
           isOpen={cropperOpen}
           imageUrl={rawAvatar}
           onCropComplete={handleCropComplete}
           onClose={() => setCropperOpen(false)}
-      />
+          initialCrop={editExistingAvatar ? formData.avatarCrop : undefined}
+          loading={avatarUploading}
+        />
       )}
     </div>
   );
