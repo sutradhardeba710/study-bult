@@ -4,7 +4,19 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Vite + React + TS</title>
+    <meta name="description" content="StudyVault - Your academic resource sharing platform" />
+    <title>StudyVault - Academic Resource Sharing</title>
+    
+    <!-- Preconnect to domains -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin />
+    <link rel="preconnect" href="https://firebasestorage.googleapis.com" crossorigin />
+    
+    <!-- Preload critical assets -->
+    <link rel="preload" href="/src/main.tsx" as="script" type="module" />
+    <link rel="preload" href="/src/index.css" as="style" />
+    
+    <!-- Font display optimization -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" media="print" onload="this.media='all'" />
   </head>
   <body>
     <div id="root"></div>

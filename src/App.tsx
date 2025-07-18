@@ -1,16 +1,19 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import { MetaProvider } from './context/MetaContext';
-import Navigation from './components/Navigation';
 import { Toaster } from 'react-hot-toast';
-import AnalyticsTracker from './components/AnalyticsTracker';
-import ErrorBoundary from './components/ErrorBoundary';
-import NetworkStatusBanner from './components/NetworkStatusBanner';
 import { lazy, Suspense, useEffect } from 'react';
-import Error404 from './pages/Error404';
-import Footer from './components/Footer';
 import { initRecaptcha, loadGoogleMaps, addSearchConsoleVerification } from './services/google';
 
+// Lazy load components for better performance
+const Navigation = lazy(() => import('./components/Navigation'));
+const AnalyticsTracker = lazy(() => import('./components/AnalyticsTracker'));
+const ErrorBoundary = lazy(() => import('./components/ErrorBoundary'));
+const NetworkStatusBanner = lazy(() => import('./components/NetworkStatusBanner'));
+const Footer = lazy(() => import('./components/Footer'));
+const Error404 = lazy(() => import('./pages/Error404'));
+
+// Lazy load pages with route-based code splitting
 const Home = lazy(() => import('./pages/Home'));
 const Login = lazy(() => import('./pages/Login'));
 const Register = lazy(() => import('./pages/Register'));
@@ -34,6 +37,13 @@ const GOOGLE_MAPS_API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY || '';
 const GOOGLE_RECAPTCHA_SITE_KEY = import.meta.env.VITE_GOOGLE_RECAPTCHA_SITE_KEY || '';
 const GOOGLE_SEARCH_CONSOLE_ID = import.meta.env.VITE_GOOGLE_SEARCH_CONSOLE_ID || '';
 
+// Loading spinner component
+const LoadingSpinner = () => (
+  <div className="min-h-screen flex items-center justify-center bg-gray-50">
+    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600"></div>
+  </div>
+);
+
 function App() {
   // Initialize Google services
   useEffect(() => {
@@ -42,18 +52,24 @@ function App() {
       addSearchConsoleVerification(GOOGLE_SEARCH_CONSOLE_ID);
     }
     
-    // Load Google Maps if API key is provided
+    // Load Google Maps if API key is provided - defer loading for better initial performance
     if (GOOGLE_MAPS_API_KEY) {
-      loadGoogleMaps(GOOGLE_MAPS_API_KEY)
-        .then(() => console.log('Google Maps loaded successfully'))
-        .catch(error => console.error('Failed to load Google Maps:', error));
+      const timer = setTimeout(() => {
+        loadGoogleMaps(GOOGLE_MAPS_API_KEY)
+          .catch(error => console.error('Failed to load Google Maps:', error));
+      }, 3000); // Delay loading by 3 seconds
+      
+      return () => clearTimeout(timer);
     }
 
-    // Initialize reCAPTCHA if site key is provided
+    // Initialize reCAPTCHA if site key is provided - defer loading
     if (GOOGLE_RECAPTCHA_SITE_KEY) {
-      initRecaptcha(GOOGLE_RECAPTCHA_SITE_KEY)
-        .then(() => console.log('reCAPTCHA initialized successfully'))
-        .catch(error => console.error('Failed to initialize reCAPTCHA:', error));
+      const timer = setTimeout(() => {
+        initRecaptcha(GOOGLE_RECAPTCHA_SITE_KEY)
+          .catch(error => console.error('Failed to initialize reCAPTCHA:', error));
+      }, 2000); // Delay loading by 2 seconds
+      
+      return () => clearTimeout(timer);
     }
   }, []);
 
@@ -62,43 +78,45 @@ function App() {
       <MetaProvider>
         <Router>
           <div className="App flex flex-col min-h-screen">
-            <Toaster position="top-right" />
-            <NetworkStatusBanner />
-            <Suspense fallback={<div className="min-h-screen flex items-center justify-center bg-gray-50"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600"></div></div>}>
-            <Routes>
-              {/* Admin Routes */}
-                <Route path="/admin" element={<ProtectedAdminRoute><AdminHome /></ProtectedAdminRoute>} />
-                <Route path="/admin/papers" element={<ProtectedAdminRoute><AdminPapers /></ProtectedAdminRoute>} />
-                <Route path="/admin/meta" element={<ProtectedAdminRoute><AdminMeta /></ProtectedAdminRoute>} />
-                <Route path="/admin/users" element={<ProtectedAdminRoute><AdminUsers /></ProtectedAdminRoute>} />
-              {/* Public Routes */}
-              <Route path="/*" element={
+            <Toaster position="top-right" toastOptions={{ duration: 3000 }} />
+            <Suspense fallback={<LoadingSpinner />}>
+              <Routes>
+                {/* Admin Routes */}
+                <Route path="/admin" element={<Suspense fallback={<LoadingSpinner />}><ProtectedAdminRoute><AdminHome /></ProtectedAdminRoute></Suspense>} />
+                <Route path="/admin/papers" element={<Suspense fallback={<LoadingSpinner />}><ProtectedAdminRoute><AdminPapers /></ProtectedAdminRoute></Suspense>} />
+                <Route path="/admin/meta" element={<Suspense fallback={<LoadingSpinner />}><ProtectedAdminRoute><AdminMeta /></ProtectedAdminRoute></Suspense>} />
+                <Route path="/admin/users" element={<Suspense fallback={<LoadingSpinner />}><ProtectedAdminRoute><AdminUsers /></ProtectedAdminRoute></Suspense>} />
+                {/* Public Routes */}
+                <Route path="/*" element={
                   <div className="flex flex-col flex-1">
-                  <Navigation />
-                    <AnalyticsTracker measurementId={GOOGLE_ANALYTICS_ID} />
-                    <ErrorBoundary>
-                      <Suspense fallback={<div className="min-h-screen flex items-center justify-center bg-gray-50"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600"></div></div>}>
-                  <Routes>
-                    <Route path="/" element={<Home />} />
-                    <Route path="/login" element={<Login />} />
-                    <Route path="/register" element={<Register />} />
-<Route path="/reset-password" element={<ResetPassword />} />
-                    <Route path="/browse" element={<Browse />} />
-                    <Route path="/upload" element={<Upload />} />
-                    <Route path="/dashboard/*" element={<Dashboard />} />
-                          <Route path="/about" element={<About />} />
-                          <Route path="/contact" element={<Contact />} />
-                          <Route path="/privacy" element={<Privacy />} />
-                          <Route path="/terms" element={<Terms />} />
-                          <Route path="*" element={<Error404 />} />
-                  </Routes>
-                      </Suspense>
-                    </ErrorBoundary>
+                    <Suspense fallback={<LoadingSpinner />}>
+                      <NetworkStatusBanner />
+                      <Navigation />
+                      <AnalyticsTracker measurementId={GOOGLE_ANALYTICS_ID} />
+                      <ErrorBoundary>
+                        <Routes>
+                          <Route path="/" element={<Suspense fallback={<LoadingSpinner />}><Home /></Suspense>} />
+                          <Route path="/login" element={<Suspense fallback={<LoadingSpinner />}><Login /></Suspense>} />
+                          <Route path="/register" element={<Suspense fallback={<LoadingSpinner />}><Register /></Suspense>} />
+                          <Route path="/reset-password" element={<Suspense fallback={<LoadingSpinner />}><ResetPassword /></Suspense>} />
+                          <Route path="/browse" element={<Suspense fallback={<LoadingSpinner />}><Browse /></Suspense>} />
+                          <Route path="/upload" element={<Suspense fallback={<LoadingSpinner />}><Upload /></Suspense>} />
+                          <Route path="/dashboard/*" element={<Suspense fallback={<LoadingSpinner />}><Dashboard /></Suspense>} />
+                          <Route path="/about" element={<Suspense fallback={<LoadingSpinner />}><About /></Suspense>} />
+                          <Route path="/contact" element={<Suspense fallback={<LoadingSpinner />}><Contact /></Suspense>} />
+                          <Route path="/privacy" element={<Suspense fallback={<LoadingSpinner />}><Privacy /></Suspense>} />
+                          <Route path="/terms" element={<Suspense fallback={<LoadingSpinner />}><Terms /></Suspense>} />
+                          <Route path="*" element={<Suspense fallback={<LoadingSpinner />}><Error404 /></Suspense>} />
+                        </Routes>
+                      </ErrorBoundary>
+                    </Suspense>
                   </div>
-              } />
-            </Routes>
+                } />
+              </Routes>
             </Suspense>
-            <Footer />
+            <Suspense fallback={<div className="h-16"></div>}>
+              <Footer />
+            </Suspense>
           </div>
         </Router>
       </MetaProvider>
