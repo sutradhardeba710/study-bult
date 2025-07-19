@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { X, User, Upload, BookOpen, Home, LogOut, Shield, Grid, Settings, UserCircle } from 'lucide-react';
+import { X, User, Upload, BookOpen, Home, LogOut, Shield, Grid, Settings, UserCircle, HelpCircle, MessageCircle, FileQuestion } from 'lucide-react';
 import Button from './Button';
 import { useState, useEffect, useRef } from 'react';
 
@@ -47,7 +47,9 @@ const Navigation = () => {
   const { currentUser, userProfile, logout } = useAuth();
   const [avatarPreview, setAvatarPreview] = useState<string | undefined>(undefined);
   const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
-  const dropdownRef = useRef<HTMLDivElement>(null);
+  const [supportDropdownOpen, setSupportDropdownOpen] = useState(false);
+  const profileDropdownRef = useRef<HTMLDivElement>(null);
+  const supportDropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (userProfile?.avatarOriginal && userProfile.avatarCrop) {
@@ -59,11 +61,14 @@ const Navigation = () => {
     }
   }, [userProfile?.avatarOriginal, JSON.stringify(userProfile?.avatarCrop ?? {})]);
 
-  // Close dropdown when clicking outside
+  // Close dropdowns when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+      if (profileDropdownRef.current && !profileDropdownRef.current.contains(event.target as Node)) {
         setProfileDropdownOpen(false);
+      }
+      if (supportDropdownRef.current && !supportDropdownRef.current.contains(event.target as Node)) {
+        setSupportDropdownOpen(false);
       }
     };
 
@@ -78,6 +83,12 @@ const Navigation = () => {
     ...(currentUser ? [{ name: 'Upload Paper', href: '/upload', icon: Upload }] : []),
     ...(currentUser ? [{ name: 'Dashboard', href: '/dashboard', icon: User }] : []),
     ...(userProfile?.role === 'admin' ? [{ name: 'Admin Panel', href: '/admin', icon: Shield }] : []),
+  ];
+
+  const supportLinks = [
+    { name: 'Help Center', href: '/help-center', icon: HelpCircle },
+    { name: 'FAQ', href: '/faq', icon: FileQuestion },
+    { name: 'Contact Us', href: '/contact', icon: MessageCircle },
   ];
 
   const handleLogout = async () => {
@@ -115,6 +126,47 @@ const Navigation = () => {
                 {item.name}
               </Link>
             ))}
+            
+            {/* Support Dropdown */}
+            <div 
+              className="relative" 
+              ref={supportDropdownRef}
+            >
+              <div 
+                className="flex items-center space-x-1 text-gray-700 hover:text-primary-600 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200 cursor-pointer"
+                onClick={() => setSupportDropdownOpen(!supportDropdownOpen)}
+                onMouseEnter={() => setSupportDropdownOpen(true)}
+                aria-expanded={supportDropdownOpen}
+                aria-haspopup="true"
+              >
+                <span>Support</span>
+                <svg className={`w-4 h-4 transition-transform ${supportDropdownOpen ? 'transform rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+              </div>
+
+              {/* Support Dropdown Menu */}
+              {supportDropdownOpen && (
+                <div 
+                  className="absolute left-0 mt-2 w-48 origin-top-left bg-white border border-gray-200 rounded-md shadow-lg z-10 animate-fadeIn"
+                  onMouseLeave={() => setSupportDropdownOpen(false)}
+                >
+                  <div className="py-1">
+                    {supportLinks.map((item) => (
+                      <Link
+                        key={item.name}
+                        to={item.href}
+                        className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-primary-600"
+                        onClick={() => setSupportDropdownOpen(false)}
+                      >
+                        <item.icon className="w-4 h-4 mr-2" />
+                        {item.name}
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
 
           {/* Auth Buttons / User Menu */}
@@ -123,7 +175,7 @@ const Navigation = () => {
               <div className="flex items-center space-x-4">
                 <div 
                   className="relative profile-dropdown-container" 
-                  ref={dropdownRef}
+                  ref={profileDropdownRef}
                 >
                   <div 
                     className="flex items-center space-x-2 focus:outline-none group cursor-pointer"
@@ -240,6 +292,23 @@ const Navigation = () => {
                 <span>{item.name}</span>
               </Link>
             ))}
+            
+            {/* Mobile Support Links */}
+            <div className="pt-2 pb-1">
+              <p className="px-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Support</p>
+            </div>
+            {supportLinks.map((item) => (
+              <Link
+                key={item.name}
+                to={item.href}
+                className="flex items-center space-x-2 text-gray-700 hover:text-primary-600 hover:bg-gray-50 block px-3 py-2 rounded-md text-base font-medium transition-colors duration-200"
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                <item.icon className="w-5 h-5" />
+                <span>{item.name}</span>
+              </Link>
+            ))}
+            
             <div className="pt-4 space-y-2">
               {currentUser ? (
                 <>

@@ -30,6 +30,9 @@ const About = lazy(() => import('./pages/About'));
 const Contact = lazy(() => import('./pages/Contact'));
 const Privacy = lazy(() => import('./pages/Privacy'));
 const Terms = lazy(() => import('./pages/Terms'));
+const HelpCenter = lazy(() => import('./pages/HelpCenter'));
+const FAQ = lazy(() => import('./pages/FAQ'));
+const CookiePolicy = lazy(() => import('./pages/CookiePolicy'));
 
 // Google service configuration
 const GOOGLE_ANALYTICS_ID = import.meta.env.VITE_GOOGLE_ANALYTICS_ID || 'G-XXXXXXXXXX';
@@ -106,6 +109,9 @@ function App() {
                           <Route path="/contact" element={<Suspense fallback={<LoadingSpinner />}><Contact /></Suspense>} />
                           <Route path="/privacy" element={<Suspense fallback={<LoadingSpinner />}><Privacy /></Suspense>} />
                           <Route path="/terms" element={<Suspense fallback={<LoadingSpinner />}><Terms /></Suspense>} />
+                          <Route path="/cookie-policy" element={<Suspense fallback={<LoadingSpinner />}><CookiePolicy /></Suspense>} />
+                          <Route path="/help-center" element={<Suspense fallback={<LoadingSpinner />}><HelpCenter /></Suspense>} />
+                          <Route path="/faq" element={<Suspense fallback={<LoadingSpinner />}><FAQ /></Suspense>} />
                           <Route path="*" element={<Suspense fallback={<LoadingSpinner />}><Error404 /></Suspense>} />
                         </Routes>
                       </ErrorBoundary>
