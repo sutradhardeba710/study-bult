@@ -3,6 +3,9 @@ const nodemailer = require('nodemailer');
 const cors = require('cors');
 const dotenv = require('dotenv');
 const path = require('path');
+const rateLimit = require('express-rate-limit');
+const helmet = require('helmet');
+const validator = require('validator');
 
 // Load environment variables from .env.local if it exists
 dotenv.config({ path: path.resolve(__dirname, '../.env.local') });
@@ -12,8 +15,60 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-app.use(cors({ origin: ['http://localhost:5173', 'http://localhost:5174'] }));
-app.use(express.json());
+// Security headers
+app.use(helmet());
+
+// Define allowed origins
+const allowedOrigins = [
+  'http://localhost:5173', 
+  'http://localhost:5174',
+  'http://localhost:5175',
+  process.env.VITE_PRODUCTION_URL, // Add your production URL here
+  'https://study-vault.vercel.app'
+].filter(Boolean); // Filter out undefined values
+
+// Configure CORS with proper origin validation
+app.use(cors({
+  origin: function(origin, callback) {
+    // Allow requests with no origin (like mobile apps, curl requests)
+    if (!origin) return callback(null, true);
+    
+    if (allowedOrigins.indexOf(origin) === -1) {
+      const msg = 'The CORS policy for this site does not allow access from the specified Origin.';
+      return callback(new Error(msg), false);
+    }
+    return callback(null, true);
+  },
+  methods: ['GET', 'POST'],
+  credentials: true
+}));
+
+app.use(express.json({ limit: '100kb' })); // Limit payload size
+
+// Rate limiting
+const apiLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100, // limit each IP to 100 requests per windowMs
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: 'Too many requests from this IP, please try again after 15 minutes'
+});
+
+// Apply rate limiting to email endpoints
+app.use('/api/', apiLimiter);
+
+// Validate email addresses
+const validateEmail = (email) => {
+  return validator.isEmail(email);
+};
+
+// Sanitize HTML content to prevent XSS
+const sanitizeHtml = (html) => {
+  // Basic sanitization - in production you'd want to use a library like DOMPurify
+  return html
+    .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
+    .replace(/on\w+="[^"]*"/g, '');
+};
 
 const transporter = nodemailer.createTransport({
   host: process.env.VITE_EMAIL_HOST,
@@ -32,7 +87,7 @@ const testEmailConnection = async () => {
     console.log('SMTP connection successful');
     return true;
   } catch (error) {
-    console.error('SMTP connection failed:', error);
+    console.error('SMTP connection failed:', error.message);
     return false;
   }
 };
@@ -40,60 +95,80 @@ const testEmailConnection = async () => {
 // Run the test on startup
 testEmailConnection();
 
+// Health check endpoint
+app.get('/api/health', (req, res) => {
+  res.json({ status: 'ok' });
+});
+
 app.post('/api/send-email', async (req, res) => {
-  console.log('Received email request:', {
-    to: req.body.to,
-    subject: req.body.subject
-  });
-  
-  const { to, subject, html } = req.body;
-  if (!to || !subject || !html) {
-    console.error('Missing required fields:', { to, subject, htmlProvided: !!html });
-    return res.status(400).json({ error: 'Missing required fields' });
-  }
+  // Log minimal information
+  console.log('Received email request');
   
   try {
-    console.log('Sending email to:', to);
+    const { to, subject, html } = req.body;
+    
+    // Input validation
+    if (!to || !subject || !html) {
+      return res.status(400).json({ error: 'Missing required fields' });
+    }
+    
+    // Validate email
+    if (!validateEmail(to)) {
+      return res.status(400).json({ error: 'Invalid email address' });
+    }
+    
+    // Sanitize HTML content
+    const sanitizedHtml = sanitizeHtml(html);
+    
+    // Send email
     const info = await transporter.sendMail({
       from: process.env.VITE_EMAIL_FROM,
       to,
       subject,
-      html,
+      html: sanitizedHtml,
     });
-    console.log('Email sent successfully:', info.messageId);
+    
+    console.log('Email sent successfully');
     res.json({ success: true, messageId: info.messageId });
   } catch (error) {
-    console.error('Email send error:', error);
-    res.status(500).json({ error: 'Failed to send email', details: error.message });
+    console.error('Email send error:', error.message);
+    res.status(500).json({ error: 'Failed to send email' });
   }
 });
 
-// Test endpoint to send a test email
-app.get('/api/test-email', async (req, res) => {
-  const testEmail = req.query.email || process.env.VITE_EMAIL_USER;
-  
-  try {
-    const info = await transporter.sendMail({
-      from: process.env.VITE_EMAIL_FROM,
-      to: testEmail,
-      subject: 'StudyVault Email Test',
-      html: `
-        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-          <h2>StudyVault Email Test</h2>
-          <p>This is a test email from StudyVault.</p>
-          <p>If you received this email, the email service is working correctly!</p>
-          <p>Time sent: ${new Date().toLocaleString()}</p>
-        </div>
-      `,
-    });
+// Test endpoint to send a test email - only available in development
+if (process.env.NODE_ENV !== 'production') {
+  app.get('/api/test-email', async (req, res) => {
+    const testEmail = req.query.email;
     
-    console.log('Test email sent:', info.messageId);
-    res.json({ success: true, messageId: info.messageId, sentTo: testEmail });
-  } catch (error) {
-    console.error('Test email error:', error);
-    res.status(500).json({ error: 'Failed to send test email', details: error.message });
-  }
-});
+    // Validate email
+    if (!testEmail || !validateEmail(testEmail)) {
+      return res.status(400).json({ error: 'Valid email address required' });
+    }
+    
+    try {
+      const info = await transporter.sendMail({
+        from: process.env.VITE_EMAIL_FROM,
+        to: testEmail,
+        subject: 'StudyVault Email Test',
+        html: `
+          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+            <h2>StudyVault Email Test</h2>
+            <p>This is a test email from StudyVault.</p>
+            <p>If you received this email, the email service is working correctly!</p>
+            <p>Time sent: ${new Date().toLocaleString()}</p>
+          </div>
+        `,
+      });
+      
+      console.log('Test email sent successfully');
+      res.json({ success: true, messageId: info.messageId, sentTo: testEmail });
+    } catch (error) {
+      console.error('Test email error:', error.message);
+      res.status(500).json({ error: 'Failed to send test email' });
+    }
+  });
+}
 
 app.get('/', (req, res) => {
   res.send('Email API is running');
@@ -101,5 +176,5 @@ app.get('/', (req, res) => {
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
-  console.log(`Email configuration loaded from: ${process.env.VITE_EMAIL_HOST}`);
+  console.log(`Email service initialized`);
 }); 

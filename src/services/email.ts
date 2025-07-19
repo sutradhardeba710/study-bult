@@ -1,27 +1,21 @@
 import type { UserProfile } from '../context/AuthContext';
 
-// Email configuration
+// Email configuration - moved to server-side only
+// No more client-side email credentials
 const emailConfig = {
-  host: import.meta.env.VITE_EMAIL_HOST || 'smtp.example.com',
-  port: Number(import.meta.env.VITE_EMAIL_PORT) || 587,
-  secure: import.meta.env.VITE_EMAIL_SECURE === 'true',
-  auth: {
-    user: import.meta.env.VITE_EMAIL_USER || 'user@example.com',
-    pass: import.meta.env.VITE_EMAIL_PASS || 'password',
-  },
-  from: import.meta.env.VITE_EMAIL_FROM || 'StudyVault <noreply@studyvault.com>',
+  from: 'StudyVault <noreply@studyvault.com>', // Just keep display name
 };
 
-// API URL for email service
-const API_URL = 'http://localhost:5000/api/send-email';
+// API URL for email service - dynamically determined based on environment
+const API_URL = import.meta.env.PROD 
+  ? '/api/send-email'  // In production, use relative URL (handled by proxy)
+  : 'http://localhost:5000/api/send-email'; // Only use localhost in development
 
 // Send email through backend API
 const sendMailViaAPI = async (mailOptions: any) => {
   try {
-    console.log('Attempting to send email via API:', {
-      to: mailOptions.to,
-      subject: mailOptions.subject
-    });
+    // Avoid logging sensitive data
+    console.log('Attempting to send email via API');
     
     const response = await fetch(API_URL, {
       method: 'POST',
@@ -39,15 +33,15 @@ const sendMailViaAPI = async (mailOptions: any) => {
     
     if (!response.ok) {
       const errorData = await response.json();
-      console.error('Email API error response:', errorData);
+      console.error('Email API error');
       throw new Error(errorData.error || 'Failed to send email');
     }
 
     const result = await response.json();
-    console.log('Email sent via API successfully:', result);
+    console.log('Email sent via API successfully');
     return result;
   } catch (error) {
-    console.error('Error sending email via API:', error);
+    console.error('Error sending email via API');
     throw error;
   }
 };
@@ -57,7 +51,8 @@ const sendMailViaAPI = async (mailOptions: any) => {
  */
 export const testEmailConnection = async () => {
   try {
-    const response = await fetch('http://localhost:5000');
+    const baseUrl = import.meta.env.PROD ? '' : 'http://localhost:5000';
+    const response = await fetch(`${baseUrl}/api/health`);
     if (response.ok) {
       console.log('Email service connection test successful');
       return true;
@@ -66,7 +61,7 @@ export const testEmailConnection = async () => {
       return false;
     }
   } catch (error) {
-    console.error('Email service connection failed:', error);
+    console.error('Email service connection failed');
     return false;
   }
 };
@@ -74,7 +69,7 @@ export const testEmailConnection = async () => {
 /**
  * Send welcome email after registration
  */
-export const sendWelcomeEmail = async (user: UserProfile, password?: string) => {
+export const sendWelcomeEmail = async (user: UserProfile) => {
   try {
     await sendMailViaAPI({
       from: emailConfig.from,
@@ -89,10 +84,9 @@ export const sendWelcomeEmail = async (user: UserProfile, password?: string) => 
           <ul>
             <li><strong>Name:</strong> ${user.name}</li>
             <li><strong>Email:</strong> ${user.email}</li>
-            <li><strong>College:</strong> ${user.college}</li>
-            <li><strong>Course:</strong> ${user.course}</li>
-            <li><strong>Semester:</strong> ${user.semester}</li>
-            ${password ? `<li><strong>Password:</strong> ${password} (Please change this after logging in)</li>` : ''}
+            <li><strong>College:</strong> ${user.college || 'Not provided'}</li>
+            <li><strong>Course:</strong> ${user.course || 'Not provided'}</li>
+            <li><strong>Semester:</strong> ${user.semester || 'Not provided'}</li>
           </ul>
           
           <p>You can now access all the features of StudyVault, including uploading and browsing academic papers.</p>
@@ -103,10 +97,10 @@ export const sendWelcomeEmail = async (user: UserProfile, password?: string) => 
         </div>
       `,
     });
-    console.log(`Welcome email sent to ${user.email}`);
+    console.log('Welcome email sent successfully');
     return true;
   } catch (error) {
-    console.error('Error sending welcome email:', error);
+    console.error('Error sending welcome email');
     return false;
   }
 };
@@ -121,6 +115,9 @@ export const sendLoginNotificationEmail = async (user: UserProfile, loginDetails
   location?: string;
 }) => {
   try {
+    // Sanitize and limit information sent
+    const sanitizedIP = loginDetails.ip ? `${loginDetails.ip.split('.').slice(0, 2).join('.')}.*.*` : 'Unknown';
+    
     await sendMailViaAPI({
       from: emailConfig.from,
       to: user.email,
@@ -135,9 +132,8 @@ export const sendLoginNotificationEmail = async (user: UserProfile, loginDetails
           <h3>Login Details:</h3>
           <ul>
             <li><strong>Time:</strong> ${loginDetails.time.toLocaleString()}</li>
-            ${loginDetails.ip ? `<li><strong>IP Address:</strong> ${loginDetails.ip}</li>` : ''}
-            ${loginDetails.device ? `<li><strong>Device:</strong> ${loginDetails.device}</li>` : ''}
-            ${loginDetails.location ? `<li><strong>Location:</strong> ${loginDetails.location}</li>` : ''}
+            <li><strong>Device:</strong> ${loginDetails.device || 'Unknown device'}</li>
+            <li><strong>Approximate Location:</strong> ${loginDetails.location || 'Unknown location'}</li>
           </ul>
           
           <p>If this was you, no action is needed. If you didn't log in at this time, please secure your account by changing your password immediately.</p>
@@ -146,10 +142,10 @@ export const sendLoginNotificationEmail = async (user: UserProfile, loginDetails
         </div>
       `,
     });
-    console.log(`Login notification email sent to ${user.email}`);
+    console.log('Login notification email sent successfully');
     return true;
   } catch (error) {
-    console.error('Error sending login notification email:', error);
+    console.error('Error sending login notification email');
     return false;
   }
 };
@@ -180,10 +176,10 @@ export const sendAccountDeletionEmail = async (email: string, name: string) => {
         </div>
       `,
     });
-    console.log(`Account deletion email sent to ${email}`);
+    console.log('Account deletion email sent successfully');
     return true;
   } catch (error) {
-    console.error('Error sending account deletion email:', error);
+    console.error('Error sending account deletion email');
     return false;
   }
 };
@@ -216,10 +212,10 @@ export const sendPasswordResetEmail = async (email: string, resetLink: string) =
         </div>
       `,
     });
-    console.log(`Password reset email sent to ${email}`);
+    console.log('Password reset email sent successfully');
     return true;
   } catch (error) {
-    console.error('Error sending password reset email:', error);
+    console.error('Error sending password reset email');
     return false;
   }
 }; 
