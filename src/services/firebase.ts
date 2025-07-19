@@ -3,14 +3,15 @@ import { getAuth, GoogleAuthProvider, setPersistence, browserLocalPersistence } 
 import { getFirestore } from 'firebase/firestore';
 import { getStorage } from 'firebase/storage';
 
-// Your Firebase configuration with hardcoded values
-const firebaseConfig = {
-  apiKey: "AIzaSyBfFBYgZpSUXpIUXfpS6Wr9vPfbcSHNxpk",
-  authDomain: "study-vault-e1c59.firebaseapp.com",
-  projectId: "study-vault-e1c59",
-  storageBucket: "study-vault-e1c59.appspot.com",
-  messagingSenderId: "1090684076393",
-  appId: "1:1090684076393:web:d4e2c8e9e9e9e9e9e9e9e9"
+// Your Firebase configuration
+// Replace with your actual Firebase config or use environment variables
+const firebaseConfig: { [key: string]: any } = {
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY || "your-api-key",
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN || "your-project.firebaseapp.com",
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID || "your-project-id",
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET || "your-project.appspot.com",
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID || "your-sender-id",
+  appId: import.meta.env.VITE_FIREBASE_APP_ID || "your-app-id"
 };
 
 // Improved configuration validation
