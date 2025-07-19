@@ -3,10 +3,11 @@ import React, { useState } from 'react';
 interface FAQItemProps {
   question: string;
   answer: React.ReactNode;
+  defaultOpen?: boolean;
 }
 
-const FAQItem: React.FC<FAQItemProps> = ({ question, answer }) => {
-  const [isOpen, setIsOpen] = useState(false);
+const FAQItem: React.FC<FAQItemProps> = ({ question, answer, defaultOpen = false }) => {
+  const [isOpen, setIsOpen] = useState(defaultOpen);
   
   return (
     <div className="border-b border-gray-200 py-4">
@@ -25,11 +26,9 @@ const FAQItem: React.FC<FAQItemProps> = ({ question, answer }) => {
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
         </svg>
       </button>
-      {isOpen && (
-        <div className="mt-3 text-gray-600">
-          {answer}
-        </div>
-      )}
+      <div className={`mt-3 text-gray-600 transition-all duration-300 ${isOpen ? 'block' : 'hidden'}`}>
+        {answer}
+      </div>
     </div>
   );
 };
@@ -44,7 +43,8 @@ const FAQ = () => {
           question="What is StudyVault?" 
           answer={
             <p>StudyVault is a platform where students can share and access question papers and academic resources from various colleges and courses. Our goal is to help students prepare better for exams by providing access to previous years' question papers.</p>
-          } 
+          }
+          defaultOpen={true}
         />
         
         <FAQItem 
