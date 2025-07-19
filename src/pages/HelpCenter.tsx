@@ -1,5 +1,3 @@
-import React from 'react';
-
 const HelpCenter = () => (
   <div className="max-w-4xl mx-auto py-12 px-4">
     <h1 className="text-3xl font-bold mb-6 text-gray-900">Help Center</h1>

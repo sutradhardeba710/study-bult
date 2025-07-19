@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { X, User, Upload, BookOpen, Home, LogOut, Shield, Grid, Settings, UserCircle, HelpCircle, MessageCircle, FileQuestion } from 'lucide-react';
+import { X, User, Upload, BookOpen, Home, LogOut, Shield, Settings, HelpCircle, MessageCircle, FileQuestion } from 'lucide-react';
 import Button from './Button';
 import { useState, useEffect, useRef } from 'react';
 
