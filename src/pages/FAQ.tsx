@@ -3,21 +3,21 @@ import React, { useState } from 'react';
 interface FAQItemProps {
   question: string;
   answer: React.ReactNode;
-  defaultOpen?: boolean;
 }
 
-const FAQItem: React.FC<FAQItemProps> = ({ question, answer, defaultOpen = false }) => {
-  const [isOpen, setIsOpen] = useState(defaultOpen);
+const FAQItem: React.FC<FAQItemProps> = ({ question, answer }) => {
+  const [isOpen, setIsOpen] = useState(false);
   
   return (
-    <div className="border-b border-gray-200 py-4">
+    <div className="border-b border-gray-200 py-5">
       <button
         className="flex justify-between items-center w-full text-left font-medium text-gray-800 focus:outline-none"
         onClick={() => setIsOpen(!isOpen)}
+        aria-expanded={isOpen}
       >
         <span className="text-lg">{question}</span>
         <svg
-          className={`w-5 h-5 transition-transform ${isOpen ? 'transform rotate-180' : ''}`}
+          className={`w-5 h-5 transition-transform duration-200 ${isOpen ? 'transform rotate-180' : ''}`}
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
@@ -26,7 +26,10 @@ const FAQItem: React.FC<FAQItemProps> = ({ question, answer, defaultOpen = false
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
         </svg>
       </button>
-      <div className={`mt-3 text-gray-600 transition-all duration-300 ${isOpen ? 'block' : 'hidden'}`}>
+      <div 
+        className={`mt-3 text-gray-600 overflow-hidden transition-all duration-200 ${isOpen ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'}`}
+        aria-hidden={!isOpen}
+      >
         {answer}
       </div>
     </div>
@@ -36,15 +39,14 @@ const FAQItem: React.FC<FAQItemProps> = ({ question, answer, defaultOpen = false
 const FAQ = () => {
   return (
     <div className="max-w-3xl mx-auto py-12 px-4">
-      <h1 className="text-3xl font-bold mb-8 text-gray-900">Frequently Asked Questions</h1>
+      <h1 className="text-3xl font-bold mb-8 text-center text-gray-900">Frequently Asked Questions</h1>
       
-      <div className="space-y-1">
+      <div className="space-y-2">
         <FAQItem 
           question="What is StudyVault?" 
           answer={
             <p>StudyVault is a platform where students can share and access question papers and academic resources from various colleges and courses. Our goal is to help students prepare better for exams by providing access to previous years' question papers.</p>
-          }
-          defaultOpen={true}
+          } 
         />
         
         <FAQItem 
