@@ -1,9 +1,5 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { FileText } from 'lucide-react';
-import * as pdfjsLib from 'pdfjs-dist';
-
-// Set the PDF.js worker source
-pdfjsLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`;
 
 interface PDFThumbnailProps {
   fileUrl: string;
@@ -13,8 +9,8 @@ interface PDFThumbnailProps {
 }
 
 /**
- * A component that renders a thumbnail of the first page of a PDF
- * Falls back to a placeholder icon if rendering fails
+ * A component that displays a PDF icon with styling
+ * This version doesn't try to render actual PDF content to avoid CORS issues
  */
 const PDFThumbnail: React.FC<PDFThumbnailProps> = ({ 
   fileUrl, 
@@ -22,96 +18,56 @@ const PDFThumbnail: React.FC<PDFThumbnailProps> = ({
   height = 56,
   showBadge = true 
 }) => {
-  const [thumbnailUrl, setThumbnailUrl] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState(false);
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  const retryCount = useRef(0);
-  const maxRetries = 2;
+  const [fileExists, setFileExists] = useState(true);
 
+  // Check if the file exists by making a HEAD request
   useEffect(() => {
     if (!fileUrl) {
-      setError(true);
+      setFileExists(false);
       setIsLoading(false);
       return;
     }
 
-    // Function to generate thumbnail
-    const generateThumbnail = async () => {
+    const checkFile = async () => {
       try {
         setIsLoading(true);
-        setError(false);
-
-        // Load the PDF document
-        const loadingTask = pdfjsLib.getDocument({
-          url: fileUrl,
-          cMapUrl: 'https://cdn.jsdelivr.net/npm/pdfjs-dist@5.3.93/cmaps/',
-          cMapPacked: true,
-          standardFontDataUrl: 'https://cdn.jsdelivr.net/npm/pdfjs-dist@5.3.93/standard_fonts/',
-          useSystemFonts: true,
-          useWorkerFetch: true,
-          isEvalSupported: true,
-          disableFontFace: false,
+        
+        // Simple HEAD request to check if file exists
+        const response = await fetch(fileUrl, { 
+          method: 'HEAD',
+          mode: 'no-cors' // Use no-cors to avoid CORS issues
         });
         
-        const pdf = await loadingTask.promise;
-        
-        // Get the first page
-        const page = await pdf.getPage(1);
-        
-        // Determine the scale to fit within our dimensions
-        const viewport = page.getViewport({ scale: 1 });
-        const scale = Math.min(width / viewport.width, height / viewport.height);
-        const scaledViewport = page.getViewport({ scale });
-        
-        // Render to canvas
-        const canvas = canvasRef.current;
-        if (canvas) {
-          const context = canvas.getContext('2d');
-          canvas.width = scaledViewport.width;
-          canvas.height = scaledViewport.height;
-          
-          if (context) {
-            const renderContext = {
-              canvasContext: context,
-              viewport: scaledViewport,
-              enableWebGL: true,
-              renderInteractiveForms: false,
-            };
-
-            await page.render(renderContext).promise;
-            
-            // Convert canvas to data URL
-            setThumbnailUrl(canvas.toDataURL('image/png'));
-          }
-        }
-        
+        // Since no-cors doesn't give us status, we'll assume success
+        setFileExists(true);
         setIsLoading(false);
       } catch (err) {
-        console.error('Error generating PDF thumbnail:', err);
-        
-        // Retry logic
-        if (retryCount.current < maxRetries) {
-          retryCount.current += 1;
-          console.log(`Retrying thumbnail generation (${retryCount.current}/${maxRetries})...`);
-          setTimeout(generateThumbnail, 1000); // Retry after 1 second
-        } else {
-          setError(true);
-          setIsLoading(false);
-        }
+        console.error('Error checking PDF:', err);
+        setFileExists(false);
+        setIsLoading(false);
       }
     };
 
-    generateThumbnail();
-    
-    // Reset retry count when fileUrl changes
-    return () => {
-      retryCount.current = 0;
-    };
-  }, [fileUrl, width, height]);
+    checkFile();
+  }, [fileUrl]);
 
-  // Hidden canvas for rendering
-  const hiddenCanvas = <canvas ref={canvasRef} style={{ display: 'none' }} />;
+  // Generate a color based on the fileUrl (for visual variety)
+  const getColorFromString = (str: string) => {
+    let hash = 0;
+    for (let i = 0; i < str.length; i++) {
+      hash = str.charCodeAt(i) + ((hash << 5) - hash);
+    }
+    
+    // Generate hue from 0 to 360
+    const hue = hash % 360;
+    
+    // Use a pastel color with fixed saturation and lightness
+    return `hsl(${hue}, 70%, 85%)`;
+  };
+
+  const bgColor = fileUrl ? getColorFromString(fileUrl) : '#f3f4f6';
+  const textColor = fileUrl ? `hsl(${getColorFromString(fileUrl).match(/\d+/)?.[0] || 0}, 80%, 30%)` : '#9ca3af';
 
   // Show loading state
   if (isLoading) {
@@ -120,20 +76,18 @@ const PDFThumbnail: React.FC<PDFThumbnailProps> = ({
         style={{ width, height }} 
         className="flex items-center justify-center bg-gray-100 rounded overflow-hidden animate-pulse"
       >
-        {hiddenCanvas}
         <FileText className="w-2/3 h-2/3 text-gray-300" />
       </div>
     );
   }
 
   // Show error state or placeholder
-  if (error || !thumbnailUrl) {
+  if (!fileExists) {
     return (
       <div 
         style={{ width, height }} 
         className="flex items-center justify-center bg-gray-100 rounded overflow-hidden"
       >
-        {hiddenCanvas}
         <FileText className="w-2/3 h-2/3 text-gray-400" />
         {showBadge && (
           <div className="absolute bottom-0 right-0 bg-red-500 text-white text-[8px] px-1 rounded-tl">
@@ -144,23 +98,53 @@ const PDFThumbnail: React.FC<PDFThumbnailProps> = ({
     );
   }
 
-  // Show thumbnail
+  // Get file name from URL for display
+  const fileName = fileUrl.split('/').pop()?.split('?')[0] || '';
+  const fileExt = fileName.split('.').pop()?.toUpperCase() || 'PDF';
+  
+  // First letter of the filename (excluding extension)
+  const firstLetter = fileName.replace(/\.[^/.]+$/, "").charAt(0).toUpperCase();
+
+  // Show styled PDF icon
   return (
     <div 
-      style={{ width, height }} 
-      className="relative bg-gray-100 rounded overflow-hidden shadow-sm"
+      style={{ width, height, backgroundColor: bgColor }} 
+      className="relative rounded overflow-hidden shadow-sm flex flex-col"
     >
-      {hiddenCanvas}
-      <img 
-        src={thumbnailUrl} 
-        alt="PDF thumbnail" 
-        className="w-full h-full object-contain"
-        style={{ maxWidth: '100%', maxHeight: '100%' }}
-      />
-      <div className="absolute bottom-0 left-0 right-0 h-1/5 bg-gradient-to-t from-primary-100 to-transparent"></div>
+      {/* Top part (page fold) */}
+      <div className="absolute top-0 right-0 w-1/3 h-1/3 bg-white opacity-20">
+        <div 
+          className="absolute bottom-0 left-0 w-0 h-0 border-b-[8px] border-r-[8px]"
+          style={{ 
+            borderBottomColor: bgColor, 
+            borderRightColor: 'transparent' 
+          }}
+        ></div>
+      </div>
+      
+      {/* Document icon */}
+      <div className="flex-grow flex items-center justify-center">
+        <FileText 
+          className="w-1/2 h-1/2" 
+          style={{ color: textColor }} 
+        />
+      </div>
+      
+      {/* First letter of filename */}
+      <div 
+        className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 font-bold text-lg"
+        style={{ color: textColor }}
+      >
+        {firstLetter}
+      </div>
+      
+      {/* Bottom gradient */}
+      <div className="absolute bottom-0 left-0 right-0 h-1/4 bg-black bg-opacity-20"></div>
+      
+      {/* PDF badge */}
       {showBadge && (
         <div className="absolute bottom-0 right-0 bg-primary-600 text-white text-[8px] px-1 rounded-tl">
-          PDF
+          {fileExt}
         </div>
       )}
     </div>
