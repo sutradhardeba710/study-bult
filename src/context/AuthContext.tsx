@@ -125,8 +125,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       await setDoc(doc(db, 'users', user.uid), userProfileData);
       setUserProfile(userProfileData);
       
-      // Send welcome email with account details
-      await sendWelcomeEmail(userProfileData, password);
+      // Send welcome email
+      await sendWelcomeEmail(userProfileData);
     } catch (error: any) {
       console.error('Registration error:', error);
       throw new Error(error?.message || 'An unexpected error occurred.');

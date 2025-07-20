@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { Upload, Download, FileText, Heart, TrendingUp, Download as DownloadIcon } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { getUserPapers, getUserLikeEvents, getPapersByIds } from '../../services/papers';
-import { Upload, Download, Heart, FileText, TrendingUp, Download as DownloadIcon } from 'lucide-react';
 import { db } from '../../services/firebase';
 import { collection, query, where, getDocs } from 'firebase/firestore';
 import Skeleton from '../../components/Skeleton';

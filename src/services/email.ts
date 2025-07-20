@@ -115,8 +115,7 @@ export const sendLoginNotificationEmail = async (user: UserProfile, loginDetails
   location?: string;
 }) => {
   try {
-    // Sanitize and limit information sent
-    const sanitizedIP = loginDetails.ip ? `${loginDetails.ip.split('.').slice(0, 2).join('.')}.*.*` : 'Unknown';
+    // No need to sanitize IP since we're not using it in the email anymore
     
     await sendMailViaAPI({
       from: emailConfig.from,
