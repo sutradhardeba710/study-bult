@@ -29,27 +29,13 @@ const PDFThumbnail: React.FC<PDFThumbnailProps> = ({
       return;
     }
 
-    const checkFile = async () => {
-      try {
-        setIsLoading(true);
-        
-        // Simple HEAD request to check if file exists
-        const response = await fetch(fileUrl, { 
-          method: 'HEAD',
-          mode: 'no-cors' // Use no-cors to avoid CORS issues
-        });
-        
-        // Since no-cors doesn't give us status, we'll assume success
-        setFileExists(true);
-        setIsLoading(false);
-      } catch (err) {
-        console.error('Error checking PDF:', err);
-        setFileExists(false);
-        setIsLoading(false);
-      }
-    };
+    // Set a timeout to simulate checking the file
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+      setFileExists(true);
+    }, 300);
 
-    checkFile();
+    return () => clearTimeout(timer);
   }, [fileUrl]);
 
   // Generate a color based on the fileUrl (for visual variety)
