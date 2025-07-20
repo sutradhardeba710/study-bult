@@ -385,8 +385,13 @@ const AdminPapers: React.FC = () => {
                           aria-label={`Select paper ${paper.title}`}
                         />
                             <div className="flex items-center">
-                              <div className="h-12 w-10 mr-2">
-                                <PDFThumbnail fileUrl={paper.fileUrl} width={40} height={48} />
+                              <div className="h-12 w-10 mr-2 relative">
+                                <PDFThumbnail 
+                                  fileUrl={paper.fileUrl} 
+                                  width={40} 
+                                  height={48} 
+                                  showBadge={true}
+                                />
                               </div>
                               <span className="whitespace-nowrap">{paper.title}</span>
                             </div>
