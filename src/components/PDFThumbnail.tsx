@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { FileText } from 'lucide-react';
 import * as pdfjsLib from 'pdfjs-dist';
-import type { PDFDocumentProxy, PDFPageProxy } from 'pdfjs-dist';
 
 // Set the PDF.js worker source
 pdfjsLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`;
