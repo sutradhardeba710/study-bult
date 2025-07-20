@@ -7,6 +7,7 @@ import { getMetaItems, type MetaItem } from '../../services/meta';
 import toast from 'react-hot-toast';
 import { PanelLeft } from 'lucide-react';
 import Select from 'react-select';
+import PDFThumbnail from '../../components/PDFThumbnail';
 
 const initialForm = {
   title: '',
@@ -383,7 +384,12 @@ const AdminPapers: React.FC = () => {
                           disabled={paper.status !== 'pending'}
                           aria-label={`Select paper ${paper.title}`}
                         />
-                            <span className="whitespace-nowrap">{paper.title}</span>
+                            <div className="flex items-center">
+                              <div className="h-12 w-10 mr-2">
+                                <PDFThumbnail fileUrl={paper.fileUrl} width={40} height={48} />
+                              </div>
+                              <span className="whitespace-nowrap">{paper.title}</span>
+                            </div>
                           </div>
                       </td>
                         <td className="px-4 py-2 whitespace-nowrap">{paper.uploaderName}</td>
@@ -633,8 +639,20 @@ const AdminPapers: React.FC = () => {
                   </select>
                 </div>
                 <div className="flex justify-end gap-2">
-                  <button type="button" className="btn" onClick={closeEditModal}>Cancel</button>
-                  <button type="submit" className="btn-primary" disabled={editLoading}>{editLoading ? 'Saving...' : 'Save Changes'}</button>
+                  <button 
+                    type="button" 
+                    className="px-3 py-1 text-sm rounded font-semibold bg-gray-400 text-white hover:bg-gray-500 transition-colors" 
+                    onClick={closeEditModal}
+                  >
+                    Cancel
+                  </button>
+                  <button 
+                    type="submit" 
+                    className="px-3 py-1 text-sm rounded font-semibold bg-blue-600 text-white hover:bg-blue-700 transition-colors" 
+                    disabled={editLoading}
+                  >
+                    {editLoading ? 'Saving...' : 'Save Changes'}
+                  </button>
                 </div>
               </form>
             </div>

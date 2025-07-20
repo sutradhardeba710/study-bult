@@ -9,6 +9,7 @@ import toast from 'react-hot-toast';
 import Fuse from 'fuse.js';
 import Skeleton from '../components/Skeleton';
 import PdfViewer from '../components/PdfViewer';
+import PDFThumbnail from '../components/PDFThumbnail';
 
 // No longer needed as we're using the pdfProxy service
 
@@ -298,9 +299,14 @@ const Browse = () => {
             {filteredPapers.map((paper) => (
               <div key={paper.id} className="bg-white rounded-lg shadow-sm border border-gray-200">
                 <div className="p-6">
-                  <h3 className="text-lg font-semibold text-gray-900 mb-2 line-clamp-2">
-                    {paper.title}
-                  </h3>
+                  <div className="flex items-start mb-4">
+                    <div className="h-20 w-16 mr-4 flex-shrink-0">
+                      <PDFThumbnail fileUrl={paper.fileUrl} width={64} height={80} />
+                    </div>
+                    <h3 className="text-lg font-semibold text-gray-900 mb-2 line-clamp-2">
+                      {paper.title}
+                    </h3>
+                  </div>
                   <div className="space-y-2 text-sm text-gray-600 mb-4">
                     <p><span className="font-medium">Subject:</span> {paper.subject}</p>
                     <p><span className="font-medium">Semester:</span> {paper.semester}</p>
