@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { FileText } from 'lucide-react';
 import * as pdfjsLib from 'pdfjs-dist';
+import type { PDFDocumentProxy, PDFPageProxy } from 'pdfjs-dist';
 
 // Set the PDF.js worker source
 pdfjsLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`;
@@ -45,8 +46,13 @@ const PDFThumbnail: React.FC<PDFThumbnailProps> = ({
         // Load the PDF document
         const loadingTask = pdfjsLib.getDocument({
           url: fileUrl,
-          cMapUrl: 'https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/cmaps/',
+          cMapUrl: 'https://cdn.jsdelivr.net/npm/pdfjs-dist@5.3.93/cmaps/',
           cMapPacked: true,
+          standardFontDataUrl: 'https://cdn.jsdelivr.net/npm/pdfjs-dist@5.3.93/standard_fonts/',
+          useSystemFonts: true,
+          useWorkerFetch: true,
+          isEvalSupported: true,
+          disableFontFace: false,
         });
         
         const pdf = await loadingTask.promise;
@@ -67,10 +73,14 @@ const PDFThumbnail: React.FC<PDFThumbnailProps> = ({
           canvas.height = scaledViewport.height;
           
           if (context) {
-            await page.render({
+            const renderContext = {
               canvasContext: context,
-              viewport: scaledViewport
-            }).promise;
+              viewport: scaledViewport,
+              enableWebGL: true,
+              renderInteractiveForms: false,
+            };
+
+            await page.render(renderContext).promise;
             
             // Convert canvas to data URL
             setThumbnailUrl(canvas.toDataURL('image/png'));

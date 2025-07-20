@@ -3,7 +3,6 @@ import react from '@vitejs/plugin-react-swc'
 import path from 'path'
 import { viteStaticCopy } from 'vite-plugin-static-copy'
 import viteCompression from 'vite-plugin-compression'
-import viteImagemin from 'vite-plugin-imagemin'
 
 // https://vite.dev/config/
 export default defineConfig({
@@ -27,31 +26,7 @@ export default defineConfig({
       algorithm: 'brotliCompress',
       ext: '.br',
     }),
-    // Optimize images
-    viteImagemin({
-      gifsicle: {
-        optimizationLevel: 7,
-        interlaced: false,
-      },
-      optipng: {
-        optimizationLevel: 7,
-      },
-      mozjpeg: {
-        quality: 80,
-      },
-      pngquant: {
-        quality: [0.8, 0.9],
-        speed: 4,
-      },
-      svgo: {
-        plugins: [
-          {
-            name: 'removeViewBox',
-            active: false,
-          },
-        ],
-      },
-    }),
+    // Image optimization is now handled by the optimize-images.js script
   ],
   resolve: {
     alias: {
