@@ -301,7 +301,7 @@ const Browse = () => {
                 <div className="p-6">
                   <div className="flex items-start mb-4">
                     <div className="h-20 w-16 mr-4 flex-shrink-0">
-                      <PDFThumbnail fileUrl={paper.fileUrl} width={64} height={80} />
+                      <PDFThumbnail fileUrl={paper.fileUrl} width={64} height={80} showBadge={false} />
                     </div>
                     <h3 className="text-lg font-semibold text-gray-900 mb-2 line-clamp-2">
                       {paper.title}
