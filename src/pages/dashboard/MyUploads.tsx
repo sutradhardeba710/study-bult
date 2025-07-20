@@ -1,10 +1,12 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { getUserPapers } from '../../services/papers';
 import type { PaperData } from '../../services/upload';
 import { Download, Heart, Eye, FileText, RefreshCw } from 'lucide-react';
 import PDFThumbnail from '../../components/PDFThumbnail';
 import Skeleton from '../../components/Skeleton';
+import logger from '../../utils/logger';
 
 const MyUploads = () => {
   const { userProfile } = useAuth();
@@ -15,18 +17,19 @@ const MyUploads = () => {
 
     const fetchPapers = async () => {
     if (!userProfile?.uid) {
-      console.log('No userProfile.uid found:', userProfile);
+      logger.warn('No user ID found, cannot fetch papers');
       return;
     }
 
       try {
       setError(null);
-      console.log('Fetching papers for user ID:', userProfile.uid);
+      // Remove sensitive logging
         const userPapers = await getUserPapers(userProfile.uid);
-      console.log('Papers fetched successfully:', userPapers);
+      // Remove sensitive logging that shows paper contents
+        logger.debug('Papers fetched', { count: userPapers.length });
         setPapers(userPapers);
       } catch (error) {
-        console.error('Error fetching papers:', error);
+        logger.error('Error fetching papers', error);
       setError('Failed to load your papers. Please try again.');
       } finally {
         setLoading(false);

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { getUserPapers, getUserLikeEvents, getPapersByIds } from '../../services/papers';
@@ -7,6 +7,7 @@ import { db } from '../../services/firebase';
 import { collection, query, where, getDocs } from 'firebase/firestore';
 import Skeleton from '../../components/Skeleton';
 import toast from 'react-hot-toast';
+import logger from '../../utils/logger';
 
 const DashboardHome = () => {
   const { userProfile } = useAuth();
@@ -24,6 +25,7 @@ const DashboardHome = () => {
     const fetchStats = async () => {
       if (!userProfile?.uid) return;
       try {
+        setLoading(true);
         const [userPapers, likeEvents] = await Promise.all([
           getUserPapers(userProfile.uid),
           getUserLikeEvents(userProfile.uid)
@@ -42,8 +44,9 @@ const DashboardHome = () => {
           totalDownloads,
           likedPapers: totalLikes
         });
+        logger.debug('Stats fetched successfully');
       } catch (error) {
-        console.error('Error fetching stats:', error);
+        logger.error('Error fetching stats', error);
         toast.error('Failed to load dashboard stats. Please refresh the page.');
       } finally {
         setLoading(false);
@@ -100,8 +103,9 @@ const DashboardHome = () => {
           return dateB - dateA;
         });
         setActivity(allActivities.slice(0, 10)); // Show up to 10 recent activities
+        logger.debug('Activity fetched', { count: allActivities.length });
       } catch (error) {
-        console.error('Error fetching activity:', error);
+        logger.error('Error fetching activity', error);
       } finally {
         setActivityLoading(false);
       }
@@ -321,7 +325,6 @@ const DashboardHome = () => {
         ) : (
           <div className="space-y-4">
             {activity.map((item, idx) => {
-              console.log(`Activity item ${idx}:`, item);
               return (
               <div key={idx} className="flex items-start space-x-4 p-4 rounded-lg hover:bg-gray-50 transition-colors duration-200">
                 <div className="flex-shrink-0">

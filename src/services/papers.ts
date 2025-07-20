@@ -15,6 +15,7 @@ import {
 } from 'firebase/firestore';
 import { db } from './firebase';
 import type { PaperData } from './upload';
+import logger from '../utils/logger';
 
 export interface PaperFilter {
   college?: string;
@@ -68,7 +69,7 @@ export const getPapers = async (filters: PaperFilter = {}, limitCount: number = 
 
     return papers;
   } catch (error) {
-    console.error('Error fetching papers:', error);
+    logger.error('Error fetching papers:', error);
     throw error;
   }
 };
@@ -81,14 +82,15 @@ export const getPaperById = async (paperId: string): Promise<PaperData | null> =
     }
     return null;
   } catch (error) {
-    console.error('Error fetching paper:', error);
+    logger.error('Error fetching paper:', error);
     throw error;
   }
 };
 
 export const getUserPapers = async (userId: string): Promise<PaperData[]> => {
   try {
-    console.log('Fetching papers for user:', userId);
+    logger.debug('Fetching papers for user', { userId: userId.substring(0, 4) + '...' });
+    
     // Temporarily removed orderBy to fix BloomFilter error
     // Add back once index is created: orderBy('createdAt', 'desc')
     const q = query(
@@ -108,10 +110,10 @@ export const getUserPapers = async (userId: string): Promise<PaperData[]> => {
       return dateB.getTime() - dateA.getTime();
     });
     
-    console.log('Found papers:', papers.length, papers);
+    logger.debug('Papers fetched successfully', { count: papers.length });
     return papers;
   } catch (error) {
-    console.error('Error in getUserPapers:', error);
+    logger.error('Error in getUserPapers', error);
     throw error;
   }
 };
@@ -142,7 +144,7 @@ export const getLikedPapers = async (userId: string): Promise<PaperData[]> => {
 
     return papers;
   } catch (error) {
-    console.error('Error fetching liked papers:', error);
+    logger.error('Error fetching liked papers:', error);
     throw error;
   }
 };
@@ -163,7 +165,7 @@ export const likePaper = async (paperId: string, userId: string): Promise<void> 
       updatedAt: serverTimestamp(),
     });
   } catch (error) {
-    console.error('Error liking paper:', error);
+    logger.error('Error liking paper:', error);
     throw error;
   }
 };
@@ -189,7 +191,7 @@ export const unlikePaper = async (paperId: string, userId: string): Promise<void
       updatedAt: serverTimestamp(),
     });
   } catch (error) {
-    console.error('Error unliking paper:', error);
+    logger.error('Error unliking paper:', error);
     throw error;
   }
 };
@@ -204,7 +206,7 @@ export const isPaperLiked = async (paperId: string, userId: string): Promise<boo
     const likesSnapshot = await getDocs(likesQuery);
     return !likesSnapshot.empty;
   } catch (error) {
-    console.error('Error checking if paper is liked:', error);
+    logger.error('Error checking if paper is liked:', error);
     return false;
   }
 };
@@ -226,7 +228,7 @@ export const addDownload = async (paperId: string, userId: string): Promise<void
       updatedAt: serverTimestamp(),
     });
   } catch (error) {
-    console.error('Error adding download:', error);
+    logger.error('Error adding download:', error);
     throw error;
   }
 };
@@ -273,7 +275,7 @@ export const getUserDownloads = async (userId: string): Promise<PaperData[]> => 
 
     return papersWithDownloadDates.map(({ downloadDate, ...paper }) => paper);
   } catch (error) {
-    console.error('Error fetching user downloads:', error);
+    logger.error('Error fetching user downloads:', error);
     throw error;
   }
 };
@@ -294,7 +296,7 @@ export const getDownloadDate = async (paperId: string, userId: string): Promise<
     
     return null;
   } catch (error) {
-    console.error('Error getting download date:', error);
+    logger.error('Error getting download date:', error);
     return null;
   }
 };
@@ -303,7 +305,7 @@ export const deletePaper = async (paperId: string): Promise<void> => {
   try {
     await deleteDoc(doc(db, 'papers', paperId));
   } catch (error) {
-    console.error('Error deleting paper:', error);
+    logger.error('Error deleting paper:', error);
     throw error;
   }
 };
@@ -313,7 +315,7 @@ export const approvePaper = async (paperId: string): Promise<void> => {
     const paperRef = doc(db, 'papers', paperId);
     await updateDoc(paperRef, { status: 'approved' });
   } catch (error) {
-    console.error('Error approving paper:', error);
+    logger.error('Error approving paper:', error);
     throw error;
   }
 };
@@ -323,7 +325,7 @@ export const rejectPaper = async (paperId: string): Promise<void> => {
     const paperRef = doc(db, 'papers', paperId);
     await updateDoc(paperRef, { status: 'rejected' });
   } catch (error) {
-    console.error('Error rejecting paper:', error);
+    logger.error('Error rejecting paper:', error);
     throw error;
   }
 };
@@ -333,7 +335,7 @@ export const deletePaperById = async (paperId: string): Promise<void> => {
     const paperRef = doc(db, 'papers', paperId);
     await deleteDoc(paperRef);
   } catch (error) {
-    console.error('Error deleting paper:', error);
+    logger.error('Error deleting paper:', error);
     throw error;
   }
 };
@@ -371,7 +373,7 @@ export const getUserLikeEvents = async (userId: string): Promise<Array<{ paperId
     }
     return likeEvents;
   } catch (error) {
-    console.error('Error fetching like events:', error);
+    logger.error('Error fetching like events:', error);
     throw error;
   }
 }; 
@@ -400,7 +402,7 @@ export const updatePaper = async (paperId: string, data: Partial<PaperData>): Pr
       updatedAt: serverTimestamp(),
     });
   } catch (error) {
-    console.error('Error updating paper:', error);
+    logger.error('Error updating paper:', error);
     throw error;
   }
 }; 
