@@ -194,14 +194,38 @@ const AdminUsers: React.FC = () => {
                       <td className="px-2 sm:px-4 py-2">{user.course}</td>
                         <td className="px-2 sm:px-4 py-2 align-top">
                           <div className="flex flex-col gap-2 w-full">
-                            <button className="btn-secondary px-3 py-1 text-xs w-full" onClick={() => handleEdit(user)} disabled={loading}>Edit</button>
-                            <button className="btn-primary px-3 py-1 text-xs w-full" onClick={() => handleViewActivity(user)} disabled={loading}>View Activity</button>
-                            <button className="btn-secondary px-3 py-1 text-xs w-full" onClick={() => handleResetPassword(user)} disabled={loading}>Reset Password</button>
-                        {currentUser?.uid !== user.uid && (
-                              <button className="btn-danger px-3 py-1 text-xs w-full" onClick={() => handleDelete(user.uid)} disabled={loading}>Delete</button>
-                        )}
+                            <button 
+                              className="px-3 py-1 text-xs rounded font-semibold bg-yellow-400 text-white hover:bg-yellow-500 transition-colors w-full" 
+                              onClick={() => handleEdit(user)} 
+                              disabled={loading}
+                            >
+                              Edit
+                            </button>
+                            <button 
+                              className="px-3 py-1 text-xs rounded font-semibold bg-blue-600 text-white hover:bg-blue-700 transition-colors w-full" 
+                              onClick={() => handleViewActivity(user)} 
+                              disabled={loading}
+                            >
+                              View Activity
+                            </button>
+                            <button 
+                              className="px-3 py-1 text-xs rounded font-semibold bg-purple-600 text-white hover:bg-purple-700 transition-colors w-full" 
+                              onClick={() => handleResetPassword(user)} 
+                              disabled={loading}
+                            >
+                              Reset Password
+                            </button>
+                            {currentUser?.uid !== user.uid && (
+                              <button 
+                                className="px-3 py-1 text-xs rounded font-semibold bg-red-600 text-white hover:bg-red-700 transition-colors w-full" 
+                                onClick={() => handleDelete(user.uid)} 
+                                disabled={loading}
+                              >
+                                Delete
+                              </button>
+                            )}
                           </div>
-                      </td>
+                        </td>
                     </tr>
                   ))}
                 </tbody>

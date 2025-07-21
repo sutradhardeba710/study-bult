@@ -367,6 +367,7 @@ const AdminPapers: React.FC = () => {
                           <span className="text-xs font-medium text-gray-500 uppercase">Title</span>
                         </div>
                     </th>
+                      <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase min-w-[80px]">Preview</th>
                       <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase min-w-[100px]">Uploader</th>
                       <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase min-w-[100px]">Status</th>
                       <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase min-w-[160px]">Actions</th>
@@ -384,18 +385,13 @@ const AdminPapers: React.FC = () => {
                           disabled={paper.status !== 'pending'}
                           aria-label={`Select paper ${paper.title}`}
                         />
-                            <div className="flex items-center">
-                              <div className="h-12 w-10 mr-2 relative">
-                                <PDFThumbnail 
-                                  fileUrl={paper.fileUrl} 
-                                  width={40} 
-                                  height={48} 
-                                  showBadge={true}
-                                />
-                              </div>
-                              <span className="whitespace-nowrap">{paper.title}</span>
-                            </div>
+                            <span className="whitespace-nowrap">{paper.title}</span>
                           </div>
+                      </td>
+                      <td className="px-4 py-2">
+                        <div className="cursor-pointer" onClick={() => handleViewPaper(paper)}>
+                          <PDFThumbnail fileUrl={paper.fileUrl} width={60} height={80} className="shadow-sm hover:shadow-md transition-shadow" />
+                        </div>
                       </td>
                         <td className="px-4 py-2 whitespace-nowrap">{paper.uploaderName}</td>
                         <td className="px-4 py-2 whitespace-nowrap">

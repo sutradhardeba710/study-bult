@@ -149,7 +149,13 @@ const AdminMeta: React.FC = () => {
               onChange={e => setNewName(e.target.value)}
               disabled={loading}
             />
-            <button className="btn-primary" onClick={handleAdd} disabled={loading || !newName.trim()}>Add</button>
+            <button 
+              className="px-3 py-2 rounded font-semibold bg-green-600 text-white hover:bg-green-700 transition-colors disabled:opacity-50"
+              onClick={handleAdd} 
+              disabled={loading || !newName.trim()}
+            >
+              Add
+            </button>
           </div>
           {loading ? (
             <div className="flex justify-center py-8">
@@ -173,9 +179,23 @@ const AdminMeta: React.FC = () => {
                   <tr key={item.id}>
                     <td className="px-2 py-2 align-middle">
                       {/* Up/Down buttons for reordering */}
-                      <button disabled={index === 0} onClick={() => moveItem(index, index - 1)} title="Move up">↑</button>
-                      <button disabled={index === items.length - 1} onClick={() => moveItem(index, index + 1)} title="Move down">↓</button>
-                              </td>
+                      <button 
+                        disabled={index === 0} 
+                        onClick={() => moveItem(index, index - 1)} 
+                        title="Move up"
+                        className={`px-2 py-1 text-xs rounded font-semibold ${index === 0 ? 'bg-gray-200 text-gray-400' : 'bg-blue-500 text-white hover:bg-blue-600'} transition-colors mr-1`}
+                      >
+                        ↑
+                      </button>
+                      <button 
+                        disabled={index === items.length - 1} 
+                        onClick={() => moveItem(index, index + 1)} 
+                        title="Move down"
+                        className={`px-2 py-1 text-xs rounded font-semibold ${index === items.length - 1 ? 'bg-gray-200 text-gray-400' : 'bg-blue-500 text-white hover:bg-blue-600'} transition-colors`}
+                      >
+                        ↓
+                      </button>
+                    </td>
                     <td className="px-4 py-2 align-middle whitespace-nowrap">
                                 {editId === item.id ? (
                                   <input
@@ -206,13 +226,37 @@ const AdminMeta: React.FC = () => {
                       {/* Actions: Edit, Save, Delete */}
                                 {editId === item.id ? (
                                   <>
-                          <button onClick={handleUpdate} disabled={loading}>Save</button>
-                          <button onClick={() => setEditId(null)} disabled={loading}>Cancel</button>
+                          <button 
+                            className="px-3 py-1 text-xs rounded font-semibold bg-blue-600 text-white hover:bg-blue-700 transition-colors mr-2"
+                            onClick={handleUpdate} 
+                            disabled={loading}
+                          >
+                            Save
+                          </button>
+                          <button 
+                            className="px-3 py-1 text-xs rounded font-semibold bg-gray-400 text-white hover:bg-gray-500 transition-colors"
+                            onClick={() => setEditId(null)} 
+                            disabled={loading}
+                          >
+                            Cancel
+                          </button>
                                   </>
                                 ) : (
                                   <>
-                          <button onClick={() => handleEdit(item)} disabled={loading}>Edit</button>
-                          <button onClick={() => handleDelete(item.id!)} disabled={loading}>Delete</button>
+                          <button 
+                            className="px-3 py-1 text-xs rounded font-semibold bg-yellow-400 text-white hover:bg-yellow-500 transition-colors mr-2"
+                            onClick={() => handleEdit(item)} 
+                            disabled={loading}
+                          >
+                            Edit
+                          </button>
+                          <button 
+                            className="px-3 py-1 text-xs rounded font-semibold bg-red-600 text-white hover:bg-red-700 transition-colors"
+                            onClick={() => handleDelete(item.id!)} 
+                            disabled={loading}
+                          >
+                            Delete
+                          </button>
                                   </>
                                 )}
                               </td>

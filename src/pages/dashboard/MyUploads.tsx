@@ -232,13 +232,8 @@ const MyUploads = () => {
             {papers.map((paper) => (
               <div key={paper.id} className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 flex flex-col space-y-2">
                 <div className="flex items-center space-x-3">
-                  <div className="h-10 w-10 rounded-lg bg-primary-100 flex items-center justify-center overflow-hidden relative">
-                    <PDFThumbnail 
-                      fileUrl={paper.fileUrl} 
-                      width={40} 
-                      height={56} 
-                      showBadge={true}
-                    />
+                  <div className="h-10 w-10 rounded-lg bg-primary-100 flex items-center justify-center overflow-hidden">
+                    <PDFThumbnail fileUrl={paper.fileUrl} width={40} height={56} />
                   </div>
                   <div>
                     <div className="text-base font-semibold text-gray-900">{paper.title}</div>
@@ -322,13 +317,8 @@ const MyUploads = () => {
                   <tr key={paper.id} className="hover:bg-gray-50">
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center">
-                          <div className="h-10 w-10 rounded-lg bg-primary-100 flex items-center justify-center overflow-hidden relative">
-                            <PDFThumbnail 
-                              fileUrl={paper.fileUrl} 
-                              width={40} 
-                              height={56} 
-                              showBadge={true}
-                            />
+                          <div className="h-10 w-10 rounded-lg bg-primary-100 flex items-center justify-center overflow-hidden">
+                            <PDFThumbnail fileUrl={paper.fileUrl} width={40} height={56} />
                         </div>
                         <div className="ml-4">
                           <div className="text-sm font-medium text-gray-900">

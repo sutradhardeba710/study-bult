@@ -3,6 +3,7 @@ import react from '@vitejs/plugin-react-swc'
 import path from 'path'
 import { viteStaticCopy } from 'vite-plugin-static-copy'
 import viteCompression from 'vite-plugin-compression'
+// import viteImagemin from 'vite-plugin-imagemin'
 
 // https://vite.dev/config/
 export default defineConfig({
@@ -26,11 +27,37 @@ export default defineConfig({
       algorithm: 'brotliCompress',
       ext: '.br',
     }),
+    // Optimize images
+    /* Temporarily disabled due to installation issues
+    viteImagemin({
+      gifsicle: {
+        optimizationLevel: 7,
+        interlaced: false,
+      },
+      optipng: {
+        optimizationLevel: 7,
+      },
+      mozjpeg: {
+        quality: 80,
+      },
+      pngquant: {
+        quality: [0.8, 0.9],
+        speed: 4,
+      },
+      svgo: {
+        plugins: [
+          {
+            name: 'removeViewBox',
+            active: false,
+          },
+        ],
+      },
+    }),
+    */
   ],
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
-      // Remove the PDF.js alias as it's causing issues
     },
   },
   server: {
@@ -38,8 +65,7 @@ export default defineConfig({
     open: true
   },
   optimizeDeps: {
-    exclude: ['nodemailer'],
-    // Remove the PDF.js worker include as it's causing issues
+    exclude: ['nodemailer']
   },
   build: {
     rollupOptions: {
@@ -48,7 +74,7 @@ export default defineConfig({
         manualChunks: {
           'vendor': ['react', 'react-dom', 'react-router-dom'],
           'ui': ['react-hot-toast', 'react-select', 'react-easy-crop', 'lucide-react'],
-          // Remove PDF from manual chunks as it's causing issues
+          'pdf': ['react-pdf', 'pdfjs-dist']
         }
       }
     },
