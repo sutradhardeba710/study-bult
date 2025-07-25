@@ -37,6 +37,24 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://study-vault2.vercel.app/help-center</loc>
+    <lastmod>2025-07-25</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://study-vault2.vercel.app/faq</loc>
+    <lastmod>2025-07-25</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://study-vault2.vercel.app/cookie-policy</loc>
+    <lastmod>2025-07-25</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
     <loc>https://study-vault2.vercel.app/privacy</loc>
     <lastmod>2025-07-25</lastmod>
     <changefreq>yearly</changefreq>

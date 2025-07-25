@@ -13,7 +13,9 @@
     "analyze": "vite build --mode analyze",
     "optimize-images": "node scripts/optimize-images.js",
     "clean": "rimraf dist",
-    "build:prod": "npm run clean && npm run optimize-images && npm run build"
+    "build:prod": "npm run clean && npm run optimize-images && npm run build",
+    "submit-sitemap": "node scripts/submit-sitemap.js",
+    "seo-check": "node scripts/seo-check.js"
   },
   "dependencies": {
     "@firebase/app": "^0.13.2",
@@ -51,6 +53,7 @@
     "eslint-plugin-react-hooks": "^5.2.0",
     "eslint-plugin-react-refresh": "^0.4.20",
     "globals": "^16.2.0",
+    "node-html-parser": "^7.0.1",
     "postcss": "^8.5.6",
     "rimraf": "^5.0.10",
     "rollup-plugin-visualizer": "^5.14.0",
