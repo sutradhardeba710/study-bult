@@ -16,7 +16,8 @@
     "build:prod": "npm run clean && npm run optimize-images && npm run build",
     "submit-sitemap": "node scripts/submit-sitemap.js",
     "resubmit-sitemap": "node scripts/resubmit-sitemap.js",
-    "seo-check": "node scripts/seo-check.js"
+    "seo-check": "node scripts/seo-check.js",
+    "serve-sitemap": "node server/serve-sitemap.js"
   },
   "dependencies": {
     "@firebase/app": "^0.13.2",
@@ -27,6 +28,8 @@
     "@sentry/tracing": "^7.120.3",
     "@types/react-easy-crop": "^1.16.0",
     "cloudinary": "^2.7.0",
+    "cors": "^2.8.5",
+    "express": "^5.1.0",
     "firebase": "^11.10.0",
     "firebase-functions": "^6.3.2",
     "fuse.js": "^7.1.0",
