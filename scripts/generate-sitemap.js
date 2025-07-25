@@ -7,7 +7,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 // Configuration
-const BASE_URL = process.env.SITE_URL || 'https://studyvault.example.com';
+const BASE_URL = process.env.SITE_URL || 'https://study-vault2.vercel.app';
 const OUTPUT_PATH = path.join(__dirname, '../public/sitemap.xml');
 
 // Define your routes here
@@ -41,6 +41,21 @@ const routes = [
     path: '/register',
     changefreq: 'monthly',
     priority: 0.8
+  },
+  {
+    path: '/help-center',
+    changefreq: 'monthly',
+    priority: 0.6
+  },
+  {
+    path: '/faq',
+    changefreq: 'monthly',
+    priority: 0.6
+  },
+  {
+    path: '/cookie-policy',
+    changefreq: 'yearly',
+    priority: 0.5
   },
   {
     path: '/privacy',
