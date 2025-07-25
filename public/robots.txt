@@ -2,13 +2,4 @@
 User-agent: *
 Allow: /
 
-# Disallow admin pages
-Disallow: /admin/
-Disallow: /dashboard/
-
-# Disallow authentication pages
-Disallow: /login
-Disallow: /register
-
-# Allow search engines to access sitemap
-Sitemap: https://studyvault.example.com/sitemap.xml 
+Sitemap: https://studyvault.vercel.app/sitemap.xml 

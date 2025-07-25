@@ -4,8 +4,50 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="StudyVault - Your academic resource sharing platform" />
+    <meta name="description" content="StudyVault - Share and discover academic papers, notes and resources with fellow students" />
+    <meta name="keywords" content="academic papers, student resources, study materials, college notes, research papers, education" />
+    <meta name="author" content="StudyVault" />
+    <meta name="robots" content="index, follow" />
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://studyvault.vercel.app/" />
+    <meta property="og:title" content="StudyVault - Academic Resource Sharing" />
+    <meta property="og:description" content="Share and discover academic papers, notes and resources with fellow students" />
+    <meta property="og:image" content="https://studyvault.vercel.app/og-image.jpg" />
+    
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image" />
+    <meta property="twitter:url" content="https://studyvault.vercel.app/" />
+    <meta property="twitter:title" content="StudyVault - Academic Resource Sharing" />
+    <meta property="twitter:description" content="Share and discover academic papers, notes and resources with fellow students" />
+    <meta property="twitter:image" content="https://studyvault.vercel.app/og-image.jpg" />
+    
     <title>StudyVault - Academic Resource Sharing</title>
+    
+    <!-- Structured Data -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        "name": "StudyVault",
+        "url": "https://studyvault.vercel.app/",
+        "potentialAction": {
+          "@type": "SearchAction",
+          "target": "https://studyvault.vercel.app/browse?q={search_term_string}",
+          "query-input": "required name=search_term_string"
+        },
+        "description": "Share and discover academic papers, notes and resources with fellow students",
+        "publisher": {
+          "@type": "Organization",
+          "name": "StudyVault",
+          "logo": {
+            "@type": "ImageObject",
+            "url": "https://studyvault.vercel.app/logo.png"
+          }
+        }
+      }
+    </script>
     
     <!-- Preconnect to domains -->
     <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin />
@@ -17,6 +59,9 @@
     
     <!-- Font display optimization -->
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" media="print" onload="this.media='all'" />
+    
+    <!-- Canonical URL -->
+    <link rel="canonical" href="https://studyvault.vercel.app/" />
   </head>
   <body>
     <div id="root"></div>
