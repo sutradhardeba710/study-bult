@@ -15,6 +15,7 @@
     "clean": "rimraf dist",
     "build:prod": "npm run clean && npm run optimize-images && npm run build",
     "submit-sitemap": "node scripts/submit-sitemap.js",
+    "resubmit-sitemap": "node scripts/resubmit-sitemap.js",
     "seo-check": "node scripts/seo-check.js"
   },
   "dependencies": {
