@@ -244,9 +244,9 @@ const Settings = () => {
     if (crop === null) crop = undefined;
     if (original) {
       if (crop) {
-        getCroppedAvatarUrl(original, crop, setAvatarPreview);
+      getCroppedAvatarUrl(original, crop, setAvatarPreview);
       } else {
-        setAvatarPreview(original);
+      setAvatarPreview(original);
       }
     } else {
       setAvatarPreview(undefined);
@@ -311,26 +311,26 @@ const Settings = () => {
             <div className="flex items-center space-x-4">
               <div className="relative">
                 <div className="w-24 h-24 rounded-full bg-gray-200 overflow-hidden flex items-center justify-center">
-                  {avatarPreview ? (
+            {avatarPreview ? (
                     <img 
                       src={avatarPreview} 
                       alt="Avatar preview" 
                       className="w-full h-full object-cover"
                     />
-                  ) : (
+            ) : (
                     <User className="w-12 h-12 text-gray-400" />
                   )}
-                </div>
+              </div>
                 {avatarPreview && (
-                  <button
-                    type="button"
+              <button
+                type="button"
                     onClick={handleEditExistingAvatar}
                     className="absolute bottom-0 right-0 bg-white rounded-full p-1 shadow-md border border-gray-200"
-                    disabled={avatarUploading}
-                  >
+                disabled={avatarUploading}
+              >
                     <Pencil className="w-4 h-4 text-gray-600" />
-                  </button>
-                )}
+              </button>
+            )}
               </div>
               <div>
                 <input 
@@ -340,26 +340,26 @@ const Settings = () => {
                   className="hidden" 
                   accept="image/*" 
                 />
-                <button
-                  type="button"
-                  onClick={() => fileInputRef.current?.click()}
+            <button
+              type="button"
+              onClick={() => fileInputRef.current?.click()}
                   className="text-sm font-medium text-primary-600 hover:text-primary-700"
-                  disabled={avatarUploading}
-                >
+              disabled={avatarUploading}
+            >
                   {avatarUploading ? 'Uploading...' : 'Change picture'}
-                </button>
+            </button>
                 {formData.avatarOriginal && (
                   <button
                     type="button"
                     onClick={handleRemoveAvatar}
                     className="text-sm font-medium text-red-600 hover:text-red-700 ml-4"
-                    disabled={avatarUploading}
+              disabled={avatarUploading}
                   >
                     Remove
                   </button>
                 )}
-              </div>
-            </div>
+          </div>
+        </div>
           </div>
 
           {/* Rest of the form fields */}
@@ -569,7 +569,7 @@ const Settings = () => {
       </Modal>
 
       {cropperOpen && rawAvatar && (
-        <AvatarCropperModal
+      <AvatarCropperModal
           isOpen={cropperOpen}
           imageUrl={rawAvatar}
           onCropComplete={handleCropComplete}
@@ -579,7 +579,7 @@ const Settings = () => {
             setEditingExistingAvatar(false);
           }}
           initialCrop={editingExistingAvatar ? formData.avatarCrop : undefined}
-        />
+      />
       )}
     </div>
   );
