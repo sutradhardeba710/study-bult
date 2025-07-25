@@ -2,4 +2,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://studyvault.vercel.app/sitemap.xml 
+Sitemap: https://study-vault2.vercel.app/sitemap.xml 
