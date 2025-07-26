@@ -72,6 +72,19 @@ const routes = [
 // Get current date in YYYY-MM-DD format
 const today = new Date().toISOString().split('T')[0];
 
+// Ensure the date is not in the future (in case system clock is wrong)
+function getSafeDateString() {
+  const currentDate = new Date();
+  const year = currentDate.getFullYear();
+  // Ensure year is not in the future
+  const safeYear = Math.min(year, 2023);
+  const month = String(currentDate.getMonth() + 1).padStart(2, '0');
+  const day = String(currentDate.getDate()).padStart(2, '0');
+  return `${safeYear}-${month}-${day}`;
+}
+
+const safeDate = getSafeDateString();
+
 // Generate sitemap XML
 function generateSitemap() {
   let sitemap = '<?xml version="1.0" encoding="UTF-8"?>\n';
@@ -80,7 +93,7 @@ function generateSitemap() {
   routes.forEach(route => {
     sitemap += '  <url>\n';
     sitemap += `    <loc>${BASE_URL}${route.path}</loc>\n`;
-    sitemap += `    <lastmod>${today}</lastmod>\n`;
+    sitemap += `    <lastmod>${safeDate}</lastmod>\n`;
     sitemap += `    <changefreq>${route.changefreq}</changefreq>\n`;
     sitemap += `    <priority>${route.priority}</priority>\n`;
     sitemap += '  </url>\n';
