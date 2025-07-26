@@ -1,0 +1,11 @@
+https://study-vault2.vercel.app/
+https://study-vault2.vercel.app/about
+https://study-vault2.vercel.app/browse
+https://study-vault2.vercel.app/contact
+https://study-vault2.vercel.app/login
+https://study-vault2.vercel.app/register
+https://study-vault2.vercel.app/help-center
+https://study-vault2.vercel.app/faq
+https://study-vault2.vercel.app/cookie-policy
+https://study-vault2.vercel.app/privacy
+https://study-vault2.vercel.app/terms 
