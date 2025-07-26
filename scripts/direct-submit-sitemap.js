@@ -3,7 +3,7 @@
  * Run with: node scripts/direct-submit-sitemap.js
  */
 
-const https = require('https');
+import https from 'https';
 
 // Your sitemap URLs
 const SITEMAP_URLS = [
