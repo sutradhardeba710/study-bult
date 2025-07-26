@@ -4,4 +4,5 @@ Allow: /
 
 # Sitemap locations
 Sitemap: https://study-vault2.vercel.app/sitemap.xml
+Sitemap: https://study-vault2.vercel.app/sitemap-cors.xml
 Sitemap: https://study-vault2.vercel.app/sitemap.txt 
