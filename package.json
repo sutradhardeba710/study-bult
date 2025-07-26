@@ -15,6 +15,7 @@
     "clean": "rimraf dist",
     "build:prod": "npm run clean && npm run optimize-images && npm run build",
     "submit-sitemap": "node scripts/submit-sitemap.js",
+    "direct-submit-sitemap": "node scripts/direct-submit-sitemap.js",
     "validate-sitemap": "npm install @xmldom/xmldom --no-save && node scripts/validate-sitemap.js",
     "resubmit-sitemap": "node scripts/resubmit-sitemap.js",
     "seo-check": "node scripts/seo-check.js"
