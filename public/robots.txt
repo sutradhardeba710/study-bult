@@ -2,13 +2,10 @@
 User-agent: *
 Allow: /
 
-# Disallow admin pages
+# Disallow admin routes
 Disallow: /admin/
-Disallow: /dashboard/
+Disallow: /dashboard/settings/
+Disallow: /dashboard/upload/
 
-# Disallow authentication pages
-Disallow: /login
-Disallow: /register
-
-# Allow search engines to access sitemap
+# Sitemap location
 Sitemap: https://study-vault2.vercel.app/sitemap.xml 
