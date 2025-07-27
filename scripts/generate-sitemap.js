@@ -43,21 +43,6 @@ const routes = [
     priority: 0.8
   },
   {
-    path: '/help-center',
-    changefreq: 'monthly',
-    priority: 0.6
-  },
-  {
-    path: '/faq',
-    changefreq: 'monthly',
-    priority: 0.6
-  },
-  {
-    path: '/cookie-policy',
-    changefreq: 'yearly',
-    priority: 0.5
-  },
-  {
     path: '/privacy',
     changefreq: 'yearly',
     priority: 0.5
@@ -66,24 +51,21 @@ const routes = [
     path: '/terms',
     changefreq: 'yearly',
     priority: 0.5
+  },
+  {
+    path: '/help-center',
+    changefreq: 'monthly',
+    priority: 0.7
+  },
+  {
+    path: '/faq',
+    changefreq: 'monthly',
+    priority: 0.7
   }
 ];
 
 // Get current date in YYYY-MM-DD format
 const today = new Date().toISOString().split('T')[0];
-
-// Ensure the date is not in the future (in case system clock is wrong)
-function getSafeDateString() {
-  const currentDate = new Date();
-  const year = currentDate.getFullYear();
-  // Ensure year is not in the future
-  const safeYear = Math.min(year, 2023);
-  const month = String(currentDate.getMonth() + 1).padStart(2, '0');
-  const day = String(currentDate.getDate()).padStart(2, '0');
-  return `${safeYear}-${month}-${day}`;
-}
-
-const safeDate = getSafeDateString();
 
 // Generate sitemap XML
 function generateSitemap() {
@@ -93,7 +75,7 @@ function generateSitemap() {
   routes.forEach(route => {
     sitemap += '  <url>\n';
     sitemap += `    <loc>${BASE_URL}${route.path}</loc>\n`;
-    sitemap += `    <lastmod>${safeDate}</lastmod>\n`;
+    sitemap += `    <lastmod>${today}</lastmod>\n`;
     sitemap += `    <changefreq>${route.changefreq}</changefreq>\n`;
     sitemap += `    <priority>${route.priority}</priority>\n`;
     sitemap += '  </url>\n';
