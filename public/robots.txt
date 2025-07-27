@@ -1,8 +1,14 @@
-# Allow all web crawlers
+# StudyVault robots.txt
 User-agent: *
 Allow: /
 
-# Sitemap locations
-Sitemap: https://study-vault2.vercel.app/sitemap.xml
-Sitemap: https://study-vault2.vercel.app/sitemap-cors.xml
-Sitemap: https://study-vault2.vercel.app/sitemap.txt 
+# Disallow admin pages
+Disallow: /admin/
+Disallow: /dashboard/
+
+# Disallow authentication pages
+Disallow: /login
+Disallow: /register
+
+# Allow search engines to access sitemap
+Sitemap: https://study-vault2.vercel.app/sitemap.xml 
