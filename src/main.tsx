@@ -2,6 +2,10 @@ import React from 'react'
 import ReactDOM from 'react-dom/client'
 import App from './App.tsx'
 import './index.css'
+import { setupGlobalErrorHandler } from './utils/errorHandler'
+
+// Set up global error handling first
+setupGlobalErrorHandler();
 
 // Only load config debug in development
 const loadConfigDebug = async () => {
