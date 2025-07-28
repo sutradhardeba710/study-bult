@@ -1,7 +1,6 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import { MetaProvider } from './context/MetaContext';
-import { SEOProvider } from './context/SEOContext';
 import { Toaster } from 'react-hot-toast';
 import { lazy, Suspense, useEffect } from 'react';
 import { initRecaptcha, loadGoogleMaps } from './services/google';
@@ -26,6 +25,7 @@ const AdminHome = lazy(() => import('./pages/admin'));
 const AdminPapers = lazy(() => import('./pages/admin/papers'));
 const AdminMeta = lazy(() => import('./pages/admin/meta'));
 const AdminUsers = lazy(() => import('./pages/admin/users'));
+const AdminSEO = lazy(() => import('./pages/admin/seo'));
 const ProtectedAdminRoute = lazy(() => import('./pages/admin/ProtectedAdminRoute'));
 const About = lazy(() => import('./pages/About'));
 const Contact = lazy(() => import('./pages/Contact'));
@@ -74,8 +74,7 @@ function App() {
   return (
     <AuthProvider>
       <MetaProvider>
-        <SEOProvider>
-          <Router>
+        <Router>
           <div className="App flex flex-col min-h-screen">
             <Toaster position="top-right" toastOptions={{ duration: 3000 }} />
             <Suspense fallback={<LoadingSpinner />}>
@@ -85,6 +84,7 @@ function App() {
                 <Route path="/admin/papers" element={<Suspense fallback={<LoadingSpinner />}><ProtectedAdminRoute><AdminPapers /></ProtectedAdminRoute></Suspense>} />
                 <Route path="/admin/meta" element={<Suspense fallback={<LoadingSpinner />}><ProtectedAdminRoute><AdminMeta /></ProtectedAdminRoute></Suspense>} />
                 <Route path="/admin/users" element={<Suspense fallback={<LoadingSpinner />}><ProtectedAdminRoute><AdminUsers /></ProtectedAdminRoute></Suspense>} />
+                <Route path="/admin/seo" element={<Suspense fallback={<LoadingSpinner />}><ProtectedAdminRoute><AdminSEO /></ProtectedAdminRoute></Suspense>} />
                 {/* Public Routes */}
                 <Route path="/*" element={
                   <div className="flex flex-col flex-1">
@@ -121,9 +121,8 @@ function App() {
             </Suspense>
           </div>
         </Router>
-      </SEOProvider>
-    </MetaProvider>
-  </AuthProvider>
+      </MetaProvider>
+    </AuthProvider>
   );
 }
 

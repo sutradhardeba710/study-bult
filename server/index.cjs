@@ -170,6 +170,12 @@ if (process.env.NODE_ENV !== 'production') {
   });
 }
 
+// Import the sitemap routes
+const sitemapRoutes = require('./routes/sitemap');
+
+// Add sitemap routes
+app.use('/', sitemapRoutes);
+
 app.get('/', (req, res) => {
   res.send('Email API is running');
 });

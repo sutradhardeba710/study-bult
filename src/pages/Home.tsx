@@ -2,9 +2,24 @@ import { Link } from 'react-router-dom';
 import { Upload, Search, Download, BookOpen, Users, Shield } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import LandingLoggedIn from './LandingLoggedIn';
+import { useSEO, generateStructuredData } from '../hooks/useSEO';
 
 const Home = () => {
   const { userProfile, loading: authLoading } = useAuth();
+
+  // SEO configuration for home page
+  useSEO({
+    title: 'StudyVault - Share & Access Academic Papers | Question Papers Platform',
+    description: 'Discover thousands of question papers, study materials, and academic resources from universities and colleges. Join students worldwide in collaborative learning. Upload, browse, and download educational content.',
+    keywords: ['question papers', 'study materials', 'academic resources', 'university papers', 'college exams', 'student platform', 'educational resources', 'exam preparation'],
+    url: 'https://study-vault-gamma.vercel.app',
+    type: 'website',
+    structuredData: generateStructuredData.website({
+      name: 'StudyVault',
+      url: 'https://study-vault-gamma.vercel.app',
+      description: 'Comprehensive academic resource sharing platform for students and educators worldwide'
+    })
+  });
 
   if (authLoading) {
     return <div className="min-h-screen flex items-center justify-center bg-gray-50"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600"></div></div>;

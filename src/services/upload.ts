@@ -1,5 +1,6 @@
 import { collection, addDoc, updateDoc, doc, increment, serverTimestamp } from 'firebase/firestore';
 import { db } from './firebase';
+import { autoSubmitPaperToIndex } from './seo';
 
 export interface PaperData {
   id?: string;
@@ -104,6 +105,14 @@ export const uploadPaper = async (
       downloadCount: 0
     };
     const paperDoc = await addDoc(collection(db, 'papers'), paperDataToSave);
+
+    // Auto-submit to Google indexing (fire and forget)
+    if (paperDoc.id) {
+      autoSubmitPaperToIndex(paperDoc.id).catch(error => {
+        console.warn('Failed to submit to Google indexing:', error);
+      });
+    }
+
     return paperDoc.id;
   } catch (error: any) {
     console.error('Upload error:', error);

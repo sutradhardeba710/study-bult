@@ -1,332 +1,341 @@
+// SEO and Search Console Integration Service
+import { collection, getDocs, query, where, orderBy, limit } from 'firebase/firestore';
+import { db } from './firebase';
 import type { PaperData } from './upload';
-import type { UserProfile } from '../context/AuthContext';
 
-export interface SEOMetaData {
-  title: string;
-  description: string;
-  keywords: string[];
-  canonicalUrl: string;
-  ogTitle: string;
-  ogDescription: string;
-  ogImage: string;
-  ogType: 'website' | 'article';
-  twitterCard: 'summary' | 'summary_large_image';
-  structuredData: any;
-}
-
-export interface BreadcrumbItem {
-  name: string;
+export interface SitemapEntry {
   url: string;
+  lastmod: string;
+  changefreq: 'always' | 'hourly' | 'daily' | 'weekly' | 'monthly' | 'yearly' | 'never';
+  priority: number;
 }
 
-// Base URL for the application
+export interface SearchConsoleConfig {
+  siteUrl: string;
+  verificationCode: string;
+  indexingApiKey?: string;
+}
+
 const BASE_URL = 'https://study-vault-gamma.vercel.app';
 
-// Default meta data
-const DEFAULT_META: Partial<SEOMetaData> = {
-  ogImage: `${BASE_URL}/assets/og-image.jpg`,
-  twitterCard: 'summary_large_image',
-  keywords: ['question papers', 'study material', 'academic resources', 'exam preparation', 'student portal'],
+// Generate sitemap entries for all public pages
+export const generateSitemap = async (): Promise<SitemapEntry[]> => {
+  const entries: SitemapEntry[] = [];
+
+  // Static pages with high priority
+  const staticPages = [
+    { url: '', priority: 1.0, changefreq: 'daily' as const },
+    { url: '/browse', priority: 0.9, changefreq: 'hourly' as const },
+    { url: '/upload', priority: 0.8, changefreq: 'weekly' as const },
+    { url: '/about', priority: 0.7, changefreq: 'monthly' as const },
+    { url: '/contact', priority: 0.6, changefreq: 'monthly' as const },
+    { url: '/faq', priority: 0.6, changefreq: 'monthly' as const },
+    { url: '/help-center', priority: 0.6, changefreq: 'monthly' as const },
+    { url: '/privacy', priority: 0.5, changefreq: 'yearly' as const },
+    { url: '/terms', priority: 0.5, changefreq: 'yearly' as const },
+    { url: '/cookie-policy', priority: 0.5, changefreq: 'yearly' as const }
+  ];
+
+  staticPages.forEach(page => {
+    entries.push({
+      url: `${BASE_URL}${page.url}`,
+      lastmod: new Date().toISOString(),
+      changefreq: page.changefreq,
+      priority: page.priority
+    });
+  });
+
+  try {
+    // Get all approved papers for dynamic sitemap entries
+    const papersQuery = query(
+      collection(db, 'papers'),
+      where('status', '==', 'approved'),
+      orderBy('createdAt', 'desc'),
+      limit(1000) // Limit to prevent excessive sitemap size
+    );
+    
+    const papersSnapshot = await getDocs(papersQuery);
+    const papers = papersSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as PaperData));
+
+    // Add individual paper pages (using paper ID in URL)
+    papers.forEach(paper => {
+      if (paper.id) {
+        entries.push({
+          url: `${BASE_URL}/browse?paper=${paper.id}`,
+          lastmod: paper.createdAt ? new Date(paper.createdAt.toDate()).toISOString() : new Date().toISOString(),
+          changefreq: 'weekly',
+          priority: 0.8
+        });
+      }
+    });
+
+    // Add category pages based on subjects, courses, etc.
+    const subjects = [...new Set(papers.map(p => p.subject).filter(Boolean))];
+    const courses = [...new Set(papers.map(p => p.course).filter(Boolean))];
+    const colleges = [...new Set(papers.map(p => p.college).filter(Boolean))];
+
+    subjects.forEach(subject => {
+      entries.push({
+        url: `${BASE_URL}/browse?subject=${encodeURIComponent(subject)}`,
+        lastmod: new Date().toISOString(),
+        changefreq: 'daily',
+        priority: 0.7
+      });
+    });
+
+    courses.forEach(course => {
+      entries.push({
+        url: `${BASE_URL}/browse?course=${encodeURIComponent(course)}`,
+        lastmod: new Date().toISOString(),
+        changefreq: 'daily',
+        priority: 0.7
+      });
+    });
+
+    colleges.forEach(college => {
+      entries.push({
+        url: `${BASE_URL}/browse?college=${encodeURIComponent(college)}`,
+        lastmod: new Date().toISOString(),
+        changefreq: 'weekly',
+        priority: 0.6
+      });
+    });
+
+  } catch (error) {
+    console.error('Error generating dynamic sitemap entries:', error);
+  }
+
+  return entries;
 };
 
-// Generate SEO meta data for different pages
-export const generateSEOMeta = {
+// Generate XML sitemap content
+export const generateXMLSitemap = async (): Promise<string> => {
+  const entries = await generateSitemap();
   
-  // Home page SEO
-  home: (): SEOMetaData => ({
-    title: 'StudyVault - Academic Resource Sharing Platform | Question Papers & Study Materials',
-    description: 'Access thousands of question papers from colleges across the country. Upload, search, and download academic resources to ace your exams. Join 50,000+ students on StudyVault.',
-    keywords: [...DEFAULT_META.keywords!, 'college papers', 'university exams', 'study vault', 'academic portal'],
-    canonicalUrl: BASE_URL,
-    ogTitle: 'StudyVault - Your Gateway to Academic Success',
-    ogDescription: 'Access thousands of question papers from colleges. Upload, search, and download academic resources.',
-    ogImage: DEFAULT_META.ogImage!,
-    ogType: 'website',
-    twitterCard: DEFAULT_META.twitterCard!,
-    structuredData: {
-      "@context": "https://schema.org",
-      "@type": "WebSite",
-      "name": "StudyVault",
-      "url": BASE_URL,
-      "description": "Academic resource sharing platform for students",
-      "potentialAction": {
-        "@type": "SearchAction",
-        "target": `${BASE_URL}/browse?q={search_term_string}`,
-        "query-input": "required name=search_term_string"
+  let xml = '<?xml version="1.0" encoding="UTF-8"?>\n';
+  xml += '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n';
+  
+  entries.forEach(entry => {
+    xml += '  <url>\n';
+    xml += `    <loc>${entry.url}</loc>\n`;
+    xml += `    <lastmod>${entry.lastmod}</lastmod>\n`;
+    xml += `    <changefreq>${entry.changefreq}</changefreq>\n`;
+    xml += `    <priority>${entry.priority}</priority>\n`;
+    xml += '  </url>\n';
+  });
+  
+  xml += '</urlset>';
+  return xml;
+};
+
+// Generate robots.txt content
+export const generateRobotsTxt = (): string => {
+  return `# StudyVault robots.txt
+User-agent: *
+Allow: /
+
+# Important: Allow crawling of main content
+Allow: /browse
+Allow: /about
+Allow: /contact
+Allow: /faq
+Allow: /help-center
+
+# Disallow private/sensitive areas
+Disallow: /admin/
+Disallow: /dashboard/
+Disallow: /login
+Disallow: /register
+Disallow: /reset-password
+
+# Disallow search parameter variations to prevent duplicate content
+Disallow: /browse?*sort=*
+Disallow: /browse?*page=*
+
+# Allow common crawlers
+User-agent: Googlebot
+Allow: /
+
+User-agent: Bingbot
+Allow: /
+
+# Sitemap location
+Sitemap: ${BASE_URL}/sitemap.xml
+
+# Crawl delay for respectful crawling
+Crawl-delay: 1`;
+};
+
+// Google Search Console verification
+export const verifySearchConsole = (verificationCode: string): void => {
+  // Add Google Search Console verification meta tag
+  const existingMeta = document.querySelector('meta[name="google-site-verification"]');
+  if (existingMeta) {
+    existingMeta.setAttribute('content', verificationCode);
+  } else {
+    const meta = document.createElement('meta');
+    meta.name = 'google-site-verification';
+    meta.content = verificationCode;
+    document.head.appendChild(meta);
+  }
+};
+
+// Submit URL to Google Indexing API
+export const submitToIndexingAPI = async (url: string, type: 'URL_UPDATED' | 'URL_DELETED' = 'URL_UPDATED'): Promise<boolean> => {
+  const indexingApiKey = import.meta.env.VITE_GOOGLE_INDEXING_API_KEY;
+  
+  if (!indexingApiKey) {
+    console.warn('Google Indexing API key not configured');
+    return false;
+  }
+
+  try {
+    const response = await fetch(`https://indexing.googleapis.com/v3/urlNotifications:publish?key=${indexingApiKey}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
       },
-      "publisher": {
-        "@type": "Organization",
-        "name": "StudyVault",
-        "url": BASE_URL
-      }
+      body: JSON.stringify({
+        url: url,
+        type: type
+      })
+    });
+
+    if (response.ok) {
+      console.log(`Successfully submitted ${url} to Google Indexing API`);
+      return true;
+    } else {
+      console.error('Failed to submit to Indexing API:', await response.text());
+      return false;
     }
-  }),
-
-  // Browse page SEO
-  browse: (filters?: { college?: string; course?: string; subject?: string }): SEOMetaData => {
-    const title = filters 
-      ? `${filters.subject || filters.course || filters.college || 'Question Papers'} - Browse StudyVault`
-      : 'Browse Question Papers - StudyVault';
-    
-    const description = filters
-      ? `Find ${filters.subject || 'question papers'} for ${filters.course || ''} ${filters.college || 'colleges'}. Download academic resources instantly.`
-      : 'Browse thousands of question papers from colleges across India. Filter by college, course, semester, and subject.';
-
-    return {
-      title,
-      description,
-      keywords: [...DEFAULT_META.keywords!, 'browse papers', 'filter papers', filters?.subject || '', filters?.course || ''].filter(Boolean),
-      canonicalUrl: `${BASE_URL}/browse`,
-      ogTitle: title,
-      ogDescription: description,
-      ogImage: DEFAULT_META.ogImage!,
-      ogType: 'website',
-      twitterCard: DEFAULT_META.twitterCard!,
-      structuredData: {
-        "@context": "https://schema.org",
-        "@type": "CollectionPage",
-        "name": title,
-        "description": description,
-        "url": `${BASE_URL}/browse`,
-        "mainEntity": {
-          "@type": "ItemList",
-          "name": "Question Papers",
-          "description": "Collection of academic question papers"
-        }
-      }
-    };
-  },
-
-  // Individual paper page SEO
-  paper: (paper: PaperData): SEOMetaData => {
-    const title = `${paper.title} - ${paper.subject} | ${paper.course} Question Paper`;
-    const description = `Download ${paper.title} question paper for ${paper.subject}. ${paper.course} ${paper.semester} semester exam paper uploaded by ${paper.uploaderName}.`;
-    
-    return {
-      title,
-      description,
-      keywords: [...DEFAULT_META.keywords!, paper.subject, paper.course, paper.semester, paper.examType, paper.title],
-      canonicalUrl: `${BASE_URL}/paper/${paper.id}`,
-      ogTitle: title,
-      ogDescription: description,
-      ogImage: paper.thumbnailUrl || DEFAULT_META.ogImage!,
-      ogType: 'article',
-      twitterCard: DEFAULT_META.twitterCard!,
-      structuredData: {
-        "@context": "https://schema.org",
-        "@type": "DigitalDocument",
-        "name": paper.title,
-        "description": description,
-        "url": `${BASE_URL}/paper/${paper.id}`,
-        "author": {
-          "@type": "Person",
-          "name": paper.uploaderName
-        },
-        "datePublished": paper.createdAt,
-        "dateModified": paper.updatedAt || paper.createdAt,
-        "publisher": {
-          "@type": "Organization",
-          "name": "StudyVault"
-        },
-        "educationalUse": "examination",
-        "learningResourceType": "question paper",
-        "educationalLevel": paper.semester,
-        "about": {
-          "@type": "Course",
-          "name": paper.course,
-          "description": `${paper.subject} course materials`
-        }
-      }
-    };
-  },
-
-  // User profile page SEO
-  profile: (user: UserProfile): SEOMetaData => ({
-    title: `${user.name} - StudyVault Profile`,
-    description: `View ${user.name}'s profile on StudyVault. ${user.college} student sharing academic resources.`,
-    keywords: [...DEFAULT_META.keywords!, user.name, user.college, user.course],
-    canonicalUrl: `${BASE_URL}/profile/${user.uid}`,
-    ogTitle: `${user.name} - StudyVault`,
-    ogDescription: `${user.name}'s academic profile on StudyVault`,
-    ogImage: user.avatar || DEFAULT_META.ogImage!,
-    ogType: 'website',
-    twitterCard: DEFAULT_META.twitterCard!,
-    structuredData: {
-      "@context": "https://schema.org",
-      "@type": "Person",
-      "name": user.name,
-      "url": `${BASE_URL}/profile/${user.uid}`,
-      "description": `Student at ${user.college}`,
-      "affiliation": {
-        "@type": "Organization",
-        "name": user.college
-      }
-    }
-  }),
-
-  // Dashboard SEO
-  dashboard: (): SEOMetaData => ({
-    title: 'Dashboard - StudyVault',
-    description: 'Manage your uploads, liked papers, and account settings on StudyVault.',
-    keywords: [...DEFAULT_META.keywords!, 'dashboard', 'my papers', 'account'],
-    canonicalUrl: `${BASE_URL}/dashboard`,
-    ogTitle: 'StudyVault Dashboard',
-    ogDescription: 'Manage your academic resources and account',
-    ogImage: DEFAULT_META.ogImage!,
-    ogType: 'website',
-    twitterCard: DEFAULT_META.twitterCard!,
-    structuredData: {
-      "@context": "https://schema.org",
-      "@type": "WebPage",
-      "name": "Dashboard",
-      "url": `${BASE_URL}/dashboard`
-    }
-  })
+  } catch (error) {
+    console.error('Error submitting to Indexing API:', error);
+    return false;
+  }
 };
 
-// Generate breadcrumb structured data
-export const generateBreadcrumbs = (items: BreadcrumbItem[]) => ({
-  "@context": "https://schema.org",
-  "@type": "BreadcrumbList",
-  "itemListElement": items.map((item, index) => ({
-    "@type": "ListItem",
-    "position": index + 1,
-    "name": item.name,
-    "item": item.url
-  }))
-});
-
-// Update document head with meta tags
-export const updateDocumentMeta = (meta: SEOMetaData) => {
-  // Update title
-  document.title = meta.title;
-
-  // Update or create meta tags
-  const updateMetaTag = (name: string, content: string, property = false) => {
-    const selector = property ? `meta[property="${name}"]` : `meta[name="${name}"]`;
-    let tag = document.querySelector(selector) as HTMLMetaElement;
-    
-    if (!tag) {
-      tag = document.createElement('meta');
-      if (property) {
-        tag.setAttribute('property', name);
-      } else {
-        tag.setAttribute('name', name);
-      }
-      document.head.appendChild(tag);
-    }
-    tag.setAttribute('content', content);
-  };
-
-  // Update canonical URL
-  let canonicalLink = document.querySelector('link[rel="canonical"]') as HTMLLinkElement;
-  if (!canonicalLink) {
-    canonicalLink = document.createElement('link');
-    canonicalLink.rel = 'canonical';
-    document.head.appendChild(canonicalLink);
-  }
-  canonicalLink.href = meta.canonicalUrl;
-
-  // Basic meta tags
-  updateMetaTag('description', meta.description);
-  updateMetaTag('keywords', meta.keywords.join(', '));
-
-  // Open Graph tags
-  updateMetaTag('og:title', meta.ogTitle, true);
-  updateMetaTag('og:description', meta.ogDescription, true);
-  updateMetaTag('og:image', meta.ogImage, true);
-  updateMetaTag('og:type', meta.ogType, true);
-  updateMetaTag('og:url', meta.canonicalUrl, true);
-
-  // Twitter tags
-  updateMetaTag('twitter:card', meta.twitterCard);
-  updateMetaTag('twitter:title', meta.ogTitle);
-  updateMetaTag('twitter:description', meta.ogDescription);
-  updateMetaTag('twitter:image', meta.ogImage);
-
-  // Update structured data
-  let structuredDataScript = document.querySelector('script[type="application/ld+json"]');
-  if (!structuredDataScript) {
-    structuredDataScript = document.createElement('script');
-    structuredDataScript.type = 'application/ld+json';
-    document.head.appendChild(structuredDataScript);
-  }
-  structuredDataScript.textContent = JSON.stringify(meta.structuredData, null, 2);
+// Auto-submit new papers to indexing
+export const autoSubmitPaperToIndex = async (paperId: string): Promise<void> => {
+  const url = `${BASE_URL}/browse?paper=${paperId}`;
+  await submitToIndexingAPI(url);
 };
 
-// Generate FAQ structured data for help pages
-export const generateFAQStructuredData = (faqs: Array<{ question: string; answer: string }>) => ({
+// Generate structured data for the website
+export const getWebsiteStructuredData = () => ({
   "@context": "https://schema.org",
-  "@type": "FAQPage",
-  "mainEntity": faqs.map(faq => ({
-    "@type": "Question",
-    "name": faq.question,
-    "acceptedAnswer": {
-      "@type": "Answer",
-      "text": faq.answer
-    }
-  }))
-});
-
-// Generate organization structured data
-export const generateOrganizationStructuredData = () => ({
-  "@context": "https://schema.org",
-  "@type": "Organization",
+  "@type": "WebSite",
   "name": "StudyVault",
+  "alternateName": "Study Vault - Academic Resources",
   "url": BASE_URL,
-  "logo": `${BASE_URL}/logo.png`,
-  "description": "Academic resource sharing platform for students",
-  "contactPoint": {
-    "@type": "ContactPoint",
-    "contactType": "Customer Service",
-    "email": "support@studyvault.com"
+  "description": "Comprehensive academic resource sharing platform for students and educators",
+  "potentialAction": {
+    "@type": "SearchAction",
+    "target": {
+      "@type": "EntryPoint",
+      "urlTemplate": `${BASE_URL}/browse?q={search_term_string}`
+    },
+    "query-input": "required name=search_term_string"
   },
-  "sameAs": [
-    "https://www.facebook.com/studyvault",
-    "https://www.twitter.com/studyvault",
-    "https://www.linkedin.com/company/studyvault"
-  ]
+  "publisher": {
+    "@type": "Organization",
+    "name": "StudyVault",
+    "url": BASE_URL,
+    "logo": {
+      "@type": "ImageObject",
+      "url": `${BASE_URL}/assets/logo.png`,
+      "width": 300,
+      "height": 60
+    }
+  },
+  "mainEntity": {
+    "@type": "ItemList",
+    "name": "Academic Resources",
+    "description": "Collection of question papers, study materials, and academic resources"
+  }
 });
 
-// SEO utilities for specific actions
-export const seoUtils = {
-  // Generate meta for search results page
-  searchResults: (query: string, resultCount: number): SEOMetaData => ({
-    title: `"${query}" - Search Results | StudyVault`,
-    description: `Found ${resultCount} question papers for "${query}". Download academic resources instantly from StudyVault.`,
-    keywords: [...DEFAULT_META.keywords!, query, 'search results'],
-    canonicalUrl: `${BASE_URL}/browse?q=${encodeURIComponent(query)}`,
-    ogTitle: `Search: ${query} - StudyVault`,
-    ogDescription: `${resultCount} question papers found for "${query}"`,
-    ogImage: DEFAULT_META.ogImage!,
-    ogType: 'website',
-    twitterCard: DEFAULT_META.twitterCard!,
-    structuredData: {
-      "@context": "https://schema.org",
-      "@type": "SearchResultsPage",
-      "name": `Search results for "${query}"`,
-      "url": `${BASE_URL}/browse?q=${encodeURIComponent(query)}`
-    }
-  }),
+// Declare gtag global function
+declare global {
+  function gtag(...args: any[]): void;
+}
 
-  // Generate sitemap data
-  generateSitemapUrls: (papers: PaperData[]) => {
-    const baseUrls = [
-      { url: BASE_URL, changefreq: 'daily', priority: 1.0 },
-      { url: `${BASE_URL}/browse`, changefreq: 'daily', priority: 0.9 },
-      { url: `${BASE_URL}/upload`, changefreq: 'weekly', priority: 0.7 },
-      { url: `${BASE_URL}/about`, changefreq: 'monthly', priority: 0.5 },
-      { url: `${BASE_URL}/contact`, changefreq: 'monthly', priority: 0.5 },
-      { url: `${BASE_URL}/faq`, changefreq: 'monthly', priority: 0.5 },
-    ];
-
-    const paperUrls = papers.map(paper => ({
-      url: `${BASE_URL}/paper/${paper.id}`,
-      changefreq: 'weekly' as const,
-      priority: 0.8,
-      lastmod: paper.updatedAt || paper.createdAt
-    }));
-
-    return [...baseUrls, ...paperUrls];
+// Track search queries for insights
+export const trackSearchQuery = (query: string, resultsCount: number): void => {
+  // This could be sent to Google Analytics or your own analytics service
+  if (typeof gtag !== 'undefined') {
+    gtag('event', 'search', {
+      'search_term': query,
+      'results_count': resultsCount,
+      'page_title': document.title,
+      'page_location': window.location.href
+    });
   }
+};
+
+// Performance metrics for Core Web Vitals
+export const reportWebVitals = (metric: any): void => {
+  // Report to Google Analytics
+  if (typeof gtag !== 'undefined') {
+    gtag('event', metric.name, {
+      'event_category': 'Web Vitals',
+      'value': Math.round(metric.name === 'CLS' ? metric.value * 1000 : metric.value),
+      'event_label': metric.id,
+      'non_interaction': true
+    });
+  }
+};
+
+// SEO analysis and recommendations
+export const analyzeSEO = async (): Promise<{
+  score: number;
+  recommendations: string[];
+  criticalIssues: string[];
+}> => {
+  const recommendations: string[] = [];
+  const criticalIssues: string[] = [];
+  let score = 100;
+
+  // Check meta description
+  const metaDescription = document.querySelector('meta[name="description"]')?.getAttribute('content');
+  if (!metaDescription || metaDescription.length < 120) {
+    criticalIssues.push('Meta description is missing or too short (should be 120-160 characters)');
+    score -= 15;
+  }
+
+  // Check title tag
+  const title = document.title;
+  if (!title || title.length < 30 || title.length > 60) {
+    criticalIssues.push('Title tag should be 30-60 characters long');
+    score -= 10;
+  }
+
+  // Check structured data
+  const structuredData = document.querySelector('script[type="application/ld+json"]');
+  if (!structuredData) {
+    recommendations.push('Add structured data markup for better search results');
+    score -= 5;
+  }
+
+  // Check canonical URL
+  const canonical = document.querySelector('link[rel="canonical"]');
+  if (!canonical) {
+    recommendations.push('Add canonical URL to prevent duplicate content issues');
+    score -= 5;
+  }
+
+  // Check Open Graph tags
+  const ogTitle = document.querySelector('meta[property="og:title"]');
+  const ogDescription = document.querySelector('meta[property="og:description"]');
+  const ogImage = document.querySelector('meta[property="og:image"]');
+  
+  if (!ogTitle || !ogDescription || !ogImage) {
+    recommendations.push('Add Open Graph meta tags for better social media sharing');
+    score -= 5;
+  }
+
+  return {
+    score: Math.max(0, score),
+    recommendations,
+    criticalIssues
+  };
 }; 

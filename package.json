@@ -10,11 +10,8 @@
     "preview": "vite preview",
     "analyze": "vite build --mode analyze",
     "optimize-images": "node scripts/optimize-images.js",
-    "generate-sitemap": "node scripts/generate-sitemap.js",
     "clean": "rimraf dist",
-    "build:prod": "npm run clean && npm run optimize-images && npm run build && npm run generate-sitemap",
-    "seo:audit": "node scripts/seo-audit.js",
-    "submit:sitemap": "node scripts/submit-sitemap.js"
+    "build:prod": "npm run clean && npm run optimize-images && npm run build"
   },
   "dependencies": {
     "@firebase/app": "^0.13.2",
