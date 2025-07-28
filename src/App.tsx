@@ -1,6 +1,7 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import { MetaProvider } from './context/MetaContext';
+import { SEOProvider } from './context/SEOContext';
 import { Toaster } from 'react-hot-toast';
 import { lazy, Suspense, useEffect } from 'react';
 import { initRecaptcha, loadGoogleMaps } from './services/google';
@@ -73,7 +74,8 @@ function App() {
   return (
     <AuthProvider>
       <MetaProvider>
-        <Router>
+        <SEOProvider>
+          <Router>
           <div className="App flex flex-col min-h-screen">
             <Toaster position="top-right" toastOptions={{ duration: 3000 }} />
             <Suspense fallback={<LoadingSpinner />}>
@@ -119,8 +121,9 @@ function App() {
             </Suspense>
           </div>
         </Router>
-      </MetaProvider>
-    </AuthProvider>
+      </SEOProvider>
+    </MetaProvider>
+  </AuthProvider>
   );
 }
 
