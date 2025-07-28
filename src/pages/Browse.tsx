@@ -304,13 +304,13 @@ const Browse = () => {
                       <PDFThumbnail fileUrl={paper.fileUrl} width={80} height={110} className="shadow hover:shadow-md transition-shadow" />
                     </div>
                     <div>
-                      <h3 className="text-lg font-semibold text-gray-900 mb-2 line-clamp-2">
-                        {paper.title}
-                      </h3>
+                  <h3 className="text-lg font-semibold text-gray-900 mb-2 line-clamp-2">
+                    {paper.title}
+                  </h3>
                       <div className="space-y-1 text-sm text-gray-600">
-                        <p><span className="font-medium">Subject:</span> {paper.subject}</p>
-                        <p><span className="font-medium">Semester:</span> {paper.semester}</p>
-                        <p><span className="font-medium">Course:</span> {paper.course}</p>
+                    <p><span className="font-medium">Subject:</span> {paper.subject}</p>
+                    <p><span className="font-medium">Semester:</span> {paper.semester}</p>
+                    <p><span className="font-medium">Course:</span> {paper.course}</p>
                       </div>
                     </div>
                   </div>
@@ -509,4 +509,4 @@ const Browse = () => {
   );
 };
 
-export default Browse;
+export default Browse; 

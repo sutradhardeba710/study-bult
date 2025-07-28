@@ -3,7 +3,7 @@ import { AuthProvider } from './context/AuthContext';
 import { MetaProvider } from './context/MetaContext';
 import { Toaster } from 'react-hot-toast';
 import { lazy, Suspense, useEffect } from 'react';
-import { initRecaptcha, loadGoogleMaps, addSearchConsoleVerification } from './services/google';
+import { initRecaptcha, loadGoogleMaps } from './services/google';
 
 // Lazy load components for better performance
 const Navigation = lazy(() => import('./components/Navigation'));
@@ -38,7 +38,6 @@ const CookiePolicy = lazy(() => import('./pages/CookiePolicy'));
 const GOOGLE_ANALYTICS_ID = import.meta.env.VITE_GOOGLE_ANALYTICS_ID || 'G-XXXXXXXXXX';
 const GOOGLE_MAPS_API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY || '';
 const GOOGLE_RECAPTCHA_SITE_KEY = import.meta.env.VITE_GOOGLE_RECAPTCHA_SITE_KEY || '';
-const GOOGLE_SEARCH_CONSOLE_ID = import.meta.env.VITE_GOOGLE_SEARCH_CONSOLE_ID || '';
 
 // Loading spinner component
 const LoadingSpinner = () => (
@@ -50,11 +49,6 @@ const LoadingSpinner = () => (
 function App() {
   // Initialize Google services
   useEffect(() => {
-    // Add Google Search Console verification meta tag
-    if (GOOGLE_SEARCH_CONSOLE_ID) {
-      addSearchConsoleVerification(GOOGLE_SEARCH_CONSOLE_ID);
-    }
-    
     // Load Google Maps if API key is provided - defer loading for better initial performance
     if (GOOGLE_MAPS_API_KEY) {
       const timer = setTimeout(() => {

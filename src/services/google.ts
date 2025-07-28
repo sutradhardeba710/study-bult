@@ -208,43 +208,6 @@ export const initGoogleDrive = () => {
   console.log('Google Drive API integration initialized');
 };
 
-// Google Search Console verification
-export const addSearchConsoleVerification = (verificationId: string) => {
-  // Check if meta tag already exists
-  const existingTag = document.querySelector('meta[name="google-site-verification"]');
-  if (existingTag) {
-    // Update existing tag
-    existingTag.setAttribute('content', verificationId);
-    return;
-  }
-  
-  // Create meta tag for Google Search Console verification
-  const metaTag = document.createElement('meta');
-  metaTag.name = 'google-site-verification';
-  metaTag.content = verificationId;
-  document.head.appendChild(metaTag);
-  
-  console.log('Google Search Console verification meta tag added');
-};
-
-// Generate sitemap.xml content
-export const generateSitemap = (baseUrl: string, routes: string[]) => {
-  const today = new Date().toISOString().split('T')[0];
-  
-  let sitemap = '<?xml version="1.0" encoding="UTF-8"?>\n';
-  sitemap += '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n';
-  
-  routes.forEach(route => {
-    sitemap += '  <url>\n';
-    sitemap += `    <loc>${baseUrl}${route}</loc>\n`;
-    sitemap += `    <lastmod>${today}</lastmod>\n`;
-    sitemap += '  </url>\n';
-  });
-  
-  sitemap += '</urlset>';
-  return sitemap;
-};
-
 // Type declaration for global window object
 declare global {
   interface Window {

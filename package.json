@@ -8,14 +8,10 @@
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "generate-sitemap": "node scripts/generate-sitemap.js",
-    "prebuild": "npm run generate-sitemap",
     "analyze": "vite build --mode analyze",
     "optimize-images": "node scripts/optimize-images.js",
     "clean": "rimraf dist",
-    "build:prod": "npm run clean && npm run optimize-images && npm run build",
-    "verify-google": "node scripts/verify-google-console.js",
-    "test-sitemap": "node scripts/test-sitemap.js"
+    "build:prod": "npm run clean && npm run optimize-images && npm run build"
   },
   "dependencies": {
     "@firebase/app": "^0.13.2",

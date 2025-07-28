@@ -7,8 +7,7 @@ This guide explains how to set up various Google services for the StudyVault app
 2. [Google Analytics](#google-analytics)
 3. [Google Maps API](#google-maps-api)
 4. [Google reCAPTCHA](#google-recaptcha)
-5. [Google Search Console](#google-search-console)
-6. [Environment Variables](#environment-variables)
+5. [Environment Variables](#environment-variables)
 
 ## Google Authentication
 
@@ -57,25 +56,6 @@ To protect your forms with reCAPTCHA:
 5. Copy the Site Key
 6. Add this key to your environment variables as `VITE_GOOGLE_RECAPTCHA_SITE_KEY`
 
-## Google Search Console
-
-To verify your website ownership and optimize for search:
-
-1. Go to the [Google Search Console](https://search.google.com/search-console)
-2. Add your property (website) by entering your domain or URL prefix
-3. Choose the HTML tag verification method
-4. Copy the verification ID (the content value of the meta tag)
-5. Add this ID to your environment variables as `VITE_GOOGLE_SEARCH_CONSOLE_ID`
-6. The app will automatically add the verification meta tag to your site
-7. Return to Search Console and click "Verify"
-
-After verification:
-
-1. Submit your sitemap.xml by going to **Sitemaps** > **Add a new sitemap**
-2. Enter "sitemap.xml" and click "Submit"
-3. Check for any crawl errors or issues in the Coverage report
-4. Monitor your site's performance in search results
-
 ## Environment Variables
 
 Create a `.env` file in the root of your project with the following variables:
@@ -93,7 +73,6 @@ VITE_FIREBASE_APP_ID=your-app-id
 VITE_GOOGLE_ANALYTICS_ID=G-XXXXXXXXXX
 VITE_GOOGLE_MAPS_API_KEY=your-maps-api-key
 VITE_GOOGLE_RECAPTCHA_SITE_KEY=your-recaptcha-site-key
-VITE_GOOGLE_SEARCH_CONSOLE_ID=your-search-console-verification-id
 ```
 
 Replace the placeholder values with your actual API keys and configuration values.
@@ -106,7 +85,6 @@ After setting up the services and environment variables:
 2. Test Google Sign-In on the login and register pages
 3. Check the browser console to verify Google Analytics, Maps, and reCAPTCHA are loading
 4. Use browser developer tools to confirm network requests to Google services are successful
-5. Verify that the Google Search Console meta tag is present in your HTML head
 
 ## Troubleshooting
 

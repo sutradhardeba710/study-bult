@@ -5,7 +5,4 @@ Allow: /
 # Disallow admin routes
 Disallow: /admin/
 Disallow: /dashboard/settings/
-Disallow: /dashboard/upload/
-
-# Sitemap location
-Sitemap: https://study-vault2.vercel.app/sitemap.xml 
+Disallow: /dashboard/upload/ 
