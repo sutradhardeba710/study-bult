@@ -1,12 +1,12 @@
 const express = require('express');
 const router = express.Router();
 
-// Import Firebase Admin if available
+// Import Firebase Admin initialization
 let admin;
 try {
-  admin = require('firebase-admin');
+  admin = require('../firebaseAdmin');
 } catch (error) {
-  console.warn('Firebase Admin SDK not available for server-side sitemap generation');
+  console.warn('Firebase Admin SDK not available for server-side sitemap generation:', error.message);
 }
 
 const BASE_URL = process.env.VITE_SITE_URL || 'https://study-vault-gamma.vercel.app';
