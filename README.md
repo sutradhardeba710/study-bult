@@ -20,6 +20,9 @@ A modern web platform for students to share and access question papers from vari
 - **Authentication**: Firebase Authentication with email/password
 - **Responsive Design**: Mobile-first responsive design
 - **Type Safety**: Full TypeScript implementation
+- **SEO Optimization**: Advanced Google Search integration with structured data
+- **Search Engine Visibility**: Dynamic sitemap generation and Google Indexing API
+- **Analytics**: SEO performance monitoring via admin dashboard
 
 ## Tech Stack 🛠️
 
@@ -28,6 +31,7 @@ A modern web platform for students to share and access question papers from vari
 - **Backend**: Firebase (Firestore, Storage, Authentication)
 - **Icons**: Lucide React
 - **Routing**: React Router DOM
+- **SEO**: Google Search Console API, Indexing API, Structured Data
 
 ## Getting Started 🚀
 
@@ -124,7 +128,7 @@ StudyVault uses `.env.local` for environment variables. This file is not tracked
 
 1. Copy the example environment file:
 ```bash
-cp env.local.example .env.local
+cp google-services.env.example .env.local
 ```
 
 2. Edit `.env.local` and fill in your actual values:
@@ -146,6 +150,14 @@ VITE_EMAIL_FROM=StudyVault <noreply@studyvault.com>
 
 # Google Services
 VITE_GOOGLE_ANALYTICS_ID=G-XXXXXXXXXX
+VITE_GOOGLE_MAPS_API_KEY=your-google-maps-api-key
+VITE_GOOGLE_RECAPTCHA_SITE_KEY=your-recaptcha-site-key
+
+# Google Search Integration
+VITE_GOOGLE_SEARCH_CONSOLE_API_KEY=your-search-console-api-key
+VITE_GOOGLE_INDEXING_API_KEY=your-indexing-api-key
+VITE_GOOGLE_SITE_VERIFICATION=your-site-verification-code
+VITE_SITE_URL=https://your-actual-domain.com
 ```
 
 3. You can verify your environment variables with:
@@ -286,11 +298,12 @@ src/
 ## Roadmap 🗺️
 
 ### Phase 2 (Next)
-- [ ] Admin panel for content moderation
+- [x] Admin panel for content moderation
 - [ ] Email notifications
-- [ ] Advanced search and filtering
-- [ ] Paper categories and tags
+- [x] Advanced search and filtering
+- [x] Paper categories and tags
 - [ ] User ratings and reviews
+- [x] SEO optimization and Google Search integration
 
 ### Phase 3 (Future)
 - [ ] Mobile app (React Native)
