@@ -176,8 +176,21 @@ const sitemapRoutes = require('./routes/sitemap');
 // Add sitemap routes
 app.use('/', sitemapRoutes);
 
+// Add a health check for diagnostics
+app.get('/api/health-check', (req, res) => {
+  res.json({
+    status: 'ok',
+    timestamp: new Date().toISOString(),
+    services: {
+      email: !!process.env.VITE_EMAIL_HOST,
+      firebase: !!process.env.VITE_FIREBASE_PROJECT_ID,
+      server: true
+    }
+  });
+});
+
 app.get('/', (req, res) => {
-  res.send('Email API is running');
+  res.send('StudyVault API Server is running');
 });
 
 app.listen(PORT, () => {
