@@ -52,30 +52,30 @@ function App() {
   // Initialize Google services with error handling
   useEffect(() => {
     try {
-      // Load Google Maps if API key is provided - defer loading for better initial performance
+    // Load Google Maps if API key is provided - defer loading for better initial performance
       if (GOOGLE_MAPS_API_KEY && typeof GOOGLE_MAPS_API_KEY === 'string' && GOOGLE_MAPS_API_KEY.length > 0) {
-        const timer = setTimeout(() => {
-          loadGoogleMaps(GOOGLE_MAPS_API_KEY)
+      const timer = setTimeout(() => {
+        loadGoogleMaps(GOOGLE_MAPS_API_KEY)
             .catch(error => {
               console.warn('Failed to load Google Maps:', error);
               // Don't throw error, just log it
             });
-        }, 3000); // Delay loading by 3 seconds
-        
-        return () => clearTimeout(timer);
-      }
+      }, 3000); // Delay loading by 3 seconds
+      
+      return () => clearTimeout(timer);
+    }
 
-      // Initialize reCAPTCHA if site key is provided - defer loading
+    // Initialize reCAPTCHA if site key is provided - defer loading
       if (GOOGLE_RECAPTCHA_SITE_KEY && typeof GOOGLE_RECAPTCHA_SITE_KEY === 'string' && GOOGLE_RECAPTCHA_SITE_KEY.length > 0) {
-        const timer = setTimeout(() => {
-          initRecaptcha(GOOGLE_RECAPTCHA_SITE_KEY)
+      const timer = setTimeout(() => {
+        initRecaptcha(GOOGLE_RECAPTCHA_SITE_KEY)
             .catch(error => {
               console.warn('Failed to initialize reCAPTCHA:', error);
               // Don't throw error, just log it
             });
-        }, 2000); // Delay loading by 2 seconds
-        
-        return () => clearTimeout(timer);
+      }, 2000); // Delay loading by 2 seconds
+      
+      return () => clearTimeout(timer);
       }
     } catch (error) {
       console.warn('Error in Google services initialization:', error);

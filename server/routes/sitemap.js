@@ -9,7 +9,7 @@ try {
   console.warn('Firebase Admin SDK not available for server-side sitemap generation:', error.message);
 }
 
-const BASE_URL = process.env.VITE_SITE_URL || 'https://study-vault-gamma.vercel.app';
+const BASE_URL = process.env.VITE_SITE_URL || 'https://study-vault2.vercel.app';
 
 // Generate sitemap.xml
 router.get('/sitemap.xml', async (req, res) => {

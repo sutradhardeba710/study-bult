@@ -6,7 +6,6 @@
   },
   "rewrites": [
     { "source": "/api/(.*)", "destination": "/server/index.cjs" },
-    { "source": "/sitemap.xml", "destination": "/server/index.cjs" },
     { "source": "/robots.txt", "destination": "/server/index.cjs" },
     { "source": "/(.*)", "destination": "/index.html" }
   ],

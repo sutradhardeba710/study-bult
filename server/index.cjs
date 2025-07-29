@@ -24,7 +24,8 @@ const allowedOrigins = [
   'http://localhost:5174',
   'http://localhost:5175',
   process.env.VITE_PRODUCTION_URL, // Add your production URL here
-  'https://study-vault.vercel.app'
+  'https://study-vault.vercel.app',
+  'https://study-vault2.vercel.app'
 ].filter(Boolean); // Filter out undefined values
 
 // Configure CORS with proper origin validation
