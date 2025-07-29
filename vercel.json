@@ -1,12 +1,11 @@
 {
   "functions": {
-    "server/index.cjs": {
+    "server/**/*.cjs": {
       "runtime": "nodejs18.x"
     }
   },
   "rewrites": [
     { "source": "/api/(.*)", "destination": "/server/index.cjs" },
-    { "source": "/robots.txt", "destination": "/server/index.cjs" },
     { "source": "/(.*)", "destination": "/index.html" }
   ],
   "headers": [
