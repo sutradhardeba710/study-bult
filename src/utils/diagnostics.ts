@@ -115,7 +115,8 @@ export const runDiagnostics = async (): Promise<DiagnosticResult[]> => {
   // 4. Check Firebase Connection
   try {
     // Check if Firebase is properly initialized
-    const { app } = await import('../services/firebase');
+    const firebaseModule = await import('../services/firebase');
+    const app = firebaseModule.default;
     if (app) {
       results.push({
         category: 'Firebase',
