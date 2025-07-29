@@ -1,0 +1,34 @@
+# StudyVault robots.txt
+User-agent: *
+Allow: /
+
+# Important: Allow crawling of main content
+Allow: /browse
+Allow: /about
+Allow: /contact
+Allow: /faq
+Allow: /help-center
+
+# Disallow private/sensitive areas
+Disallow: /admin/
+Disallow: /dashboard/
+Disallow: /login
+Disallow: /register
+Disallow: /reset-password
+
+# Disallow search parameter variations to prevent duplicate content
+Disallow: /browse?*sort=*
+Disallow: /browse?*page=*
+
+# Allow common crawlers
+User-agent: Googlebot
+Allow: /
+
+User-agent: Bingbot
+Allow: /
+
+# Sitemap location
+Sitemap: https://study-vault2.vercel.app/sitemap.xml
+
+# Crawl delay for respectful crawling
+Crawl-delay: 1 
