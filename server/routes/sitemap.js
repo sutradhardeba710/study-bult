@@ -14,7 +14,12 @@ const BASE_URL = process.env.VITE_SITE_URL || 'https://study-vault2.vercel.app';
 // Generate sitemap.xml
 router.get('/sitemap.xml', async (req, res) => {
   try {
-    res.set('Content-Type', 'application/xml');
+    // Set proper XML headers
+    res.set({
+      'Content-Type': 'application/xml; charset=utf-8',
+      'Cache-Control': 'public, max-age=3600',
+      'X-Content-Type-Options': 'nosniff'
+    });
     
     let xml = '<?xml version="1.0" encoding="UTF-8"?>\n';
     xml += '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n';
@@ -108,21 +113,24 @@ router.get('/sitemap.xml', async (req, res) => {
     
     xml += '</urlset>';
     
-    // Cache for 1 hour
-    res.set('Cache-Control', 'public, max-age=3600');
+    console.log('Generated sitemap with', (xml.match(/<url>/g) || []).length, 'URLs');
     res.send(xml);
     
   } catch (error) {
     console.error('Error generating sitemap:', error);
-    res.status(500).send('Error generating sitemap');
+    res.status(500).set('Content-Type', 'text/plain').send('Error generating sitemap');
   }
 });
 
 // Generate robots.txt
 router.get('/robots.txt', (req, res) => {
-  res.set('Content-Type', 'text/plain');
-  
-  const robotsTxt = `# StudyVault robots.txt
+  try {
+    res.set({
+      'Content-Type': 'text/plain; charset=utf-8',
+      'Cache-Control': 'public, max-age=86400'
+    });
+    
+    const robotsTxt = `# StudyVault robots.txt
 User-agent: *
 Allow: /
 
@@ -157,9 +165,13 @@ Sitemap: ${BASE_URL}/sitemap.xml
 # Crawl delay for respectful crawling
 Crawl-delay: 1`;
 
-  // Cache for 24 hours
-  res.set('Cache-Control', 'public, max-age=86400');
-  res.send(robotsTxt);
+    console.log('Generated robots.txt');
+    res.send(robotsTxt);
+    
+  } catch (error) {
+    console.error('Error generating robots.txt:', error);
+    res.status(500).set('Content-Type', 'text/plain').send('Error generating robots.txt');
+  }
 });
 
 module.exports = router; 
