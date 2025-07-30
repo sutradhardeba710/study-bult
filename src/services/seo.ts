@@ -190,9 +190,8 @@ export const submitToIndexingAPI = async (url: string, type: 'URL_UPDATED' | 'UR
   }
 
   try {
-    // Ensure URL is absolute and properly encoded
+    // Ensure URL is absolute
     const absoluteUrl = url.startsWith('http') ? url : `${BASE_URL}${url}`;
-    const encodedUrl = encodeURIComponent(absoluteUrl);
 
     const response = await fetch(`https://indexing.googleapis.com/v3/urlNotifications:publish`, {
       method: 'POST',
