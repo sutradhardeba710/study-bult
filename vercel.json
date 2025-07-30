@@ -80,6 +80,16 @@
       }
     },
     {
+      "src": "/simple-sitemap\\.xml",
+      "dest": "/simple-sitemap.xml",
+      "headers": {
+        "Content-Type": "application/xml; charset=utf-8",
+        "Cache-Control": "no-cache",
+        "Access-Control-Allow-Origin": "*",
+        "X-Robots-Tag": "noindex, nofollow"
+      }
+    },
+    {
       "src": "/(.*)",
       "dest": "/index.html"
     }
