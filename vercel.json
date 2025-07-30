@@ -1,9 +1,4 @@
 {
-  "functions": {
-    "server/index.cjs": {
-      "runtime": "nodejs20.x"
-    }
-  },
   "routes": [
     {
       "src": "/sitemap\\.xml",
