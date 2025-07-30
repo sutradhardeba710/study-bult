@@ -25,6 +25,14 @@
       }
     },
     {
+      "src": "/sitemap-new\\.xml",
+      "dest": "/sitemap-new.xml",
+      "headers": {
+        "Content-Type": "application/xml; charset=utf-8",
+        "Cache-Control": "public, max-age=86400"
+      }
+    },
+    {
       "src": "/(.*)",
       "dest": "/index.html"
     }
