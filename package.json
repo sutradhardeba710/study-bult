@@ -11,7 +11,11 @@
     "analyze": "vite build --mode analyze",
     "optimize-images": "node scripts/optimize-images.js",
     "clean": "rimraf dist",
-    "build:prod": "npm run clean && npm run optimize-images && npm run build"
+    "build:prod": "npm run clean && npm run optimize-images && npm run build",
+    "generate:sitemap": "node server/react-vite-sitemap-generator.js",
+    "submit:sitemap": "node server/google-search-console-api.js",
+    "index:urls": "node server/google-indexing-api.js",
+    "deploy:seo": "npm run generate:sitemap && npm run submit:sitemap && npm run index:urls"
   },
   "dependencies": {
     "@firebase/app": "^0.13.2",
