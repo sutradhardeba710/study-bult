@@ -1,35 +1,21 @@
 const fs = require('fs');
 const path = require('path');
+const { glob } = require('glob');
 
-// Configuration for the sitemap generator
-const config = {
-  baseUrl: 'https://study-vault2.vercel.app',
-  outputPath: path.join(__dirname, '../public'),
-  staticRoutes: [
-    '/',
-    '/browse',
-    '/upload', 
-    '/about',
-    '/contact',
-    '/faq',
-    '/help-center',
-    '/privacy',
-    '/terms',
-    '/cookie-policy'
-  ],
-  changefreq: 'weekly',
-  priority: 0.8
-};
-
+/**
+ * Advanced Sitemap Generator for React Vite Applications
+ * Handles static and dynamic routes, supports multiple formats
+ */
 class ReactViteSitemapGenerator {
   constructor(config = {}) {
     this.config = {
       baseUrl: 'https://study-vault2.vercel.app',
-      outputPath: path.join(__dirname, '../public'),
+      outputPath: path.join(process.cwd(), 'public'),
+      routesDir: path.join(process.cwd(), 'src'),
       staticRoutes: [
         '/',
         '/browse',
-        '/upload', 
+        '/upload',
         '/about',
         '/contact',
         '/faq',
@@ -38,70 +24,113 @@ class ReactViteSitemapGenerator {
         '/terms',
         '/cookie-policy'
       ],
+      excludePatterns: [
+        '/api/*',
+        '/admin/*',
+        '/_*',
+        '/test/*',
+        '/dev/*'
+      ],
       changefreq: 'weekly',
-      priority: 0.8,
+      priority: {
+        '/': 1.0,
+        '/browse': 0.9,
+        '/upload': 0.8,
+        default: 0.6
+      },
       ...config
     };
   }
 
   /**
-   * Analyze React routes from source files
+   * Generate sitemap from React Router configuration
    */
   async generateFromRoutes() {
-    // For now, return static routes since dynamic route analysis is complex
-    return this.config.staticRoutes;
-  }
-
-  /**
-   * Fetch dynamic routes from data sources (Firebase, API, etc.)
-   */
-  async fetchDynamicRoutes() {
     try {
-      // Try to connect to Firebase Admin for dynamic routes
-      let admin;
-      try {
-        admin = require('./firebaseAdmin');
-      } catch (error) {
-        console.warn('Firebase Admin not available for dynamic routes:', error.message);
-        return [];
-      }
-
-      if (!admin || !admin.apps.length) {
-        console.warn('Firebase Admin not initialized');
-        return [];
-      }
-
-      const db = admin.firestore();
-      const papersSnapshot = await db.collection('papers')
-        .where('status', '==', 'approved')
-        .limit(100)  // Limit for build-time generation
-        .get();
-
-      const routes = [];
+      console.log('🔍 Scanning React routes...');
       
-      papersSnapshot.docs.forEach(doc => {
-        routes.push(`/browse?paper=${doc.id}`);
+      // Find all route files
+      const routeFiles = await glob(`${this.config.routesDir}/**/*Route*.{js,jsx,ts,tsx}`, {
+        ignore: ['**/node_modules/**', '**/dist/**']
       });
 
-      console.log(`Found ${routes.length} dynamic routes from Firebase`);
-      return routes;
+      const dynamicRoutes = new Set();
+
+      // Parse route files for dynamic routes
+      for (const file of routeFiles) {
+        const content = fs.readFileSync(file, 'utf8');
+        
+        // Extract route paths using regex
+        const routeMatches = content.match(/path\s*:\s*["'`]([^"'`]+)["'`]/g);
+        
+        if (routeMatches) {
+          routeMatches.forEach(match => {
+            const path = match.match(/["'`]([^"'`]+)["'`]/)[1];
+            if (this.isValidRoute(path)) {
+              dynamicRoutes.add(path);
+            }
+          });
+        }
+      }
+
+      console.log(`📋 Found ${dynamicRoutes.size} dynamic routes`);
+      return Array.from(dynamicRoutes);
 
     } catch (error) {
-      console.error('Error fetching dynamic routes:', error.message);
+      console.error('❌ Failed to scan routes:', error.message);
       return [];
     }
   }
 
   /**
-   * Get priority for a route
+   * Check if route should be included in sitemap
+   */
+  isValidRoute(route) {
+    // Skip dynamic parameters, wildcards, and excluded patterns
+    if (route.includes(':') || route.includes('*') || route.includes('?')) {
+      return false;
+    }
+
+    // Check against exclude patterns
+    return !this.config.excludePatterns.some(pattern => {
+      const regex = new RegExp(pattern.replace('*', '.*'));
+      return regex.test(route);
+    });
+  }
+
+  /**
+   * Fetch dynamic routes from API or database
+   */
+  async fetchDynamicRoutes() {
+    try {
+      console.log('🌐 Fetching dynamic routes...');
+      
+      // Example: Fetch from your API
+      // const response = await fetch(`${this.config.baseUrl}/api/sitemap-routes`);
+      // const routes = await response.json();
+      
+      // For now, return empty array - implement based on your data source
+      const dynamicRoutes = [];
+      
+      // Example dynamic routes based on your app:
+      // - Paper categories: /browse/category/engineering
+      // - Individual papers: /paper/123
+      // - User profiles: /user/username
+      
+      console.log(`📊 Found ${dynamicRoutes.length} dynamic routes from data source`);
+      return dynamicRoutes;
+
+    } catch (error) {
+      console.error('❌ Failed to fetch dynamic routes:', error.message);
+      return [];
+    }
+  }
+
+  /**
+   * Get priority for a specific route
    */
   getPriority(route) {
-    if (route === '/') return 1.0;
-    if (route === '/browse') return 0.9;
-    if (route === '/upload') return 0.8;
-    if (route.includes('/browse?')) return 0.7;
-    if (['/about', '/contact', '/faq', '/help-center'].includes(route)) return 0.6;
-    return 0.5;
+    return this.config.priority[route] || this.config.priority.default;
   }
 
   /**
@@ -127,7 +156,7 @@ class ReactViteSitemapGenerator {
       console.log(`📝 Generating sitemap with ${allRoutes.length} routes`);
 
       // Generate XML
-      const now = new Date().toISOString();
+      const now = new Date().toISOString().split('T')[0];
       let xml = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">`;
 
@@ -151,19 +180,12 @@ class ReactViteSitemapGenerator {
       const timestamp = new Date().toISOString().split('T')[0];
       const sitemapPath = path.join(this.config.outputPath, `sitemap-${timestamp}.xml`);
       
-      // Ensure output directory exists
-      if (!fs.existsSync(this.config.outputPath)) {
-        fs.mkdirSync(this.config.outputPath, { recursive: true });
-      }
-      
       fs.writeFileSync(sitemapPath, xml);
       
-      // Also create a generic sitemap.xml - but this will be served dynamically by the backend
-      // This is just for fallback during build
-      fs.writeFileSync(path.join(this.config.outputPath, 'sitemap-static.xml'), xml);
+      // Also create a generic sitemap.xml
+      fs.writeFileSync(path.join(this.config.outputPath, 'sitemap.xml'), xml);
 
-      console.log(`✅ Static sitemap generated: ${sitemapPath}`);
-      console.log('Note: Dynamic sitemap will be served by the backend at /sitemap.xml');
+      console.log(`✅ Sitemap generated: ${sitemapPath}`);
       return sitemapPath;
 
     } catch (error) {
@@ -177,39 +199,29 @@ class ReactViteSitemapGenerator {
    */
   generateRobotsTxt() {
     try {
-      console.log('🚀 Generating robots.txt...');
-      
-      const robotsTxt = `# StudyVault robots.txt
-User-agent: *
+      console.log('🤖 Generating robots.txt...');
+
+      const robotsTxt = `User-agent: *
 Allow: /
 
-# Important: Allow crawling of main content
-Allow: /browse
-Allow: /about
-Allow: /contact
-Allow: /faq
-Allow: /help-center
-
-# Disallow private/sensitive areas
+# Disallow admin and API routes
 Disallow: /admin/
-Disallow: /dashboard/
-Disallow: /login
-Disallow: /register
-Disallow: /reset-password
+Disallow: /api/
+Disallow: /_next/
+Disallow: /dev/
 
-# Sitemap location (served dynamically)
+# Sitemap location
 Sitemap: ${this.config.baseUrl}/sitemap.xml
 
-# Crawl delay for respectful crawling
-Crawl-delay: 1`;
+# Additional sitemap for better coverage
+Sitemap: ${this.config.baseUrl}/sitemap-${new Date().toISOString().split('T')[0]}.xml`;
 
-      const robotsPath = path.join(this.config.outputPath, 'robots-static.txt');
+      const robotsPath = path.join(this.config.outputPath, 'robots.txt');
       fs.writeFileSync(robotsPath, robotsTxt);
-      
-      console.log(`✅ Static robots.txt generated: ${robotsPath}`);
-      console.log('Note: Dynamic robots.txt will be served by the backend at /robots.txt');
-      
+
+      console.log(`✅ Robots.txt generated: ${robotsPath}`);
       return robotsPath;
+
     } catch (error) {
       console.error('❌ Failed to generate robots.txt:', error.message);
       throw error;
@@ -217,12 +229,12 @@ Crawl-delay: 1`;
   }
 
   /**
-   * Generate sitemap index for multiple sitemaps
+   * Generate sitemap index for large sites
    */
   async generateSitemapIndex(sitemaps) {
     try {
-      console.log('🚀 Generating sitemap index...');
-      
+      console.log('📚 Generating sitemap index...');
+
       const now = new Date().toISOString();
       let xml = `<?xml version="1.0" encoding="UTF-8"?>
 <sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">`;
@@ -240,7 +252,7 @@ Crawl-delay: 1`;
 
       const indexPath = path.join(this.config.outputPath, 'sitemap-index.xml');
       fs.writeFileSync(indexPath, xml);
-      
+
       console.log(`✅ Sitemap index generated: ${indexPath}`);
       return indexPath;
 
@@ -278,11 +290,10 @@ Crawl-delay: 1`;
       }
 
       console.log('✅ Sitemap generation completed successfully!');
-      console.log('Note: The backend will serve dynamic sitemaps at runtime');
       
       return {
         sitemap: sitemapPath,
-        robots: path.join(this.config.outputPath, 'robots-static.txt'),
+        robots: path.join(this.config.outputPath, 'robots.txt'),
         routes: await this.generateFromRoutes()
       };
 
@@ -297,13 +308,26 @@ Crawl-delay: 1`;
  * CLI Usage
  */
 async function main() {
-  const generator = new ReactViteSitemapGenerator(config);
-  
+  const generator = new ReactViteSitemapGenerator({
+    baseUrl: 'https://study-vault2.vercel.app',
+    staticRoutes: [
+      '/',
+      '/browse',
+      '/upload', 
+      '/about',
+      '/contact',
+      '/faq',
+      '/help-center',
+      '/privacy',
+      '/terms',
+      '/cookie-policy'
+    ]
+  });
+
   try {
     await generator.generate();
-    process.exit(0);
   } catch (error) {
-    console.error('Generation failed:', error);
+    console.error('❌ Generation failed:', error.message);
     process.exit(1);
   }
 }

@@ -16,7 +16,7 @@ export interface SearchConsoleConfig {
   indexingApiKey?: string;
 }
 
-const BASE_URL = 'https://study-vault-gamma.vercel.app';
+const BASE_URL = import.meta.env.VITE_SITE_URL || 'https://study-vault-gamma.vercel.app';
 
 // Generate sitemap entries for all public pages
 export const generateSitemap = async (): Promise<SitemapEntry[]> => {
@@ -190,22 +190,34 @@ export const submitToIndexingAPI = async (url: string, type: 'URL_UPDATED' | 'UR
   }
 
   try {
-    const response = await fetch(`https://indexing.googleapis.com/v3/urlNotifications:publish?key=${indexingApiKey}`, {
+    // Ensure URL is absolute and properly encoded
+    const absoluteUrl = url.startsWith('http') ? url : `${BASE_URL}${url}`;
+    const encodedUrl = encodeURIComponent(absoluteUrl);
+
+    const response = await fetch(`https://indexing.googleapis.com/v3/urlNotifications:publish`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        'Authorization': `Bearer ${indexingApiKey}`,
+        'X-Goog-Api-Version': '3'
       },
       body: JSON.stringify({
-        url: url,
+        url: absoluteUrl,
         type: type
       })
     });
 
     if (response.ok) {
-      console.log(`Successfully submitted ${url} to Google Indexing API`);
+      const data = await response.json();
+      console.log(`Successfully submitted ${url} to Google Indexing API`, data);
       return true;
     } else {
-      console.error('Failed to submit to Indexing API:', await response.text());
+      const errorData = await response.json();
+      console.error('Failed to submit to Indexing API:', {
+        status: response.status,
+        statusText: response.statusText,
+        error: errorData
+      });
       return false;
     }
   } catch (error) {
@@ -216,8 +228,28 @@ export const submitToIndexingAPI = async (url: string, type: 'URL_UPDATED' | 'UR
 
 // Auto-submit new papers to indexing
 export const autoSubmitPaperToIndex = async (paperId: string): Promise<void> => {
-  const url = `${BASE_URL}/browse?paper=${paperId}`;
-  await submitToIndexingAPI(url);
+  try {
+    const paperUrl = `/browse?paper=${paperId}`;
+    const absoluteUrl = `${BASE_URL}${paperUrl}`;
+    
+    // First, verify the paper exists and is approved
+    const paperRef = collection(db, 'papers');
+    const paperDoc = await getDocs(query(paperRef, where('id', '==', paperId), where('status', '==', 'approved')));
+    
+    if (paperDoc.empty) {
+      console.warn(`Paper ${paperId} not found or not approved. Skipping indexing.`);
+      return;
+    }
+
+    // Submit to indexing API
+    const success = await submitToIndexingAPI(absoluteUrl);
+    
+    if (!success) {
+      console.error(`Failed to submit paper ${paperId} to indexing API`);
+    }
+  } catch (error) {
+    console.error(`Error auto-submitting paper ${paperId} to index:`, error);
+  }
 };
 
 // Generate structured data for the website

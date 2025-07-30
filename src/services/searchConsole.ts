@@ -24,6 +24,7 @@ class SearchConsoleService {
   private apiKey: string;
   private siteUrl: string;
   private baseUrl = 'https://www.googleapis.com/webmasters/v3';
+  private authToken: string | null = null;
 
   constructor() {
     this.apiKey = import.meta.env.VITE_GOOGLE_SEARCH_CONSOLE_API_KEY || '';
@@ -33,6 +34,18 @@ class SearchConsoleService {
   // Check if Search Console is properly configured
   isConfigured(): boolean {
     return !!(this.apiKey && this.siteUrl);
+  }
+
+  private async getAuthHeaders(): Promise<HeadersInit> {
+    const headers: HeadersInit = {
+      'Content-Type': 'application/json',
+    };
+
+    if (this.authToken) {
+      headers['Authorization'] = `Bearer ${this.authToken}`;
+    }
+
+    return headers;
   }
 
   // Get search performance data
@@ -57,16 +70,16 @@ class SearchConsoleService {
         ...(filters && { dimensionFilterGroups: [{ filters }] })
       };
 
+      const headers = await this.getAuthHeaders();
       const response = await fetch(`${this.baseUrl}/sites/${encodeURIComponent(this.siteUrl)}/searchAnalytics/query?key=${this.apiKey}`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers,
         body: JSON.stringify(requestBody)
       });
 
       if (!response.ok) {
-        throw new Error(`Search Console API error: ${response.statusText}`);
+        const errorText = await response.text();
+        throw new Error(`Search Console API error: ${response.status} - ${errorText}`);
       }
 
       const data = await response.json();

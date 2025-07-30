@@ -1,6 +1,7 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react-swc'
 import path from 'path'
+import { viteStaticCopy } from 'vite-plugin-static-copy'
 import viteCompression from 'vite-plugin-compression'
 // import viteImagemin from 'vite-plugin-imagemin'
 
@@ -8,6 +9,15 @@ import viteCompression from 'vite-plugin-compression'
 export default defineConfig({
   plugins: [
     react(),
+    // Copy robots.txt to build output
+    viteStaticCopy({
+      targets: [
+        {
+          src: 'public/robots.txt',
+          dest: './'
+        }
+      ]
+    }),
     // Compress output files
     viteCompression({
       algorithm: 'gzip',

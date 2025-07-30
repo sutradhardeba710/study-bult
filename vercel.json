@@ -1,25 +1,24 @@
 {
   "routes": [
     {
+      "src": "/robots\\.txt",
+      "dest": "/robots.txt",
+      "headers": {
+        "Content-Type": "text/plain; charset=utf-8",
+        "Cache-Control": "public, max-age=86400"
+      }
+    },
+    {
       "src": "/sitemap\\.xml",
-      "dest": "/server/index.cjs",
-      "methods": ["GET"]
-    },
-    {
-      "src": "/robots\\.txt", 
-      "dest": "/server/index.cjs",
-      "methods": ["GET"]
-    },
-    {
-      "src": "/api/(.*)",
-      "dest": "/server/index.cjs"
+      "dest": "/sitemap.xml",
+      "headers": {
+        "Content-Type": "application/xml; charset=utf-8",
+        "Cache-Control": "public, max-age=3600"
+      }
     },
     {
       "src": "/(.*)",
       "dest": "/index.html"
     }
-  ],
-  "env": {
-    "VITE_SITE_URL": "https://study-vault2.vercel.app"
-  }
+  ]
 } 
