@@ -1,18 +1,20 @@
 import React from 'react';
 import { Link, useLocation, NavLink } from 'react-router-dom';
-import { PanelLeft, X, TrendingUp } from 'lucide-react';
+import { PanelLeft, X } from 'lucide-react';
 
 const links = [
   { to: '/admin', label: 'Dashboard' },
   { to: '/admin/papers', label: 'Papers' },
   { to: '/admin/meta', label: 'Subjects & Meta' },
   { to: '/admin/users', label: 'Users' },
+  { to: '/admin/google-search', label: 'Google Search' },
 ];
 
 const navLinkClass = 'flex items-center gap-2 px-5 py-3 rounded-lg font-medium transition text-base shadow-sm hover:bg-primary-50 hover:text-primary-700';
 
 const AdminSidebar: React.FC<{ open?: boolean; onClose?: () => void }> = ({ open = true, onClose }) => {
   const location = useLocation();
+  
   return (
     <>
       {/* Sidebar overlay for mobile */}
@@ -57,10 +59,6 @@ const AdminSidebar: React.FC<{ open?: boolean; onClose?: () => void }> = ({ open
                 </Link>
               </li>
             ))}
-            <NavLink to="/admin/seo" className={navLinkClass}>
-              <TrendingUp className="h-5 w-5" />
-              <span>SEO Dashboard</span>
-            </NavLink>
           </ul>
         </nav>
         <div className="mt-auto p-4 text-xs text-gray-400 text-center border-t border-gray-100">StudyVault Admin &copy; {new Date().getFullYear()}</div>

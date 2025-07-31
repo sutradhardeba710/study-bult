@@ -10,8 +10,6 @@ import Fuse from 'fuse.js';
 import Skeleton from '../components/Skeleton';
 import PdfViewer from '../components/PdfViewer';
 import PDFThumbnail from '../components/PDFThumbnail';
-import { useSEO } from '../hooks/useSEO';
-import { trackSearchQuery } from '../services/seo';
 
 // No longer needed as we're using the pdfProxy service
 
@@ -185,50 +183,6 @@ const Browse = () => {
   const subject = urlParams.get('subject') || '';
   const course = urlParams.get('course') || '';
   const college = urlParams.get('college') || '';
-
-  // Generate dynamic SEO based on search parameters
-  const generateBrowseSEO = () => {
-    let title = 'Browse Academic Papers';
-    let description = 'Explore thousands of question papers and study materials';
-    let keywords = ['question papers', 'academic resources', 'study materials'];
-
-    if (searchQuery) {
-      title = `Search Results for "${searchQuery}" - StudyVault`;
-      description = `Find question papers and study materials related to ${searchQuery}. Browse academic resources from universities and colleges.`;
-      keywords.push(searchQuery);
-    } else if (subject) {
-      title = `${subject} Question Papers - StudyVault`;
-      description = `Download ${subject} question papers, study materials, and exam resources. Access academic content from various universities and colleges.`;
-      keywords.push(subject, `${subject} papers`, `${subject} exams`);
-    } else if (course) {
-      title = `${course} Study Materials - StudyVault`;
-      description = `Browse ${course} question papers and academic resources. Find study materials for ${course} from different colleges and universities.`;
-      keywords.push(course, `${course} papers`, `${course} resources`);
-    } else if (college) {
-      title = `${college} Question Papers - StudyVault`;
-      description = `Access question papers and study materials from ${college}. Download academic resources shared by students.`;
-      keywords.push(college, `${college} papers`);
-    }
-
-    return { title, description, keywords };
-  };
-
-  const seoData = generateBrowseSEO();
-  
-  useSEO({
-    title: seoData.title,
-    description: seoData.description,
-    keywords: seoData.keywords,
-    url: `https://study-vault-gamma.vercel.app/browse${window.location.search}`,
-    type: 'website'
-  });
-
-  // Track search queries for analytics
-  useEffect(() => {
-    if (searchQuery && filteredPapers.length > 0) {
-      trackSearchQuery(searchQuery, filteredPapers.length);
-    }
-  }, [searchQuery, filteredPapers.length]);
 
   if (loading || metaLoading) {
     return (

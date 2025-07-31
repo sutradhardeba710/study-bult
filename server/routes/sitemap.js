@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router();
+const path = require('path'); // Added missing import for path
 
 // Import Firebase Admin initialization
 let admin;
@@ -8,6 +9,9 @@ try {
 } catch (error) {
   console.warn('Firebase Admin SDK not available for server-side sitemap generation:', error.message);
 }
+
+// Import sitemap generator
+const ReactViteSitemapGenerator = require('../react-vite-sitemap-generator');
 
 const BASE_URL = process.env.VITE_SITE_URL || 'https://study-vault2.vercel.app';
 
@@ -160,6 +164,51 @@ Crawl-delay: 1`;
   // Cache for 24 hours
   res.set('Cache-Control', 'public, max-age=86400');
   res.send(robotsTxt);
+});
+
+// API route to generate a new sitemap
+router.post('/api/generate-sitemap', async (req, res) => {
+  try {
+    console.log('📊 Starting sitemap generation process...');
+    
+    // Initialize sitemap generator with custom config
+    const generator = new ReactViteSitemapGenerator({
+      baseUrl: BASE_URL,
+      outputPath: path.resolve(__dirname, '../../public'),
+      staticRoutes: [
+        '/',
+        '/browse',
+        '/upload',
+        '/about',
+        '/contact',
+        '/faq',
+        '/help-center',
+        '/privacy',
+        '/terms',
+        '/cookie-policy'
+      ],
+      changefreq: 'weekly'
+    });
+    
+    // Generate sitemap
+    const result = await generator.generate();
+    
+    // Return success response
+    res.json({
+      success: true,
+      message: 'Sitemap generated successfully',
+      path: `${BASE_URL}/sitemap.xml`,
+      timestamp: new Date().toISOString()
+    });
+    
+  } catch (error) {
+    console.error('Error generating sitemap:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to generate sitemap',
+      error: error.message
+    });
+  }
 });
 
 module.exports = router; 

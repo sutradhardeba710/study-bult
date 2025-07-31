@@ -174,8 +174,14 @@ if (process.env.NODE_ENV !== 'production') {
 // Import the sitemap routes
 const sitemapRoutes = require('./routes/sitemap');
 
+// Import Google Search API routes
+const googleSearchRoutes = require('./routes/google-search');
+
 // Add sitemap routes
 app.use('/', sitemapRoutes);
+
+// Add Google Search API routes
+app.use('/api/google-search', googleSearchRoutes);
 
 // Add a health check for diagnostics
 app.get('/api/health-check', (req, res) => {
@@ -185,7 +191,8 @@ app.get('/api/health-check', (req, res) => {
     services: {
       email: !!process.env.VITE_EMAIL_HOST,
       firebase: !!process.env.VITE_FIREBASE_PROJECT_ID,
-      server: true
+      server: true,
+      googleSearch: true
     }
   });
 });

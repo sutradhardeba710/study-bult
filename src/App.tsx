@@ -21,11 +21,20 @@ const ResetPassword = lazy(() => import('./pages/ResetPassword'));
 const Browse = lazy(() => import('./pages/Browse'));
 const Upload = lazy(() => import('./pages/Upload'));
 const Dashboard = lazy(() => import('./pages/Dashboard'));
+const DashboardHome = lazy(() => import('./pages/dashboard/DashboardHome'));
+const LikedPapers = lazy(() => import('./pages/dashboard/LikedPapers'));
+const MyUploads = lazy(() => import('./pages/dashboard/MyUploads'));
+const Settings = lazy(() => import('./pages/dashboard/Settings'));
+const UploadPaper = lazy(() => import('./pages/dashboard/UploadPaper'));
+
+// Admin pages
+import GoogleSearch from './pages/admin/GoogleSearch';
+
+// Lazy load pages with route-based code splitting
 const AdminHome = lazy(() => import('./pages/admin'));
 const AdminPapers = lazy(() => import('./pages/admin/papers'));
-const AdminMeta = lazy(() => import('./pages/admin/meta'));
 const AdminUsers = lazy(() => import('./pages/admin/users'));
-const AdminSEO = lazy(() => import('./pages/admin/seo'));
+const AdminMeta = lazy(() => import('./pages/admin/meta'));
 const ProtectedAdminRoute = lazy(() => import('./pages/admin/ProtectedAdminRoute'));
 const About = lazy(() => import('./pages/About'));
 const Contact = lazy(() => import('./pages/Contact'));
@@ -95,7 +104,7 @@ function App() {
                 <Route path="/admin/papers" element={<Suspense fallback={<LoadingSpinner />}><ProtectedAdminRoute><AdminPapers /></ProtectedAdminRoute></Suspense>} />
                 <Route path="/admin/meta" element={<Suspense fallback={<LoadingSpinner />}><ProtectedAdminRoute><AdminMeta /></ProtectedAdminRoute></Suspense>} />
                 <Route path="/admin/users" element={<Suspense fallback={<LoadingSpinner />}><ProtectedAdminRoute><AdminUsers /></ProtectedAdminRoute></Suspense>} />
-                <Route path="/admin/seo" element={<Suspense fallback={<LoadingSpinner />}><ProtectedAdminRoute><AdminSEO /></ProtectedAdminRoute></Suspense>} />
+                <Route path="/admin/google-search" element={<Suspense fallback={<LoadingSpinner />}><ProtectedAdminRoute><GoogleSearch /></ProtectedAdminRoute></Suspense>} />
                 {/* Public Routes */}
                 <Route path="/*" element={
                   <div className="flex flex-col flex-1">
@@ -111,7 +120,13 @@ function App() {
                           <Route path="/reset-password" element={<Suspense fallback={<LoadingSpinner />}><ResetPassword /></Suspense>} />
                           <Route path="/browse" element={<Suspense fallback={<LoadingSpinner />}><Browse /></Suspense>} />
                           <Route path="/upload" element={<Suspense fallback={<LoadingSpinner />}><Upload /></Suspense>} />
-                          <Route path="/dashboard/*" element={<Suspense fallback={<LoadingSpinner />}><Dashboard /></Suspense>} />
+                          <Route path="/dashboard" element={<Suspense fallback={<LoadingSpinner />}><Dashboard /></Suspense>}>
+                            <Route index element={<Suspense fallback={<LoadingSpinner />}><DashboardHome /></Suspense>} />
+                            <Route path="uploads" element={<Suspense fallback={<LoadingSpinner />}><MyUploads /></Suspense>} />
+                            <Route path="likes" element={<Suspense fallback={<LoadingSpinner />}><LikedPapers /></Suspense>} />
+                            <Route path="settings" element={<Suspense fallback={<LoadingSpinner />}><Settings /></Suspense>} />
+                            <Route path="upload" element={<Suspense fallback={<LoadingSpinner />}><UploadPaper /></Suspense>} />
+                          </Route>
                           <Route path="/about" element={<Suspense fallback={<LoadingSpinner />}><About /></Suspense>} />
                           <Route path="/contact" element={<Suspense fallback={<LoadingSpinner />}><Contact /></Suspense>} />
                           <Route path="/privacy" element={<Suspense fallback={<LoadingSpinner />}><Privacy /></Suspense>} />
