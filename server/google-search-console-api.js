@@ -8,7 +8,8 @@ const path = require('path');
  */
 class GoogleSearchConsoleAPI {
   constructor() {
-    this.siteUrl = 'https://study-vault2.vercel.app/';
+    // Use environment variable or default to placeholder (should be set in production)
+    this.siteUrl = process.env.SITE_URL || 'https://your-site-url.com/';
     this.serviceAccountPath = path.join(__dirname, 'credentials.json'); // Download from Google Cloud Console
     this.webmastersService = null;
   }

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link, useLocation, NavLink } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { PanelLeft, X } from 'lucide-react';
 
 const links = [
@@ -9,8 +9,6 @@ const links = [
   { to: '/admin/users', label: 'Users' },
   { to: '/admin/google-search', label: 'Google Search' },
 ];
-
-const navLinkClass = 'flex items-center gap-2 px-5 py-3 rounded-lg font-medium transition text-base shadow-sm hover:bg-primary-50 hover:text-primary-700';
 
 const AdminSidebar: React.FC<{ open?: boolean; onClose?: () => void }> = ({ open = true, onClose }) => {
   const location = useLocation();

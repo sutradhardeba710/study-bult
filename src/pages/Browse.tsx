@@ -179,10 +179,14 @@ const Browse = () => {
 
   // Get URL parameters for SEO optimization
   const urlParams = new URLSearchParams(window.location.search);
-  const searchQuery = urlParams.get('q') || '';
-  const subject = urlParams.get('subject') || '';
-  const course = urlParams.get('course') || '';
-  const college = urlParams.get('college') || '';
+  
+  // Use search query from URL if available
+  useEffect(() => {
+    const searchFromUrl = urlParams.get('q');
+    if (searchFromUrl) {
+      setSearchTerm(searchFromUrl);
+    }
+  }, []);
 
   if (loading || metaLoading) {
     return (

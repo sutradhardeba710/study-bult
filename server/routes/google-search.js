@@ -23,8 +23,9 @@ router.post('/submit-sitemap', async (req, res) => {
       });
     }
 
-    // Submit sitemap
-    const sitemapUrl = 'https://study-vault2.vercel.app/sitemap.xml';
+    // Submit sitemap using environment variable or construct from site URL
+    const siteUrl = process.env.SITE_URL || 'https://your-site-url.com/';
+    const sitemapUrl = `${siteUrl.replace(/\/+$/, '')}/sitemap.xml`;
     const result = await searchConsoleAPI.submitSitemap(sitemapUrl);
     
     res.json({ 

@@ -1,6 +1,5 @@
 import { collection, addDoc, updateDoc, doc, increment, serverTimestamp } from 'firebase/firestore';
 import { db } from './firebase';
-import { autoSubmitPaperToIndex } from './seo';
 
 export interface PaperData {
   id?: string;
@@ -60,10 +59,22 @@ export const uploadPaper = async (
     // Cloudinary upload with progress
     const formData = new FormData();
     formData.append('file', file);
-    formData.append('upload_preset', import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET || 'YOUR_UNSIGNED_PRESET');
+    
+    const uploadPreset = import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET;
+    if (!uploadPreset) {
+      console.error('Cloudinary upload preset is not configured');
+      throw new Error('File upload configuration is missing. Please contact the administrator.');
+    }
+    
+    formData.append('upload_preset', uploadPreset);
     formData.append('folder', 'papers');
 
-    const cloudName = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME || 'YOUR_CLOUD_NAME';
+    const cloudName = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME;
+    if (!cloudName) {
+      console.error('Cloudinary cloud name is not configured');
+      throw new Error('File upload configuration is missing. Please contact the administrator.');
+    }
+    
     const url = `https://api.cloudinary.com/v1_1/${cloudName}/auto/upload`;
 
     const xhr = new XMLHttpRequest();
@@ -106,13 +117,16 @@ export const uploadPaper = async (
     };
     const paperDoc = await addDoc(collection(db, 'papers'), paperDataToSave);
 
-    // Auto-submit to Google indexing (fire and forget)
-    if (paperDoc.id) {
-      autoSubmitPaperToIndex(paperDoc.id).catch(error => {
-        console.warn('Failed to submit to Google indexing:', error);
-      });
+    // Optionally, trigger sitemap regeneration after upload
+    // This could be implemented as a server function to keep the sitemap up-to-date
+    try {
+      // This is just a placeholder - implement based on your needs
+      // await fetch('/api/regenerate-sitemap', { method: 'POST' });
+    } catch (error) {
+      console.error('Failed to trigger sitemap regeneration:', error);
+      // Non-critical error, don't throw
     }
-
+    
     return paperDoc.id;
   } catch (error: any) {
     console.error('Upload error:', error);

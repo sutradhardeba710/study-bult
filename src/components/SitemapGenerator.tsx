@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import googleSearchService from '../services/google-search';
 import axios from 'axios';
 
 interface SitemapGeneratorProps {
@@ -9,10 +8,13 @@ interface SitemapGeneratorProps {
 const SitemapGenerator: React.FC<SitemapGeneratorProps> = ({ className }) => {
   const [isGenerating, setIsGenerating] = useState(false);
   const [status, setStatus] = useState('');
+  // Get base URL from environment or window location
+  const baseUrl = import.meta.env.VITE_SITE_URL || window.location.origin;
+  
   const [mainUrls, setMainUrls] = useState<string[]>([
-    'https://study-vault2.vercel.app/',
-    'https://study-vault2.vercel.app/browse',
-    'https://study-vault2.vercel.app/about'
+    `${baseUrl}/`,
+    `${baseUrl}/browse`,
+    `${baseUrl}/about`
   ]);
   const [customUrl, setCustomUrl] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -23,12 +25,12 @@ const SitemapGenerator: React.FC<SitemapGeneratorProps> = ({ className }) => {
     setStatus('Generating sitemap...');
 
     try {
-      // Call backend to generate sitemap
-      const response = await axios.post('/api/generate-sitemap');
-      setStatus(`Sitemap generated successfully: ${response.data.path}`);
+      // Call backend to generate sitemap - ensure endpoint matches server route
+      const response = await axios.post('/api/sitemap/generate');
+      setStatus(`Sitemap generated successfully: ${response.data.path || 'sitemap.xml'}`);
     } catch (error) {
       console.error('Failed to generate sitemap:', error);
-      setStatus('Failed to generate sitemap');
+      setStatus('Failed to generate sitemap. Check server logs for details.');
     } finally {
       setIsGenerating(false);
     }
@@ -55,11 +57,17 @@ const SitemapGenerator: React.FC<SitemapGeneratorProps> = ({ className }) => {
     setStatus('Submitting URLs to Google for indexing...');
     
     try {
+      // Make sure this endpoint matches the server route configuration
       const response = await axios.post('/api/google-search/bulk-index', { urls: mainUrls });
-      setStatus(`${response.data.message}`);
-    } catch (error) {
+      
+      if (response.data && response.data.success) {
+        setStatus(`${response.data.message}`);
+      } else {
+        setStatus(`Error: ${response.data?.message || 'Unknown error occurred'}`);
+      }
+    } catch (error: any) {
       console.error('Failed to submit URLs for indexing:', error);
-      setStatus('Failed to submit URLs for indexing');
+      setStatus(`Failed to submit URLs: ${error.response?.data?.message || error.message || 'Unknown error'}`);
     } finally {
       setIsSubmitting(false);
     }
@@ -94,7 +102,7 @@ const SitemapGenerator: React.FC<SitemapGeneratorProps> = ({ className }) => {
               type="text"
               value={customUrl}
               onChange={(e) => setCustomUrl(e.target.value)}
-              placeholder="https://study-vault2.vercel.app/example"
+              placeholder={`${baseUrl}/example`}
               className="flex-1 px-3 py-2 border border-gray-300 rounded-l text-sm"
             />
             <button
