@@ -75,7 +75,10 @@ export default defineConfig({
           'vendor': ['react', 'react-dom', 'react-router-dom'],
           'ui': ['react-hot-toast', 'react-select', 'react-easy-crop', 'lucide-react'],
           'pdf': ['react-pdf', 'pdfjs-dist']
-        }
+        },
+        assetFileNames: 'assets/[name]-[hash][extname]',
+        chunkFileNames: 'assets/[name]-[hash].js',
+        entryFileNames: 'assets/[name]-[hash].js'
       }
     },
     minify: 'terser',
@@ -86,7 +89,9 @@ export default defineConfig({
       }
     },
     chunkSizeWarningLimit: 1000,
-    sourcemap: false
+    sourcemap: false,
+    assetsDir: 'assets',
+    outDir: 'dist'
   },
   css: {
     devSourcemap: false
