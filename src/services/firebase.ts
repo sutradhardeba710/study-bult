@@ -2,6 +2,7 @@ import { initializeApp } from 'firebase/app';
 import { getAuth, GoogleAuthProvider, setPersistence, browserLocalPersistence } from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore';
 import { getStorage } from 'firebase/storage';
+import { getFunctions } from 'firebase/functions';
 
 // Your Firebase configuration
 // Replace with your actual Firebase config or use environment variables
@@ -19,29 +20,29 @@ const isConfigValid = () => {
   // Check if any config value contains placeholder text
   const hasPlaceholders = Object.values(firebaseConfig).some(
     value => typeof value === 'string' && (
-      value.includes('your-') || 
-      value === 'undefined' || 
+      value.includes('your-') ||
+      value === 'undefined' ||
       value.length < 5
     )
   );
-  
+
   // Check if required fields are present and not placeholders
   const requiredFields = ['apiKey', 'authDomain', 'projectId'];
   const missingRequiredFields = requiredFields.some(
-    field => !firebaseConfig[field] || 
-            typeof firebaseConfig[field] !== 'string' || 
-            firebaseConfig[field].includes('your-')
+    field => !firebaseConfig[field] ||
+      typeof firebaseConfig[field] !== 'string' ||
+      firebaseConfig[field].includes('your-')
   );
-  
+
   // Check if we're in a development environment
   const isDevelopment = import.meta.env.DEV;
-  
+
   // Log warnings in development
   if (isDevelopment && (hasPlaceholders || missingRequiredFields)) {
     console.warn('⚠️ Firebase configuration is incomplete. Authentication and other Firebase features may not work correctly.');
     console.warn('Please check your environment variables and ensure they are properly set.');
   }
-  
+
   return !hasPlaceholders && !missingRequiredFields;
 };
 
@@ -62,6 +63,7 @@ setPersistence(auth, browserLocalPersistence)
 
 export const db = getFirestore(app);
 export const storage = getStorage(app);
+export const functions = getFunctions(app);
 export const googleProvider = new GoogleAuthProvider();
 
 // Export config validation
@@ -75,4 +77,4 @@ if (import.meta.env.DEV) {
   }
 }
 
-export default app; 
+export default app;
