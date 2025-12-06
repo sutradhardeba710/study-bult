@@ -4,7 +4,7 @@ import { getAllUsers, updateUser, deleteUser, type UserProfile } from '../../ser
 import { getUserPapers, getUserDownloads, getUserLikeEvents } from '../../services/papers';
 import { useAuth } from '../../context/AuthContext';
 import toast from 'react-hot-toast';
-import { PanelLeft } from 'lucide-react';
+import { PanelLeft, AlertTriangle, ShieldAlert } from 'lucide-react';
 import Select from 'react-select';
 
 const AdminUsers: React.FC = () => {
@@ -18,6 +18,8 @@ const AdminUsers: React.FC = () => {
   const [roleFilter, setRoleFilter] = useState('all');
   const [activityUser, setActivityUser] = useState<UserProfile | null>(null);
   const [showActivityModal, setShowActivityModal] = useState(false);
+  const [showDemoteWarning, setShowDemoteWarning] = useState(false);
+
   // Activity modal state
   const [activityLoading, setActivityLoading] = useState(false);
   const [activityError, setActivityError] = useState('');
@@ -70,9 +72,12 @@ const AdminUsers: React.FC = () => {
     setIsEditModalOpen(true);
   };
 
-  const handleUpdate = async (e?: React.FormEvent) => {
-    if (e) e.preventDefault();
+  const executeUpdate = async (isSelfDemotion: boolean) => {
     if (!editUid) return;
+
+    // Close warning modal if open
+    setShowDemoteWarning(false);
+
     setLoading(true);
     try {
       await updateUser(editUid, editData);
@@ -81,12 +86,40 @@ const AdminUsers: React.FC = () => {
       setEditData({});
       setIsEditModalOpen(false);
       fetchUsers();
+
+      // If admin removed their own privileges, redirect them
+      if (isSelfDemotion) {
+        toast.error('You have removed your admin privileges. Redirecting to home page...', {
+          duration: 5000,
+          icon: '👋',
+        });
+        setTimeout(() => {
+          window.location.href = '/';
+        }, 3000);
+      }
     } catch (error) {
       console.error('Failed to update user:', error);
       toast.error('Failed to update user: ' + (error instanceof Error ? error.message : String(error)));
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleUpdate = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+    if (!editUid) return;
+
+    // Safety check: Only warn if the currently logged-in admin is trying to change their own role
+    const isEditingSelf = currentUser?.uid === editUid;
+    const originalUser = users.find(u => u.uid === editUid);
+    const isChangingOwnAdminRole = isEditingSelf && originalUser?.role === 'admin' && editData.role !== 'admin';
+
+    if (isChangingOwnAdminRole) {
+      setShowDemoteWarning(true);
+      return;
+    }
+
+    await executeUpdate(false);
   };
 
   const handleDelete = async (uid: string) => {
@@ -137,88 +170,88 @@ const AdminUsers: React.FC = () => {
       <div className="flex flex-col md:flex-row">
         <AdminSidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} />
         <main className="flex-1 p-2 sm:p-4 md:p-8 md:ml-0 mt-16 md:mt-0">
-        <h1 className="text-2xl font-bold mb-6">Manage Users</h1>
-        <div className="bg-white rounded-lg shadow p-2 sm:p-6">
-          {/* Search and filter bar */}
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-4">
-            <input
-              type="text"
-              placeholder="Search by name or email"
-              value={search}
-              onChange={e => setSearch(e.target.value)}
-              className="border rounded px-3 py-2 w-full md:w-64"
-            />
-            <Select
-              classNamePrefix="react-select"
-              options={[
-                { value: 'all', label: 'All Roles' },
-                { value: 'student', label: 'Student' },
-                { value: 'admin', label: 'Admin' },
-              ]}
-              value={{ value: roleFilter, label: roleFilter === 'all' ? 'All Roles' : roleFilter.charAt(0).toUpperCase() + roleFilter.slice(1) }}
-              onChange={option => setRoleFilter(option ? option.value : 'all')}
-              className="w-full md:w-48"
-              isSearchable={false}
-            />
-          </div>
-          {loading ? (
-            <div className="flex justify-center py-12">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600"></div>
+          <h1 className="text-2xl font-bold mb-6">Manage Users</h1>
+          <div className="bg-white rounded-lg shadow p-2 sm:p-6">
+            {/* Search and filter bar */}
+            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-4">
+              <input
+                type="text"
+                placeholder="Search by name or email"
+                value={search}
+                onChange={e => setSearch(e.target.value)}
+                className="border rounded px-3 py-2 w-full md:w-64"
+              />
+              <Select
+                classNamePrefix="react-select"
+                options={[
+                  { value: 'all', label: 'All Roles' },
+                  { value: 'student', label: 'Student' },
+                  { value: 'admin', label: 'Admin' },
+                ]}
+                value={{ value: roleFilter, label: roleFilter === 'all' ? 'All Roles' : roleFilter.charAt(0).toUpperCase() + roleFilter.slice(1) }}
+                onChange={option => setRoleFilter(option ? option.value : 'all')}
+                className="w-full md:w-48"
+                isSearchable={false}
+              />
             </div>
-          ) : filteredUsers.length === 0 ? (
-            <div className="text-center text-gray-400 py-12">No users found.</div>
-          ) : (
-            <div className="overflow-x-auto">
-              <table className="min-w-full divide-y divide-gray-200 text-sm">
-                <thead className="bg-gray-50">
-                  <tr>
-                    <th className="px-2 sm:px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Name</th>
-                    <th className="px-2 sm:px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Email</th>
-                    <th className="px-2 sm:px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Role</th>
-                    <th className="px-2 sm:px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">College</th>
-                    <th className="px-2 sm:px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Semester</th>
-                    <th className="px-2 sm:px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Course</th>
-                    <th className="px-2 sm:px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
-                  </tr>
-                </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
-                  {filteredUsers.map(user => (
-                    <tr key={user.uid}>
-                      <td className="px-2 sm:px-4 py-2">{user.name}</td>
-                      <td className="px-2 sm:px-4 py-2">{user.email}</td>
-                      <td className="px-2 sm:px-4 py-2">
-                        <span className={`px-2 py-1 rounded text-xs font-semibold ${user.role === 'admin' ? 'bg-primary-100 text-primary-700' : 'bg-gray-100 text-gray-700'}`}>{user.role}</span>
-                      </td>
-                      <td className="px-2 sm:px-4 py-2">{user.college}</td>
-                      <td className="px-2 sm:px-4 py-2">{user.semester}</td>
-                      <td className="px-2 sm:px-4 py-2">{user.course}</td>
+            {loading ? (
+              <div className="flex justify-center py-12">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600"></div>
+              </div>
+            ) : filteredUsers.length === 0 ? (
+              <div className="text-center text-gray-400 py-12">No users found.</div>
+            ) : (
+              <div className="overflow-x-auto">
+                <table className="min-w-full divide-y divide-gray-200 text-sm">
+                  <thead className="bg-gray-50">
+                    <tr>
+                      <th className="px-2 sm:px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Name</th>
+                      <th className="px-2 sm:px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Email</th>
+                      <th className="px-2 sm:px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Role</th>
+                      <th className="px-2 sm:px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">College</th>
+                      <th className="px-2 sm:px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Semester</th>
+                      <th className="px-2 sm:px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Course</th>
+                      <th className="px-2 sm:px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody className="bg-white divide-y divide-gray-200">
+                    {filteredUsers.map(user => (
+                      <tr key={user.uid}>
+                        <td className="px-2 sm:px-4 py-2">{user.name}</td>
+                        <td className="px-2 sm:px-4 py-2">{user.email}</td>
+                        <td className="px-2 sm:px-4 py-2">
+                          <span className={`px-2 py-1 rounded text-xs font-semibold ${user.role === 'admin' ? 'bg-primary-100 text-primary-700' : 'bg-gray-100 text-gray-700'}`}>{user.role}</span>
+                        </td>
+                        <td className="px-2 sm:px-4 py-2">{user.college}</td>
+                        <td className="px-2 sm:px-4 py-2">{user.semester}</td>
+                        <td className="px-2 sm:px-4 py-2">{user.course}</td>
                         <td className="px-2 sm:px-4 py-2 align-top">
                           <div className="flex flex-col gap-2 w-full">
-                            <button 
-                              className="px-3 py-1 text-xs rounded font-semibold bg-yellow-400 text-white hover:bg-yellow-500 transition-colors w-full" 
-                              onClick={() => handleEdit(user)} 
+                            <button
+                              className="px-3 py-1 text-xs rounded font-semibold bg-yellow-400 text-white hover:bg-yellow-500 transition-colors w-full"
+                              onClick={() => handleEdit(user)}
                               disabled={loading}
                             >
                               Edit
                             </button>
-                            <button 
-                              className="px-3 py-1 text-xs rounded font-semibold bg-blue-600 text-white hover:bg-blue-700 transition-colors w-full" 
-                              onClick={() => handleViewActivity(user)} 
+                            <button
+                              className="px-3 py-1 text-xs rounded font-semibold bg-blue-600 text-white hover:bg-blue-700 transition-colors w-full"
+                              onClick={() => handleViewActivity(user)}
                               disabled={loading}
                             >
                               View Activity
                             </button>
-                            <button 
-                              className="px-3 py-1 text-xs rounded font-semibold bg-purple-600 text-white hover:bg-purple-700 transition-colors w-full" 
-                              onClick={() => handleResetPassword(user)} 
+                            <button
+                              className="px-3 py-1 text-xs rounded font-semibold bg-purple-600 text-white hover:bg-purple-700 transition-colors w-full"
+                              onClick={() => handleResetPassword(user)}
                               disabled={loading}
                             >
                               Reset Password
                             </button>
                             {currentUser?.uid !== user.uid && (
-                              <button 
-                                className="px-3 py-1 text-xs rounded font-semibold bg-red-600 text-white hover:bg-red-700 transition-colors w-full" 
-                                onClick={() => handleDelete(user.uid)} 
+                              <button
+                                className="px-3 py-1 text-xs rounded font-semibold bg-red-600 text-white hover:bg-red-700 transition-colors w-full"
+                                onClick={() => handleDelete(user.uid)}
                                 disabled={loading}
                               >
                                 Delete
@@ -226,164 +259,216 @@ const AdminUsers: React.FC = () => {
                             )}
                           </div>
                         </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
+          {/* Edit User Modal */}
+          {isEditModalOpen && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50" onClick={() => setIsEditModalOpen(false)}>
+              <div
+                className="bg-white rounded-lg shadow-lg p-4 sm:p-6 w-full max-w-md mx-2 relative flex flex-col"
+                onClick={e => e.stopPropagation()}
+              >
+                <button
+                  className="absolute top-2 right-2 text-gray-500 hover:text-gray-700 text-2xl"
+                  onClick={() => setIsEditModalOpen(false)}
+                  aria-label="Close"
+                >
+                  &times;
+                </button>
+                <h2 className="text-xl font-bold mb-4 text-center text-primary-700 break-words">Edit User</h2>
+                <form onSubmit={handleUpdate} className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Name</label>
+                    <input
+                      type="text"
+                      className="border rounded px-3 py-2 w-full"
+                      value={editData.name || ''}
+                      onChange={e => setEditData({ ...editData, name: e.target.value })}
+                      disabled={loading}
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Role</label>
+                    <select
+                      className="border rounded px-3 py-2 w-full"
+                      value={editData.role || 'student'}
+                      onChange={e => setEditData({ ...editData, role: e.target.value as 'student' | 'admin' })}
+                      disabled={loading}
+                    >
+                      <option value="student">Student</option>
+                      <option value="admin">Admin</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">College</label>
+                    <input
+                      type="text"
+                      className="border rounded px-3 py-2 w-full"
+                      value={editData.college || ''}
+                      onChange={e => setEditData({ ...editData, college: e.target.value })}
+                      disabled={loading}
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Semester</label>
+                    <input
+                      type="text"
+                      className="border rounded px-3 py-2 w-full"
+                      value={editData.semester || ''}
+                      onChange={e => setEditData({ ...editData, semester: e.target.value })}
+                      disabled={loading}
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Course</label>
+                    <input
+                      type="text"
+                      className="border rounded px-3 py-2 w-full"
+                      value={editData.course || ''}
+                      onChange={e => setEditData({ ...editData, course: e.target.value })}
+                      disabled={loading}
+                    />
+                  </div>
+                  <div className="flex justify-end space-x-2 pt-2">
+                    <button
+                      type="button"
+                      className="btn-secondary px-4 py-2"
+                      onClick={() => { setIsEditModalOpen(false); setEditUid(null); setEditData({}); }}
+                      disabled={loading}
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="submit"
+                      className="btn-primary px-4 py-2"
+                      disabled={loading}
+                    >
+                      {loading ? 'Saving...' : 'Save'}
+                    </button>
+                  </div>
+                </form>
+              </div>
             </div>
           )}
-        </div>
-        {/* Edit User Modal */}
-        {isEditModalOpen && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50" onClick={() => setIsEditModalOpen(false)}>
-            <div
-              className="bg-white rounded-lg shadow-lg p-4 sm:p-6 w-full max-w-md mx-2 relative flex flex-col"
-              onClick={e => e.stopPropagation()}
-            >
-              <button
-                className="absolute top-2 right-2 text-gray-500 hover:text-gray-700 text-2xl"
-                onClick={() => setIsEditModalOpen(false)}
-                aria-label="Close"
-              >
-                &times;
-              </button>
-              <h2 className="text-xl font-bold mb-4 text-center text-primary-700 break-words">Edit User</h2>
-              <form onSubmit={handleUpdate} className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Name</label>
-                  <input
-                    type="text"
-                    className="border rounded px-3 py-2 w-full"
-                    value={editData.name || ''}
-                    onChange={e => setEditData({ ...editData, name: e.target.value })}
-                    disabled={loading}
-                    required
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Role</label>
-                  <select
-                    className="border rounded px-3 py-2 w-full"
-                    value={editData.role || 'student'}
-                    onChange={e => setEditData({ ...editData, role: e.target.value as 'student' | 'admin' })}
-                    disabled={loading}
-                  >
-                    <option value="student">Student</option>
-                    <option value="admin">Admin</option>
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">College</label>
-                  <input
-                    type="text"
-                    className="border rounded px-3 py-2 w-full"
-                    value={editData.college || ''}
-                    onChange={e => setEditData({ ...editData, college: e.target.value })}
-                    disabled={loading}
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Semester</label>
-                  <input
-                    type="text"
-                    className="border rounded px-3 py-2 w-full"
-                    value={editData.semester || ''}
-                    onChange={e => setEditData({ ...editData, semester: e.target.value })}
-                    disabled={loading}
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Course</label>
-                  <input
-                    type="text"
-                    className="border rounded px-3 py-2 w-full"
-                    value={editData.course || ''}
-                    onChange={e => setEditData({ ...editData, course: e.target.value })}
-                    disabled={loading}
-                  />
-                </div>
-                <div className="flex justify-end space-x-2 pt-2">
-                  <button
-                    type="button"
-                    className="btn-secondary px-4 py-2"
-                    onClick={() => { setIsEditModalOpen(false); setEditUid(null); setEditData({}); }}
-                    disabled={loading}
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    type="submit"
-                    className="btn-primary px-4 py-2"
-                    disabled={loading}
-                  >
-                    {loading ? 'Saving...' : 'Save'}
-                  </button>
-                </div>
-              </form>
-            </div>
-          </div>
-        )}
-        {/* Activity Modal */}
-        {showActivityModal && activityUser && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50" onClick={() => setShowActivityModal(false)}>
+          {/* Activity Modal */}
+          {showActivityModal && activityUser && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50" onClick={() => setShowActivityModal(false)}>
               <div className="bg-white rounded-lg shadow-lg p-2 sm:p-6 w-full max-w-full sm:max-w-lg mx-2 relative flex flex-col overflow-y-auto max-h-[90vh]" onClick={e => e.stopPropagation()}>
-              <button className="absolute top-2 right-2 text-gray-500 hover:text-gray-700 text-2xl" onClick={() => setShowActivityModal(false)} aria-label="Close">&times;</button>
-              <h2 className="text-xl font-bold mb-4 text-center text-primary-700 break-words">User Activity</h2>
-              <div className="mb-4 text-center text-gray-700 font-semibold">{activityUser.name} ({activityUser.email})</div>
-              {activityLoading ? (
-                <div className="flex justify-center py-8"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600"></div></div>
-              ) : activityError ? (
-                <div className="text-red-600 text-center py-4">{activityError}</div>
-              ) : (
-                <div className="space-y-6">
-                  <div>
-                    <h3 className="font-semibold text-gray-900 mb-2">Recent Uploads</h3>
-                    {uploads.length === 0 ? <div className="text-gray-400 text-sm">No uploads found.</div> : (
-                      <ul className="divide-y divide-gray-100">
-                        {uploads.slice(0, 5).map((paper) => (
-                          <li key={paper.id} className="py-1 flex flex-col">
-                            <span className="font-medium text-gray-800">{paper.title}</span>
-                            <span className="text-xs text-gray-500">{paper.status} &middot; {paper.createdAt && (paper.createdAt.toDate ? paper.createdAt.toDate().toLocaleDateString() : new Date(paper.createdAt).toLocaleDateString())}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    )}
+                <button className="absolute top-2 right-2 text-gray-500 hover:text-gray-700 text-2xl" onClick={() => setShowActivityModal(false)} aria-label="Close">&times;</button>
+                <h2 className="text-xl font-bold mb-4 text-center text-primary-700 break-words">User Activity</h2>
+                <div className="mb-4 text-center text-gray-700 font-semibold">{activityUser.name} ({activityUser.email})</div>
+                {activityLoading ? (
+                  <div className="flex justify-center py-8"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600"></div></div>
+                ) : activityError ? (
+                  <div className="text-red-600 text-center py-4">{activityError}</div>
+                ) : (
+                  <div className="space-y-6">
+                    <div>
+                      <h3 className="font-semibold text-gray-900 mb-2">Recent Uploads</h3>
+                      {uploads.length === 0 ? <div className="text-gray-400 text-sm">No uploads found.</div> : (
+                        <ul className="divide-y divide-gray-100">
+                          {uploads.slice(0, 5).map((paper) => (
+                            <li key={paper.id} className="py-1 flex flex-col">
+                              <span className="font-medium text-gray-800">{paper.title}</span>
+                              <span className="text-xs text-gray-500">{paper.status} &middot; {paper.createdAt && (paper.createdAt.toDate ? paper.createdAt.toDate().toLocaleDateString() : new Date(paper.createdAt).toLocaleDateString())}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      )}
+                    </div>
+                    <div>
+                      <h3 className="font-semibold text-gray-900 mb-2">Recent Likes</h3>
+                      {likes.length === 0 ? <div className="text-gray-400 text-sm">No likes found.</div> : (
+                        <ul className="divide-y divide-gray-100">
+                          {likes.slice(0, 5).map((like) => (
+                            <li key={like.paperId} className="py-1 flex flex-col">
+                              <span className="font-medium text-gray-800">{like.title}</span>
+                              <span className="text-xs text-gray-500">{like.date && (like.date.toDate ? like.date.toDate().toLocaleDateString() : new Date(like.date).toLocaleDateString())}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      )}
+                    </div>
+                    <div>
+                      <h3 className="font-semibold text-gray-900 mb-2">Recent Downloads</h3>
+                      {downloads.length === 0 ? <div className="text-gray-400 text-sm">No downloads found.</div> : (
+                        <ul className="divide-y divide-gray-100">
+                          {downloads.slice(0, 5).map((paper) => (
+                            <li key={paper.id} className="py-1 flex flex-col">
+                              <span className="font-medium text-gray-800">{paper.title}</span>
+                              <span className="text-xs text-gray-500">{paper.createdAt && (paper.createdAt.toDate ? paper.createdAt.toDate().toLocaleDateString() : new Date(paper.createdAt).toLocaleDateString())}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      )}
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* Dangerous Action Warning Modal */}
+          {showDemoteWarning && (
+            <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-in fade-in duration-200">
+              <div className="bg-white rounded-xl shadow-2xl max-w-md w-full overflow-hidden border-l-4 border-red-600 animate-in zoom-in-95 duration-200">
+                <div className="bg-red-50 p-6 flex items-start gap-4 border-b border-red-100">
+                  <div className="p-3 bg-red-100 rounded-full shrink-0">
+                    <ShieldAlert className="w-8 h-8 text-red-600" />
                   </div>
                   <div>
-                    <h3 className="font-semibold text-gray-900 mb-2">Recent Likes</h3>
-                    {likes.length === 0 ? <div className="text-gray-400 text-sm">No likes found.</div> : (
-                      <ul className="divide-y divide-gray-100">
-                        {likes.slice(0, 5).map((like) => (
-                          <li key={like.paperId} className="py-1 flex flex-col">
-                            <span className="font-medium text-gray-800">{like.title}</span>
-                            <span className="text-xs text-gray-500">{like.date && (like.date.toDate ? like.date.toDate().toLocaleDateString() : new Date(like.date).toLocaleDateString())}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    )}
-                  </div>
-                  <div>
-                    <h3 className="font-semibold text-gray-900 mb-2">Recent Downloads</h3>
-                    {downloads.length === 0 ? <div className="text-gray-400 text-sm">No downloads found.</div> : (
-                      <ul className="divide-y divide-gray-100">
-                        {downloads.slice(0, 5).map((paper) => (
-                          <li key={paper.id} className="py-1 flex flex-col">
-                            <span className="font-medium text-gray-800">{paper.title}</span>
-                            <span className="text-xs text-gray-500">{paper.createdAt && (paper.createdAt.toDate ? paper.createdAt.toDate().toLocaleDateString() : new Date(paper.createdAt).toLocaleDateString())}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    )}
+                    <h3 className="text-xl font-bold text-gray-900">Revoke Admin Access?</h3>
+                    <p className="text-sm text-red-700 mt-1 font-medium">
+                      You are about to remove your own admin privileges.
+                    </p>
                   </div>
                 </div>
-              )}
+
+                <div className="p-6 space-y-5">
+                  <div className="bg-gray-50 rounded-lg p-4 text-sm text-gray-700 space-y-3 border border-gray-200">
+                    <p className="font-semibold text-gray-900 flex items-center gap-2">
+                      <AlertTriangle className="w-4 h-4 text-orange-500" />
+                      Consequences of this action:
+                    </p>
+                    <ul className="list-disc pl-5 space-y-2 text-gray-600">
+                      <li>You will <span className="font-bold text-red-600">immediately lose access</span> to the admin dashboard.</li>
+                      <li>You will not be able to manage users or approve papers.</li>
+                      <li>You cannot undo this yourself. Another admin must restore your access.</li>
+                    </ul>
+                  </div>
+                  <p className="text-xs text-gray-500 italic text-center">
+                    Are you absolutely sure you want to proceed?
+                  </p>
+                </div>
+
+                <div className="p-4 bg-gray-50 flex justify-end gap-3 border-t border-gray-100">
+                  <button
+                    onClick={() => executeUpdate(true)}
+                    className="px-5 py-2.5 text-sm font-bold text-white bg-red-600 hover:bg-red-700 rounded-lg shadow-lg hover:shadow-xl transition-all transform hover:-translate-y-0.5 flex items-center gap-2"
+                  >
+                    <ShieldAlert className="w-4 h-4" />
+                    Yes, Revoke Access
+                  </button>
+                  <button
+                    onClick={() => setShowDemoteWarning(false)}
+                    className="px-5 py-2.5 text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-200 rounded-lg transition-colors"
+                  >
+                    Cancel, Keep My Access
+                  </button>
+                </div>
+              </div>
             </div>
-          </div>
-        )}
-      </main>
+          )}
+        </main>
       </div>
     </div>
   );
 };
 
-export default AdminUsers; 
+export default AdminUsers;

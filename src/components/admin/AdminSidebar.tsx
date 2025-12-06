@@ -7,12 +7,12 @@ const links = [
   { to: '/admin/papers', label: 'Papers' },
   { to: '/admin/meta', label: 'Subjects & Meta' },
   { to: '/admin/users', label: 'Users' },
-  { to: '/admin/google-search', label: 'Google Search' },
+
 ];
 
 const AdminSidebar: React.FC<{ open?: boolean; onClose?: () => void }> = ({ open = true, onClose }) => {
   const location = useLocation();
-  
+
   return (
     <>
       {/* Sidebar overlay for mobile */}
