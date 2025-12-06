@@ -63,6 +63,7 @@ setPersistence(auth, browserLocalPersistence)
 
 export const db = getFirestore(app);
 export const storage = getStorage(app);
+
 let functionsInstance: any = null;
 try {
   functionsInstance = getFunctions(app);
@@ -70,6 +71,7 @@ try {
   console.warn('Firebase Functions service not available:', error);
 }
 export const functions = functionsInstance;
+
 export const googleProvider = new GoogleAuthProvider();
 
 // Export config validation
