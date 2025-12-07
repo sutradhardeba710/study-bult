@@ -15,8 +15,7 @@ import { signInWithGoogle, signInWithGoogleRedirect, getGoogleRedirectResult } f
 import { 
   sendWelcomeEmail, 
   sendLoginNotificationEmail, 
-  sendAccountDeletionEmail,
-  sendPasswordResetEmail 
+  sendAccountDeletionEmail
 } from '../services/email';
 
 export interface UserProfile {
@@ -276,10 +275,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       // Firebase will send an email with a password reset link
       await firebaseSendPasswordResetEmail(auth, email);
-      
-      // We can also send our custom email with the same link
-      const resetLink = `${window.location.origin}/reset-password?email=${encodeURIComponent(email)}`;
-      await sendPasswordResetEmail(email, resetLink);
+      // FIXED: Custom email removed - it was sending incorrect reset link
+      // Firebase's email contains the correct action code for password reset
     } catch (error) {
       console.error('Reset password error:', error);
       throw error;
