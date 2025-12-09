@@ -63,7 +63,8 @@ function App() {
   useEffect(() => {
     try {
       // Load Google Maps if API key is provided - defer loading for better initial performance
-      if (GOOGLE_MAPS_API_KEY && typeof GOOGLE_MAPS_API_KEY === 'string' && GOOGLE_MAPS_API_KEY.length > 0) {
+      // Only load Google Maps if we have a valid API key (not empty and not a placeholder)
+      if (GOOGLE_MAPS_API_KEY && typeof GOOGLE_MAPS_API_KEY === 'string' && GOOGLE_MAPS_API_KEY.length > 0 && !GOOGLE_MAPS_API_KEY.includes('your-')) {
         const timer = setTimeout(() => {
           loadGoogleMaps(GOOGLE_MAPS_API_KEY)
             .catch(error => {
@@ -122,7 +123,7 @@ function App() {
                           <Route path="/auth/action" element={<Suspense fallback={<LoadingSpinner />}><AuthAction /></Suspense>} />
                           <Route path="/browse" element={<Suspense fallback={<LoadingSpinner />}><Browse /></Suspense>} />
                           <Route path="/upload" element={<Suspense fallback={<LoadingSpinner />}><Upload /></Suspense>} />
-                          <Route path="/dashboard" element={<Suspense fallback={<LoadingSpinner />}><Dashboard /></Suspense>}>
+                          <Route path="/dashboard/*" element={<Suspense fallback={<LoadingSpinner />}><Dashboard /></Suspense>}>
                             <Route index element={<Suspense fallback={<LoadingSpinner />}><DashboardHome /></Suspense>} />
                             <Route path="uploads" element={<Suspense fallback={<LoadingSpinner />}><MyUploads /></Suspense>} />
                             <Route path="likes" element={<Suspense fallback={<LoadingSpinner />}><LikedPapers /></Suspense>} />
