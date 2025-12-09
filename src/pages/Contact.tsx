@@ -8,7 +8,7 @@ const Contact = () => {
     message: ''
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [submitStatus, setSubmitStatus] = useState<{success?: boolean; message?: string} | null>(null);
+  const [submitStatus, setSubmitStatus] = useState<{ success?: boolean; message?: string } | null>(null);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -22,17 +22,17 @@ const Contact = () => {
     e.preventDefault();
     setIsSubmitting(true);
     setSubmitStatus(null);
-    
+
     // Simulate form submission
     try {
       // In a real application, you would send this data to your backend
       await new Promise(resolve => setTimeout(resolve, 1000));
-      
+
       setSubmitStatus({
         success: true,
         message: 'Your message has been sent! We will get back to you soon.'
       });
-      
+
       // Reset form
       setFormData({
         name: '',
@@ -53,7 +53,7 @@ const Contact = () => {
   return (
     <div className="max-w-4xl mx-auto py-12 px-4">
       <h1 className="text-3xl font-bold mb-6 text-gray-900">Contact Us</h1>
-      
+
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         <div>
           <div className="bg-white rounded-lg shadow-sm p-6 border border-gray-200">
@@ -61,7 +61,7 @@ const Contact = () => {
             <p className="text-gray-600 mb-6">
               Have questions, feedback, or need support? We're here to help! Fill out the form or reach out to us directly.
             </p>
-            
+
             <div className="space-y-4">
               <div className="flex items-start">
                 <div className="flex-shrink-0 mt-1">
@@ -71,12 +71,12 @@ const Contact = () => {
                 </div>
                 <div className="ml-3">
                   <p className="text-sm font-medium text-gray-900">Email</p>
-                  <a href="mailto:support@studyvault.com" className="text-sm text-primary-600 hover:text-primary-700">
-                    support@studyvault.com
+                  <a href="mailto:support@study-volte.site" className="text-sm text-primary-600 hover:text-primary-700">
+                    support@study-volte.site
                   </a>
                 </div>
               </div>
-              
+
               <div className="flex items-start">
                 <div className="flex-shrink-0 mt-1">
                   <svg className="h-6 w-6 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -90,7 +90,7 @@ const Contact = () => {
                   </p>
                 </div>
               </div>
-              
+
               <div className="flex items-start">
                 <div className="flex-shrink-0 mt-1">
                   <svg className="h-6 w-6 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -109,17 +109,17 @@ const Contact = () => {
             </div>
           </div>
         </div>
-        
+
         <div>
           <form onSubmit={handleSubmit} className="bg-white rounded-lg shadow-sm p-6 border border-gray-200">
             <h2 className="text-xl font-semibold mb-4 text-gray-800">Send us a Message</h2>
-            
+
             {submitStatus && (
               <div className={`p-3 mb-4 rounded ${submitStatus.success ? 'bg-green-50 text-green-800' : 'bg-red-50 text-red-800'}`}>
                 {submitStatus.message}
               </div>
             )}
-            
+
             <div className="space-y-4">
               <div>
                 <label htmlFor="name" className="block text-sm font-medium text-gray-700">Name</label>
@@ -133,7 +133,7 @@ const Contact = () => {
                   className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500"
                 />
               </div>
-              
+
               <div>
                 <label htmlFor="email" className="block text-sm font-medium text-gray-700">Email</label>
                 <input
@@ -146,7 +146,7 @@ const Contact = () => {
                   className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500"
                 />
               </div>
-              
+
               <div>
                 <label htmlFor="subject" className="block text-sm font-medium text-gray-700">Subject</label>
                 <select
@@ -166,7 +166,7 @@ const Contact = () => {
                   <option value="Other">Other</option>
                 </select>
               </div>
-              
+
               <div>
                 <label htmlFor="message" className="block text-sm font-medium text-gray-700">Message</label>
                 <textarea
@@ -179,7 +179,7 @@ const Contact = () => {
                   className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500"
                 ></textarea>
               </div>
-              
+
               <div>
                 <button
                   type="submit"
@@ -193,8 +193,8 @@ const Contact = () => {
           </form>
         </div>
       </div>
-  </div>
-);
+    </div>
+  );
 };
 
 export default Contact; 

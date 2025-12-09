@@ -1,14 +1,14 @@
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { 
-  Home, 
-  Upload, 
-  FolderOpen, 
-  Heart, 
-  Settings, 
+import {
+  Home,
+  Upload,
+  FolderOpen,
+  Heart,
+  Settings,
   LogOut,
   User,
-  BookOpen 
+  BookOpen
 } from 'lucide-react';
 
 const DashboardSidebar = ({ onClose }: { onClose?: () => void }) => {
@@ -51,7 +51,7 @@ const DashboardSidebar = ({ onClose }: { onClose?: () => void }) => {
           <div className="w-8 h-8 bg-primary-600 rounded-lg flex items-center justify-center">
             <BookOpen className="w-5 h-5 text-white" />
           </div>
-          <span className="text-xl font-bold text-gray-900">StudyVault</span>
+          <span className="text-xl font-bold text-gray-900">Study Volte</span>
         </Link>
       </div>
       {/* User Profile */}
@@ -79,11 +79,10 @@ const DashboardSidebar = ({ onClose }: { onClose?: () => void }) => {
               <li key={item.name}>
                 <Link
                   to={item.href}
-                  className={`flex items-center gap-3 px-3 py-2 rounded-lg text-base font-medium transition-colors duration-200 ${
-                    isActive
+                  className={`flex items-center gap-3 px-3 py-2 rounded-lg text-base font-medium transition-colors duration-200 ${isActive
                       ? 'bg-primary-100 text-primary-700 shadow-sm'
                       : 'text-gray-700 hover:bg-gray-50'
-                  }`}
+                    }`}
                   onClick={onClose}
                 >
                   <item.icon className="w-5 h-5" />

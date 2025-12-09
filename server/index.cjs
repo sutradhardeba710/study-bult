@@ -25,7 +25,8 @@ const allowedOrigins = [
     'http://localhost:5175',
     process.env.VITE_PRODUCTION_URL, // Add your production URL here
     'https://study-vault.vercel.app',
-    'https://study-vault2.vercel.app'
+    'https://study-vault2.vercel.app',
+    'https://www.study-volte.site'
 ].filter(Boolean); // Filter out undefined values
 
 // Configure CORS with proper origin validation
@@ -151,11 +152,11 @@ if (process.env.NODE_ENV !== 'production') {
             const info = await transporter.sendMail({
                 from: process.env.VITE_EMAIL_FROM,
                 to: testEmail,
-                subject: 'StudyVault Email Test',
+                subject: 'Study Volte Email Test',
                 html: `
           <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-            <h2>StudyVault Email Test</h2>
-            <p>This is a test email from StudyVault.</p>
+            <h2>Study Volte Email Test</h2>
+            <p>This is a test email from Study Volte.</p>
             <p>If you received this email, the email service is working correctly!</p>
             <p>Time sent: ${new Date().toLocaleString()}</p>
           </div>
@@ -198,7 +199,7 @@ app.get('/api/health-check', (req, res) => {
 });
 
 app.get('/', (req, res) => {
-    res.send('StudyVault API Server is running');
+    res.send('Study Volte API Server is running');
 });
 
 app.listen(PORT, () => {

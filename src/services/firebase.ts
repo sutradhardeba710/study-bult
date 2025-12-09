@@ -4,15 +4,23 @@ import { getFirestore } from 'firebase/firestore';
 import { getStorage } from 'firebase/storage';
 import { getFunctions } from 'firebase/functions';
 
+// Helper to get environment variables in both Vite and Node environments
+const getEnv = (key: string) => {
+  if (typeof import.meta !== 'undefined' && import.meta.env) {
+    return import.meta.env[key];
+  }
+  return process.env[key];
+};
+
 // Your Firebase configuration
 // Replace with your actual Firebase config or use environment variables
 const firebaseConfig: { [key: string]: any } = {
-  apiKey: import.meta.env.VITE_FIREBASE_API_KEY || "your-api-key",
-  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN || "your-project.firebaseapp.com",
-  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID || "your-project-id",
-  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET || "your-project.appspot.com",
-  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID || "your-sender-id",
-  appId: import.meta.env.VITE_FIREBASE_APP_ID || "your-app-id"
+  apiKey: getEnv('VITE_FIREBASE_API_KEY') || "your-api-key",
+  authDomain: getEnv('VITE_FIREBASE_AUTH_DOMAIN') || "your-project.firebaseapp.com",
+  projectId: getEnv('VITE_FIREBASE_PROJECT_ID') || "your-project-id",
+  storageBucket: getEnv('VITE_FIREBASE_STORAGE_BUCKET') || "your-project.appspot.com",
+  messagingSenderId: getEnv('VITE_FIREBASE_MESSAGING_SENDER_ID') || "your-sender-id",
+  appId: getEnv('VITE_FIREBASE_APP_ID') || "your-app-id"
 };
 
 // Improved configuration validation
@@ -35,7 +43,7 @@ const isConfigValid = () => {
   );
 
   // Check if we're in a development environment
-  const isDevelopment = import.meta.env.DEV;
+  const isDevelopment = typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.DEV;
 
   // Log warnings in development
   if (isDevelopment && (hasPlaceholders || missingRequiredFields)) {
@@ -78,7 +86,7 @@ export const googleProvider = new GoogleAuthProvider();
 export const isFirebaseConfigured = isConfigValid();
 
 // Log configuration status in development
-if (import.meta.env.DEV) {
+if (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.DEV) {
   console.log(`Firebase configuration status: ${isFirebaseConfigured ? 'Valid ✅' : 'Invalid ❌'}`);
   if (!isFirebaseConfigured) {
     console.log('Please check your .env file and ensure all Firebase variables are set correctly.');

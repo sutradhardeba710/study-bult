@@ -111,7 +111,7 @@ const Navigation = () => {
               <div className="w-8 h-8 bg-primary-600 rounded-lg flex items-center justify-center">
                 <BookOpen className="w-5 h-5 text-white" />
               </div>
-              <span className="text-xl font-bold text-gray-900">StudyVault</span>
+              <span className="text-xl font-bold text-gray-900">Study Volte</span>
             </Link>
           </div>
 
@@ -126,13 +126,13 @@ const Navigation = () => {
                 {item.name}
               </Link>
             ))}
-            
+
             {/* Support Dropdown */}
-            <div 
-              className="relative" 
+            <div
+              className="relative"
               ref={supportDropdownRef}
             >
-              <div 
+              <div
                 className="flex items-center space-x-1 text-gray-700 hover:text-primary-600 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200 cursor-pointer"
                 onClick={() => setSupportDropdownOpen(!supportDropdownOpen)}
                 onMouseEnter={() => setSupportDropdownOpen(true)}
@@ -147,7 +147,7 @@ const Navigation = () => {
 
               {/* Support Dropdown Menu */}
               {supportDropdownOpen && (
-                <div 
+                <div
                   className="absolute left-0 mt-2 w-48 origin-top-left bg-white border border-gray-200 rounded-md shadow-lg z-10 animate-fadeIn"
                   onMouseLeave={() => setSupportDropdownOpen(false)}
                 >
@@ -173,11 +173,11 @@ const Navigation = () => {
           <div className="hidden md:flex items-center space-x-4">
             {currentUser ? (
               <div className="flex items-center space-x-4">
-                <div 
-                  className="relative profile-dropdown-container" 
+                <div
+                  className="relative profile-dropdown-container"
                   ref={profileDropdownRef}
                 >
-                  <div 
+                  <div
                     className="flex items-center space-x-2 focus:outline-none group cursor-pointer"
                     onClick={() => setProfileDropdownOpen(!profileDropdownOpen)}
                     onMouseEnter={() => setProfileDropdownOpen(true)}
@@ -201,7 +201,7 @@ const Navigation = () => {
 
                   {/* Profile Dropdown */}
                   {profileDropdownOpen && (
-                    <div 
+                    <div
                       className="absolute right-0 mt-2 w-56 origin-top-right bg-white border border-gray-200 divide-y divide-gray-100 rounded-md shadow-lg z-10 animate-fadeIn"
                       onMouseLeave={() => setProfileDropdownOpen(false)}
                     >
@@ -210,16 +210,16 @@ const Navigation = () => {
                         <p className="text-sm text-gray-500 truncate">{userProfile?.email}</p>
                       </div>
                       <div className="py-1">
-                        <Link 
-                          to="/dashboard" 
+                        <Link
+                          to="/dashboard"
                           className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-primary-600"
                           onClick={() => setProfileDropdownOpen(false)}
                         >
                           <User className="w-4 h-4 mr-2" />
                           Dashboard
                         </Link>
-                        <Link 
-                          to="/dashboard/settings" 
+                        <Link
+                          to="/dashboard/settings"
                           className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-primary-600"
                           onClick={() => setProfileDropdownOpen(false)}
                         >
@@ -292,7 +292,7 @@ const Navigation = () => {
                 <span>{item.name}</span>
               </Link>
             ))}
-            
+
             {/* Mobile Support Links */}
             <div className="pt-2 pb-1">
               <p className="px-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Support</p>
@@ -308,7 +308,7 @@ const Navigation = () => {
                 <span>{item.name}</span>
               </Link>
             ))}
-            
+
             <div className="pt-4 space-y-2">
               {currentUser ? (
                 <>

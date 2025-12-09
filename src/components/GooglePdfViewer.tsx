@@ -18,16 +18,16 @@ const GooglePdfViewer: React.FC<GooglePdfViewerProps> = ({
   title = 'PDF Document'
 }) => {
   const [isLoaded, setIsLoaded] = useState(false);
-  
+
   // Encode the URL for Google Docs Viewer and add parameters to hide UI elements
   // Add parameters to hide UI elements directly in the URL
   const googleDocsUrl = `https://docs.google.com/viewer?url=${encodeURIComponent(fileUrl)}&embedded=true&chrome=false&dov=1`;
-  
+
   // Handle iframe load event - just set loaded state
   const handleIframeLoad = () => {
     setIsLoaded(true);
   };
-  
+
   return (
     <div className="google-pdf-viewer-container relative" style={{ width, height }}>
       {/* Custom loading indicator */}
@@ -39,7 +39,7 @@ const GooglePdfViewer: React.FC<GooglePdfViewerProps> = ({
           </div>
         </div>
       )}
-      
+
       <iframe
         id="google-pdf-viewer"
         src={googleDocsUrl}
@@ -57,10 +57,10 @@ const GooglePdfViewer: React.FC<GooglePdfViewerProps> = ({
         className={`transition-opacity duration-300 ${isLoaded ? 'opacity-100' : 'opacity-0'}`}
         sandbox="allow-scripts allow-same-origin allow-forms"
       ></iframe>
-      
+
       {/* Custom watermark/overlay hidden */}
       <div className="hidden absolute bottom-4 right-4 bg-white bg-opacity-80 px-3 py-1 rounded-full text-xs text-gray-500 shadow-sm">
-        StudyVault PDF Viewer
+        Study Volte PDF Viewer
       </div>
     </div>
   );

@@ -19,10 +19,10 @@ const BASE_URL = process.env.VITE_SITE_URL || 'https://study-vault2.vercel.app';
 router.get('/sitemap.xml', async (req, res) => {
   try {
     res.set('Content-Type', 'application/xml');
-    
+
     let xml = '<?xml version="1.0" encoding="UTF-8"?>\n';
     xml += '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n';
-    
+
     // Static pages
     const staticPages = [
       { url: '', priority: 1.0, changefreq: 'daily' },
@@ -56,9 +56,9 @@ router.get('/sitemap.xml', async (req, res) => {
           .limit(1000)
           .get();
 
-        const papers = papersSnapshot.docs.map(doc => ({ 
-          id: doc.id, 
-          ...doc.data() 
+        const papers = papersSnapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data()
         }));
 
         // Add individual paper pages
@@ -109,13 +109,13 @@ router.get('/sitemap.xml', async (req, res) => {
         console.error('Error fetching dynamic content for sitemap:', error);
       }
     }
-    
+
     xml += '</urlset>';
-    
+
     // Cache for 1 hour
     res.set('Cache-Control', 'public, max-age=3600');
     res.send(xml);
-    
+
   } catch (error) {
     console.error('Error generating sitemap:', error);
     res.status(500).send('Error generating sitemap');
@@ -125,8 +125,8 @@ router.get('/sitemap.xml', async (req, res) => {
 // Generate robots.txt
 router.get('/robots.txt', (req, res) => {
   res.set('Content-Type', 'text/plain');
-  
-  const robotsTxt = `# StudyVault robots.txt
+
+  const robotsTxt = `# Study Volte robots.txt
 User-agent: *
 Allow: /
 
@@ -170,7 +170,7 @@ Crawl-delay: 1`;
 router.post('/api/generate-sitemap', async (req, res) => {
   try {
     console.log('📊 Starting sitemap generation process...');
-    
+
     // Initialize sitemap generator with custom config
     const generator = new ReactViteSitemapGenerator({
       baseUrl: BASE_URL,
@@ -189,10 +189,10 @@ router.post('/api/generate-sitemap', async (req, res) => {
       ],
       changefreq: 'weekly'
     });
-    
+
     // Generate sitemap
     const result = await generator.generate();
-    
+
     // Return success response
     res.json({
       success: true,
@@ -200,7 +200,7 @@ router.post('/api/generate-sitemap', async (req, res) => {
       path: `${BASE_URL}/sitemap.xml`,
       timestamp: new Date().toISOString()
     });
-    
+
   } catch (error) {
     console.error('Error generating sitemap:', error);
     res.status(500).json({

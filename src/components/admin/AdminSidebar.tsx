@@ -59,7 +59,7 @@ const AdminSidebar: React.FC<{ open?: boolean; onClose?: () => void }> = ({ open
             ))}
           </ul>
         </nav>
-        <div className="mt-auto p-4 text-xs text-gray-400 text-center border-t border-gray-100">StudyVault Admin &copy; {new Date().getFullYear()}</div>
+        <div className="mt-auto p-4 text-xs text-gray-400 text-center border-t border-gray-100">Study Volte Admin &copy; {new Date().getFullYear()}</div>
       </aside>
     </>
   );

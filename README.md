@@ -1,4 +1,4 @@
-# StudyVault 📚
+# Study Volte 📚
 
 A modern web platform for students to share and access question papers from various colleges and universities.
 
@@ -124,7 +124,7 @@ A modern web platform for students to share and access question papers from vari
 
 ## Environment Variables
 
-StudyVault uses `.env.local` for environment variables. This file is not tracked by Git for security reasons.
+Study Volte uses `.env.local` for environment variables. This file is not tracked by Git for security reasons.
 
 1. Copy the example environment file:
 ```bash
@@ -146,7 +146,7 @@ VITE_EMAIL_HOST=smtp.example.com
 VITE_EMAIL_PORT=587
 VITE_EMAIL_USER=your-email@example.com
 VITE_EMAIL_PASS=your-password
-VITE_EMAIL_FROM=StudyVault <noreply@studyvault.com>
+VITE_EMAIL_FROM=Study Volte <noreply@studyvault.com>
 
 # Google Services
 VITE_GOOGLE_ANALYTICS_ID=G-XXXXXXXXXX

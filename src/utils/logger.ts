@@ -1,5 +1,5 @@
 /**
- * Secure logging utility for StudyVault
+ * Secure logging utility for Study Volte
  * 
  * This utility provides secure logging functions that automatically sanitize sensitive data
  * before logging to the console. Use these functions instead of direct console.log calls.
@@ -17,29 +17,29 @@ const isDevelopment = import.meta.env.DEV === true;
  */
 const sanitizeData = (data: any): any => {
   if (!data) return data;
-  
+
   // If it's a simple value, return it
   if (typeof data !== 'object') return data;
-  
+
   // Handle arrays
   if (Array.isArray(data)) {
     return data.map(item => sanitizeData(item));
   }
-  
+
   // Handle objects
   const sensitiveFields = [
     'email', 'password', 'token', 'uid', 'id', 'auth', 'key', 'secret',
     'credential', 'phone', 'address', 'credit', 'card', 'ssn', 'social'
   ];
-  
+
   const result = { ...data };
-  
+
   Object.keys(result).forEach(key => {
     // Check if this is a sensitive field
-    const isFieldSensitive = sensitiveFields.some(field => 
+    const isFieldSensitive = sensitiveFields.some(field =>
       key.toLowerCase().includes(field.toLowerCase())
     );
-    
+
     if (isFieldSensitive) {
       // Redact sensitive fields
       if (typeof result[key] === 'string') {
@@ -58,7 +58,7 @@ const sanitizeData = (data: any): any => {
       result[key] = sanitizeData(result[key]);
     }
   });
-  
+
   return result;
 };
 
@@ -108,7 +108,7 @@ export const logDebug = (message: string, data?: any): void => {
 const log = (level: LogLevel, message: string, data?: any): void => {
   const timestamp = new Date().toISOString();
   const sanitizedData = data ? sanitizeData(data) : undefined;
-  
+
   switch (level) {
     case 'info':
       if (sanitizedData) {

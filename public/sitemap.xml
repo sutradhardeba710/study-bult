@@ -1,63 +1,63 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://study-vault2.vercel.app/</loc>
+    <loc>https://www.study-volte.site/</loc>
     <lastmod>2025-01-28T21:00:00+00:00</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
-    <loc>https://study-vault2.vercel.app/browse</loc>
+    <loc>https://www.study-volte.site/browse</loc>
     <lastmod>2025-01-28T21:00:00+00:00</lastmod>
     <changefreq>hourly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://study-vault2.vercel.app/upload</loc>
+    <loc>https://www.study-volte.site/upload</loc>
     <lastmod>2025-01-28T21:00:00+00:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://study-vault2.vercel.app/about</loc>
+    <loc>https://www.study-volte.site/about</loc>
     <lastmod>2025-01-28T21:00:00+00:00</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://study-vault2.vercel.app/contact</loc>
+    <loc>https://www.study-volte.site/contact</loc>
     <lastmod>2025-01-28T21:00:00+00:00</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://study-vault2.vercel.app/faq</loc>
+    <loc>https://www.study-volte.site/faq</loc>
     <lastmod>2025-01-28T21:00:00+00:00</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://study-vault2.vercel.app/help-center</loc>
+    <loc>https://www.study-volte.site/help-center</loc>
     <lastmod>2025-01-28T21:00:00+00:00</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://study-vault2.vercel.app/privacy</loc>
+    <loc>https://www.study-volte.site/privacy</loc>
     <lastmod>2025-01-28T21:00:00+00:00</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
-    <loc>https://study-vault2.vercel.app/terms</loc>
+    <loc>https://www.study-volte.site/terms</loc>
     <lastmod>2025-01-28T21:00:00+00:00</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
-    <loc>https://study-vault2.vercel.app/cookie-policy</loc>
+    <loc>https://www.study-volte.site/cookie-policy</loc>
     <lastmod>2025-01-28T21:00:00+00:00</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.5</priority>
   </url>
-</urlset> 
+</urlset>

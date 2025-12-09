@@ -118,15 +118,54 @@ export const onAuthUserDeleted = functions.auth.user().onDelete(async (user) => 
         // Delete user's Firestore document
         await admin.firestore().collection('users').doc(uid).delete();
 
-        // Optionally: Delete user's uploaded papers, likes, etc.
-        //const papersQuery = admin.firestore().collection('papers').where('uploaderId', '==', uid);
-        //const papers = await papersQuery.get();
-        //const batch = admin.firestore().batch();
-        //papers.forEach(doc => batch.delete(doc.ref));
-        //await batch.commit();
-
         functions.logger.info(`Cleaned up Firestore data for deleted auth user: ${uid}`);
     } catch (error: any) {
         functions.logger.error(`Error cleaning up user ${uid}:`, error);
+    }
+});
+
+import * as nodemailer from 'nodemailer';
+
+// Configure Nodemailer transporter
+// Note: In production, use functions.config() to set these values
+// firebase functions:config:set email.host="smtp.example.com" email.port="587" email.user="user@example.com" email.pass="password"
+const transporter = nodemailer.createTransport({
+    host: process.env.EMAIL_HOST || functions.config().email?.host,
+    port: parseInt(process.env.EMAIL_PORT || functions.config().email?.port || '587'),
+    secure: (process.env.EMAIL_PORT || functions.config().email?.port) === '465',
+    auth: {
+        user: process.env.EMAIL_USER || functions.config().email?.user,
+        pass: process.env.EMAIL_PASS || functions.config().email?.pass,
+    },
+});
+
+/**
+ * Cloud Function to send emails
+ */
+export const sendEmail = functions.https.onCall(async (data, context) => {
+    // Optional: Check if the user is authenticated
+    // if (!context.auth) {
+    //     throw new functions.https.HttpsError('unauthenticated', 'User must be authenticated to send emails.');
+    // }
+
+    const { to, subject, html } = data;
+
+    if (!to || !subject || !html) {
+        throw new functions.https.HttpsError('invalid-argument', 'Missing required fields: to, subject, html');
+    }
+
+    try {
+        const info = await transporter.sendMail({
+            from: 'Study Volte <noreply@study-volte.site>',
+            to,
+            subject,
+            html,
+        });
+
+        functions.logger.info(`Email sent to ${to}: ${info.messageId}`);
+        return { success: true, messageId: info.messageId };
+    } catch (error: any) {
+        functions.logger.error('Error sending email:', error);
+        throw new functions.https.HttpsError('internal', `Failed to send email: ${error.message}`);
     }
 });
