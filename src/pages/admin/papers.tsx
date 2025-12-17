@@ -39,7 +39,8 @@ const AdminPapers: React.FC = () => {
   const [editStatus, setEditStatus] = useState<'pending' | 'approved' | 'rejected'>('pending');
   const [editLoading, setEditLoading] = useState(false);
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
-  const [bulkLoading, setBulkLoading] = useState<'approve' | 'reject' | null>(null);
+  const [bulkLoading, setBulkLoading] = useState<'approve' | 'reject' | 'delete' | null>(null);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const fetchPapers = async () => {
     setLoading(true);
@@ -228,11 +229,12 @@ const AdminPapers: React.FC = () => {
       setSelectedIds([]);
       fetchPapers();
     } catch {
-      toast.error('Failed to approve selected papers');
+      toast.error('Failed to bulk approve papers');
     } finally {
       setBulkLoading(null);
     }
   };
+
   const handleBulkReject = async () => {
     setBulkLoading('reject');
     try {
@@ -241,13 +243,27 @@ const AdminPapers: React.FC = () => {
       setSelectedIds([]);
       fetchPapers();
     } catch {
-      toast.error('Failed to reject selected papers');
+      toast.error('Failed to bulk reject papers');
     } finally {
       setBulkLoading(null);
     }
   };
 
-  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const handleBulkDelete = async () => {
+    if (!window.confirm('Are you sure you want to delete all selected papers? This action cannot be undone.')) return;
+    setBulkLoading('delete');
+    try {
+      await Promise.all(selectedIds.map(id => deletePaperById(id)));
+      toast.success('Selected papers deleted');
+      setSelectedIds([]);
+      fetchPapers();
+    } catch {
+      toast.error('Failed to bulk delete papers');
+    } finally {
+      setBulkLoading(null);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Mobile sidebar toggle */}
@@ -340,6 +356,13 @@ const AdminPapers: React.FC = () => {
               >
                 {bulkLoading === 'reject' ? 'Rejecting...' : 'Bulk Reject'}
               </button>
+              <button
+                className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition-colors disabled:opacity-50"
+                disabled={selectedIds.length === 0 || bulkLoading === 'delete'}
+                onClick={handleBulkDelete}
+              >
+                {bulkLoading === 'delete' ? 'Deleting...' : 'Bulk Delete'}
+              </button>
               {selectedIds.length > 0 && (
                 <span className="ml-2 text-sm text-gray-500">{selectedIds.length} selected</span>
               )}
@@ -395,8 +418,8 @@ const AdminPapers: React.FC = () => {
                         <td className="px-4 py-2 whitespace-nowrap">{paper.uploaderName}</td>
                         <td className="px-4 py-2 whitespace-nowrap">
                           <span className={`px-2 py-1 rounded text-xs font-semibold ${paper.status === 'approved' ? 'bg-green-100 text-green-700' :
-                              paper.status === 'pending' ? 'bg-yellow-100 text-yellow-700' :
-                                'bg-red-100 text-red-700'
+                            paper.status === 'pending' ? 'bg-yellow-100 text-yellow-700' :
+                              'bg-red-100 text-red-700'
                             }`}>
                             {paper.status}
                           </span>
@@ -480,8 +503,8 @@ const AdminPapers: React.FC = () => {
                   <div className="bg-gray-50 rounded p-3 flex flex-col">
                     <span className="text-xs text-gray-500 font-semibold uppercase mb-1">Status</span>
                     <span className={`text-base font-semibold ${selectedPaper.status === 'approved' ? 'text-green-600' :
-                        selectedPaper.status === 'pending' ? 'text-yellow-600' :
-                          'text-red-600'
+                      selectedPaper.status === 'pending' ? 'text-yellow-600' :
+                        'text-red-600'
                       }`}>{selectedPaper.status}</span>
                   </div>
                   <div className="bg-gray-50 rounded p-3 flex flex-col">
