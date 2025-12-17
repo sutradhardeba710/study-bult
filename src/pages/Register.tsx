@@ -172,7 +172,7 @@ const Register = () => {
             }
         } catch (error: any) {
             console.error('Google login error:', error);
-            setAuthError('Failed to sign in with Google. Please try again.');
+            setAuthError(`Failed to sign in with Google: ${error.message} (${error.code})`);
         } finally {
             setIsGoogleLoading(false);
         }
@@ -523,4 +523,4 @@ const Register = () => {
     );
 };
 
-export default Register; 
+export default Register;
