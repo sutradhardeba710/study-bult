@@ -58,7 +58,13 @@ const isConfigValid = () => {
 const app = initializeApp(firebaseConfig);
 
 // Initialize Firebase services
+// Initialize Firebase services
 export const auth = getAuth(app);
+console.log('Firebase initialized with config:', {
+  authDomain: firebaseConfig.authDomain,
+  projectId: firebaseConfig.projectId,
+  hasApiKey: !!firebaseConfig.apiKey
+});
 
 // Set persistence to LOCAL (survives browser restarts)
 setPersistence(auth, browserLocalPersistence)

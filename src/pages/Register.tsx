@@ -139,7 +139,11 @@ const Register = () => {
             console.log('Registration successful, welcome email should be sent');
             navigate('/dashboard');
         } catch (error: any) {
-            console.error('Registration error:', error);
+            console.error('Registration error details:', {
+                code: error.code,
+                message: error.message,
+                fullError: error
+            });
             if (error.code === 'auth/email-already-in-use') {
                 setAuthError('An account with this email already exists');
             } else if (error.code === 'auth/invalid-email') {
