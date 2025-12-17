@@ -227,10 +227,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
         try {
             const userRef = doc(db, 'users', currentUser.uid);
-            await setDoc(userRef, profile, { merge: true });
+
+            // Sanitize the profile object to remove undefined values
+            const sanitizedProfile = Object.entries(profile).reduce((acc, [key, value]) => {
+                if (value !== undefined) {
+                    acc[key as keyof UserProfile] = value;
+                }
+                return acc;
+            }, {} as Partial<UserProfile>);
+
+            await setDoc(userRef, sanitizedProfile, { merge: true });
 
             if (userProfile) {
-                setUserProfile({ ...userProfile, ...profile });
+                setUserProfile({ ...userProfile, ...sanitizedProfile });
             }
         } catch (error) {
             console.error('Update profile error:', error);
@@ -275,15 +284,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         try {
             // Firebase will send an email with a password reset link
             await firebaseSendPasswordResetEmail(auth, email);
-            // FIXED: Custom email removed - it was sending incorrect reset link
-            // Firebase's email contains the correct action code for password reset
         } catch (error) {
             console.error('Reset password error:', error);
             throw error;
         }
     };
 
-    // Add this function to update user profile and send welcome email
     const updateUserProfileAfterGoogleSignIn = async (profile: UserProfile, updatedFields: Partial<UserProfile>) => {
         if (!isFirebaseConfigured) {
             throw new Error('Firebase is not properly configured. Please check your environment variables.');
@@ -359,7 +365,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         checkGoogleRedirect,
         logout,
         updateUserProfile,
-        updateUserProfileAfterGoogleSignIn, // Add this to the context value
+        updateUserProfileAfterGoogleSignIn,
         deleteAccount,
         resetPassword
     };
@@ -369,4 +375,4 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             {!loading && children}
         </AuthContext.Provider>
     );
-}; 
+};

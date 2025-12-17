@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import AdminSidebar from '../../components/admin/AdminSidebar';
-import { getMetaItems, addMetaItem, updateMetaItem, deleteMetaItem, reorderMetaItems, type MetaType, type MetaItem } from '../../services/meta';
+import { getMetaItems, addMetaItem, updateMetaItem, deleteMetaItem, approveMetaItem, reorderMetaItems, type MetaType, type MetaItem } from '../../services/meta';
 import { useMeta } from '../../context/MetaContext';
 import toast from 'react-hot-toast';
-import { PanelLeft, GripVertical } from 'lucide-react';
+import { PanelLeft, GripVertical, Check, X } from 'lucide-react';
 import {
   DndContext,
   closestCenter,
@@ -48,6 +48,7 @@ interface SortableRowProps {
   setEditId: (id: string | null) => void;
   handleEdit: (item: MetaItem) => void;
   handleDelete: (id: string) => void;
+  handleApprove: (id: string) => void;
 }
 
 const SortableRow: React.FC<SortableRowProps> = ({
@@ -62,6 +63,7 @@ const SortableRow: React.FC<SortableRowProps> = ({
   setEditId,
   handleEdit,
   handleDelete,
+  handleApprove,
 }) => {
   const {
     attributes,
@@ -78,11 +80,13 @@ const SortableRow: React.FC<SortableRowProps> = ({
     opacity: isDragging ? 0.3 : 1,
   };
 
+  const isPending = item.status === 'pending';
+
   return (
     <tr
       ref={setNodeRef}
       style={style}
-      className={`group hover:bg-gray-50 transition-colors ${isDragging ? 'bg-gray-100' : 'bg-white'}`}
+      className={`group hover:bg-gray-50 transition-colors ${isDragging ? 'bg-gray-100' : 'bg-white'} ${isPending ? 'bg-yellow-50' : ''}`}
     >
       <td className="px-2 py-2 align-middle w-[40px]">
         <button
@@ -104,7 +108,14 @@ const SortableRow: React.FC<SortableRowProps> = ({
             disabled={loading}
           />
         ) : (
-          <span className="font-medium text-gray-700">{item.name}</span>
+          <div className="flex items-center gap-2">
+            <span className="font-medium text-gray-700">{item.name}</span>
+            {isPending && (
+              <span className="px-2 py-0.5 text-xs font-medium bg-yellow-100 text-yellow-800 rounded-full">
+                Pending
+              </span>
+            )}
+          </div>
         )}
       </td>
       <td className="px-4 py-2 align-middle">
@@ -120,7 +131,7 @@ const SortableRow: React.FC<SortableRowProps> = ({
           <span className="text-gray-600">{item.description}</span>
         )}
       </td>
-      <td className="px-4 py-2 align-middle w-[160px]">
+      <td className="px-4 py-2 align-middle w-[200px]">
         {editId === item.id ? (
           <div className="flex space-x-2">
             <button
@@ -139,7 +150,28 @@ const SortableRow: React.FC<SortableRowProps> = ({
             </button>
           </div>
         ) : (
-          <div className="flex space-x-2 opacity-0 group-hover:opacity-100 transition-opacity">
+          <div className="flex space-x-2 items-center">
+            {isPending && (
+              <>
+                <button
+                  className="p-1.5 rounded bg-green-100 text-green-700 hover:bg-green-200 transition-colors shadow-sm"
+                  onClick={() => handleApprove(item.id!)}
+                  disabled={loading}
+                  title="Approve"
+                >
+                  <Check size={16} />
+                </button>
+                <button
+                  className="p-1.5 rounded bg-red-100 text-red-700 hover:bg-red-200 transition-colors shadow-sm"
+                  onClick={() => handleDelete(item.id!)}
+                  disabled={loading}
+                  title="Reject"
+                >
+                  <X size={16} />
+                </button>
+                <div className="w-px h-4 bg-gray-300 mx-1"></div>
+              </>
+            )}
             <button
               className="px-3 py-1 text-xs rounded font-semibold bg-yellow-400 text-white hover:bg-yellow-500 transition-colors shadow-sm"
               onClick={() => handleEdit(item)}
@@ -221,7 +253,8 @@ const AdminMeta: React.FC = () => {
     if (!newName.trim()) return;
     setLoading(true);
     try {
-      await addMetaItem(activeType, newName.trim());
+      // Admin added items are auto-approved
+      await addMetaItem(activeType, newName.trim(), undefined, undefined, true);
       toast.success('Added!');
       setNewName('');
       fetchItems(activeType);
@@ -270,6 +303,21 @@ const AdminMeta: React.FC = () => {
     } catch (error) {
       console.error('Failed to delete:', error);
       toast.error('Failed to delete: ' + (error instanceof Error ? error.message : String(error)));
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleApprove = async (id: string) => {
+    setLoading(true);
+    try {
+      await approveMetaItem(activeType, id);
+      toast.success('Approved!');
+      fetchItems(activeType);
+      await refreshMeta();
+    } catch (error) {
+      console.error('Failed to approve:', error);
+      toast.error('Failed to approve');
     } finally {
       setLoading(false);
     }
@@ -359,6 +407,12 @@ const AdminMeta: React.FC = () => {
               >
                 Add Item
               </button>
+              {items.filter(i => i.status === 'pending').length > 0 && (
+                <div className="flex items-center ml-4 px-3 py-1 bg-yellow-100 text-yellow-800 rounded-full text-sm font-medium border border-yellow-200">
+                  <span className="mr-1 font-bold">{items.filter(i => i.status === 'pending').length}</span>
+                  Pending Approval
+                </div>
+              )}
             </div>
             {loading ? (
               <div className="flex justify-center py-12">
@@ -383,7 +437,7 @@ const AdminMeta: React.FC = () => {
                         <th className="px-2 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider w-[40px]"></th>
                         <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Name</th>
                         <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Description</th>
-                        <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider w-[160px]">Actions</th>
+                        <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider w-[200px]">Actions</th>
                       </tr>
                     </thead>
                     <tbody className="bg-white divide-y divide-gray-200">
@@ -405,6 +459,7 @@ const AdminMeta: React.FC = () => {
                             setEditId={setEditId}
                             handleEdit={handleEdit}
                             handleDelete={handleDelete}
+                            handleApprove={handleApprove}
                           />
                         ))}
                       </SortableContext>

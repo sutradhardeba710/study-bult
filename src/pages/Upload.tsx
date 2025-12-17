@@ -1,12 +1,77 @@
 import { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Upload as UploadIcon, FileText, X } from 'lucide-react';
+import { Upload as UploadIcon, FileText, X, Plus } from 'lucide-react';
 import { useMeta } from '../context/MetaContext';
 import { useAuth } from '../context/AuthContext';
 import Button from '../components/Button';
 import toast from 'react-hot-toast';
 import Skeleton from '../components/Skeleton';
 import { uploadPaper } from '../services/upload';
+import AddOptionModal from '../components/AddOptionModal';
+import { type MetaType, type MetaItem } from '../services/meta';
+import Select, { type SingleValue, type StylesConfig, components, type MenuListProps } from 'react-select';
+
+// Custom styles for react-select to match Tailwind theme
+const selectStyles: StylesConfig<any, false> = {
+  control: (base, state) => ({
+    ...base,
+    borderColor: state.isFocused ? '#2563eb' : '#d1d5db', // primary-600 or gray-300
+    boxShadow: state.isFocused ? '0 0 0 1px #2563eb' : 'none',
+    '&:hover': {
+      borderColor: state.isFocused ? '#2563eb' : '#9ca3af', // gray-400
+    },
+    paddingTop: '2px',
+    paddingBottom: '2px',
+    borderRadius: '0.375rem', // rounded-md
+  }),
+  option: (base, state) => ({
+    ...base,
+    backgroundColor: state.isSelected ? '#2563eb' : state.isFocused ? '#eff6ff' : 'white', // primary-600 or primary-50
+    color: state.isSelected ? 'white' : '#1f2937', // gray-900
+    cursor: 'pointer',
+    '&:active': {
+      backgroundColor: '#2563eb',
+      color: 'white',
+    },
+  }),
+  input: (base) => ({
+    ...base,
+    'input:focus': {
+      boxShadow: 'none',
+    },
+  }),
+  menu: (base) => ({
+    ...base,
+    zIndex: 50, // Ensure it sits above other elements
+  }),
+};
+
+// Custom MenuList component to add "Add New" button at the bottom
+const CustomMenuList = (props: MenuListProps<any, false>) => {
+  const { onAddNew, addNewLabel } = props.selectProps as any;
+
+  return (
+    <components.MenuList {...props}>
+      {props.children}
+      <div
+        className="border-t border-gray-200 p-2 cursor-pointer hover:bg-gray-50 text-primary-600 font-medium text-sm flex items-center justify-center transition-colors"
+        onClick={(e) => {
+          // Prevent the dropdown from closing immediately if needed, or let it close
+          // e.stopPropagation(); 
+          if (onAddNew) onAddNew();
+        }}
+        onMouseDown={(e) => {
+          // Prevent input blur which closes the menu
+          e.preventDefault();
+          e.stopPropagation();
+        }}
+      >
+        <Plus size={16} className="mr-1" />
+        {addNewLabel || 'Add New'}
+      </div>
+    </components.MenuList>
+  );
+};
 
 const Upload = () => {
   const navigate = useNavigate();
@@ -27,7 +92,12 @@ const Upload = () => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [uploadProgress, setUploadProgress] = useState(0);
 
-  const { colleges, semesters, courses, subjects, examTypes, loading: metaLoading } = useMeta();
+  // Modal state
+  const [modalOpen, setModalOpen] = useState(false);
+  const [modalType, setModalType] = useState<MetaType>('subjects');
+  const [modalTitle, setModalTitle] = useState('');
+
+  const { colleges, semesters, courses, subjects, examTypes, loading: metaLoading, refreshMeta } = useMeta();
 
   // Redirect if not logged in
   useEffect(() => {
@@ -79,7 +149,7 @@ const Upload = () => {
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="bg-white p-8 rounded-lg shadow-md text-center">
           <h2 className="text-2xl font-bold mb-2 text-gray-900">Login Required</h2>
-          <p className="text-gray-700 mb-4">You must be logged in to upload papers.<br/>Redirecting to login...</p>
+          <p className="text-gray-700 mb-4">You must be logged in to upload papers.<br />Redirecting to login...</p>
           <button
             className="mt-2 px-4 py-2 bg-primary-600 text-white rounded hover:bg-primary-700"
             onClick={() => navigate('/login?redirect=/upload')}
@@ -91,7 +161,26 @@ const Upload = () => {
     );
   }
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
+  const handleSelectChange = (newValue: SingleValue<{ value: string; label: string }>, actionMeta: { name?: string }) => {
+    const name = actionMeta.name;
+    const value = newValue?.value || '';
+
+    if (name) {
+      setFormData(prev => ({
+        ...prev,
+        [name]: value
+      }));
+      // Clear error when user selects
+      if (errors[name]) {
+        setErrors(prev => ({
+          ...prev,
+          [name]: ''
+        }));
+      }
+    }
+  };
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
@@ -102,6 +191,33 @@ const Upload = () => {
       setErrors(prev => ({
         ...prev,
         [name]: ''
+      }));
+    }
+  };
+
+  const openAddModal = (type: MetaType, title: string) => {
+    setModalType(type);
+    setModalTitle(title);
+    setModalOpen(true);
+  };
+
+  const handleModalSuccess = async (newItemName: string) => {
+    await refreshMeta();
+
+    // Map modal type back to form field name
+    let fieldName = '';
+    switch (modalType) {
+      case 'colleges': fieldName = 'college'; break;
+      case 'courses': fieldName = 'course'; break;
+      case 'subjects': fieldName = 'subject'; break;
+      case 'semesters': fieldName = 'semester'; break;
+      case 'examTypes': fieldName = 'examType'; break;
+    }
+
+    if (fieldName) {
+      setFormData(prev => ({
+        ...prev,
+        [fieldName]: newItemName
       }));
     }
   };
@@ -143,7 +259,7 @@ const Upload = () => {
   const handleDrop = (e: React.DragEvent) => {
     e.preventDefault();
     setIsDragOver(false);
-    
+
     const files = e.dataTransfer.files;
     if (files.length > 0) {
       handleFileSelect(files[0]);
@@ -209,7 +325,7 @@ const Upload = () => {
       toast.error(`Please wait ${Math.ceil((RATE_LIMIT_SECONDS * 1000 - (Date.now() - parseInt(lastUpload, 10))) / 1000)} seconds before uploading again.`);
       return;
     }
-    
+
     if (!validateForm()) {
       return;
     }
@@ -251,6 +367,32 @@ const Upload = () => {
     }
   };
 
+  // Helper to create options
+  const createOptions = (items: MetaItem[]) => {
+    return items.map(item => ({
+      value: item.name,
+      label: item.status === 'pending' ? `${item.name} (Pending Approval)` : item.name
+    }));
+  };
+
+  // Helper for grouped subjects
+  const createSubjectOptions = () => {
+    const grouped = subjects.reduce((acc, subject) => {
+      const category = subject.category || 'Other';
+      if (!acc[category]) acc[category] = [];
+      acc[category].push({
+        value: subject.name,
+        label: subject.status === 'pending' ? `${subject.name} (Pending Approval)` : subject.name
+      });
+      return acc;
+    }, {} as Record<string, { value: string; label: string }[]>);
+
+    return Object.entries(grouped).map(([category, items]) => ({
+      label: category,
+      options: items
+    }));
+  };
+
   return (
     <div
       className={`min-h-screen bg-gray-50${isDragOver ? ' ring-4 ring-primary-300' : ''}`}
@@ -273,13 +415,12 @@ const Upload = () => {
               <label className="block text-sm font-medium text-gray-700 mb-4">
                 Upload PDF File
               </label>
-              
+
               <div
-                className={`border-2 border-dashed rounded-lg p-8 text-center ${
-                  isDragOver
+                className={`border-2 border-dashed rounded-lg p-8 text-center ${isDragOver
                     ? 'border-primary-500 bg-primary-50'
                     : 'border-gray-300 hover:border-gray-400'
-                }`}
+                  }`}
                 onDragOver={handleDragOver}
                 onDragLeave={handleDragLeave}
                 onDrop={handleDrop}
@@ -324,7 +465,7 @@ const Upload = () => {
                     </div>
                   </div>
                 )}
-                
+
                 <input
                   ref={fileInputRef}
                   type="file"
@@ -333,7 +474,7 @@ const Upload = () => {
                   className="hidden"
                 />
               </div>
-              
+
               {errors.file && (
                 <p className="mt-2 text-sm text-red-600">{errors.file}</p>
               )}
@@ -352,9 +493,8 @@ const Upload = () => {
                   name="title"
                   value={formData.title}
                   onChange={handleChange}
-                  className={`mt-1 block w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm ${
-                    errors.title ? 'border-red-300' : 'border-gray-300'
-                  }`}
+                  className={`mt-1 block w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm ${errors.title ? 'border-red-300' : 'border-gray-300'
+                    }`}
                   placeholder="e.g., Data Structures and Algorithms - Mid Term"
                 />
                 {errors.title && (
@@ -364,30 +504,26 @@ const Upload = () => {
 
               {/* College */}
               <div>
-                <label htmlFor="college" className="block text-sm font-medium text-gray-700">
+                <label htmlFor="college" className="block text-sm font-medium text-gray-700 mb-1">
                   College *
                 </label>
                 {metaLoading ? (
-                  <Skeleton variant="rect" width="100%" height={40} className="mb-2" />
+                  <Skeleton variant="rect" width="100%" height={38} className="mb-2" />
                 ) : (
-                <select
-                  id="college"
-                  name="college"
-                  value={formData.college}
-                  onChange={handleChange}
-                  className={`mt-1 block w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm ${
-                    errors.college ? 'border-red-300' : 'border-gray-300'
-                  }`}
-                >
-                  <option value="">Select college</option>
-                    {colleges.length === 0 ? (
-                      <option value="">No colleges found</option>
-                    ) : (
-                      colleges.map((college) => (
-                        <option key={college.id} value={college.name}>{college.name}</option>
-                      ))
-                    )}
-                </select>
+                  <Select
+                    name="college"
+                    options={createOptions(colleges)}
+                    value={formData.college ? { value: formData.college, label: formData.college } : null}
+                    onChange={handleSelectChange}
+                    styles={selectStyles}
+                    placeholder="Select college"
+                    isClearable
+                    className={errors.college ? 'border-red-300 rounded-md' : ''}
+                    components={{ MenuList: CustomMenuList }}
+                    // @ts-ignore - Custom props
+                    onAddNew={() => openAddModal('colleges', 'College')}
+                    addNewLabel="Add New College"
+                  />
                 )}
                 {errors.college && (
                   <p className="mt-2 text-sm text-red-600">{errors.college}</p>
@@ -396,30 +532,26 @@ const Upload = () => {
 
               {/* Semester */}
               <div>
-                <label htmlFor="semester" className="block text-sm font-medium text-gray-700">
+                <label htmlFor="semester" className="block text-sm font-medium text-gray-700 mb-1">
                   Semester *
                 </label>
                 {metaLoading ? (
-                  <Skeleton variant="rect" width="100%" height={40} className="mb-2" />
+                  <Skeleton variant="rect" width="100%" height={38} className="mb-2" />
                 ) : (
-                <select
-                  id="semester"
-                  name="semester"
-                  value={formData.semester}
-                  onChange={handleChange}
-                  className={`mt-1 block w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm ${
-                    errors.semester ? 'border-red-300' : 'border-gray-300'
-                  }`}
-                >
-                  <option value="">Select semester</option>
-                    {semesters.length === 0 ? (
-                      <option value="">No semesters found</option>
-                    ) : (
-                      semesters.map((semester) => (
-                        <option key={semester.id} value={semester.name}>{semester.name}</option>
-                      ))
-                    )}
-                </select>
+                  <Select
+                    name="semester"
+                    options={createOptions(semesters)}
+                    value={formData.semester ? { value: formData.semester, label: formData.semester } : null}
+                    onChange={handleSelectChange}
+                    styles={selectStyles}
+                    placeholder="Select semester"
+                    isClearable
+                    className={errors.semester ? 'border-red-300 rounded-md' : ''}
+                    components={{ MenuList: CustomMenuList }}
+                    // @ts-ignore - Custom props
+                    onAddNew={() => openAddModal('semesters', 'Semester')}
+                    addNewLabel="Add New Semester"
+                  />
                 )}
                 {errors.semester && (
                   <p className="mt-2 text-sm text-red-600">{errors.semester}</p>
@@ -428,30 +560,26 @@ const Upload = () => {
 
               {/* Course */}
               <div>
-                <label htmlFor="course" className="block text-sm font-medium text-gray-700">
+                <label htmlFor="course" className="block text-sm font-medium text-gray-700 mb-1">
                   Course *
                 </label>
                 {metaLoading ? (
-                  <Skeleton variant="rect" width="100%" height={40} className="mb-2" />
+                  <Skeleton variant="rect" width="100%" height={38} className="mb-2" />
                 ) : (
-                <select
-                  id="course"
-                  name="course"
-                  value={formData.course}
-                  onChange={handleChange}
-                  className={`mt-1 block w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm ${
-                    errors.course ? 'border-red-300' : 'border-gray-300'
-                  }`}
-                >
-                  <option value="">Select course</option>
-                    {courses.length === 0 ? (
-                      <option value="">No courses found</option>
-                    ) : (
-                      courses.map((course) => (
-                        <option key={course.id} value={course.name}>{course.name}</option>
-                      ))
-                    )}
-                </select>
+                  <Select
+                    name="course"
+                    options={createOptions(courses)}
+                    value={formData.course ? { value: formData.course, label: formData.course } : null}
+                    onChange={handleSelectChange}
+                    styles={selectStyles}
+                    placeholder="Select course"
+                    isClearable
+                    className={errors.course ? 'border-red-300 rounded-md' : ''}
+                    components={{ MenuList: CustomMenuList }}
+                    // @ts-ignore - Custom props
+                    onAddNew={() => openAddModal('courses', 'Course')}
+                    addNewLabel="Add New Course"
+                  />
                 )}
                 {errors.course && (
                   <p className="mt-2 text-sm text-red-600">{errors.course}</p>
@@ -460,30 +588,26 @@ const Upload = () => {
 
               {/* Subject */}
               <div>
-                <label htmlFor="subject" className="block text-sm font-medium text-gray-700">
+                <label htmlFor="subject" className="block text-sm font-medium text-gray-700 mb-1">
                   Subject *
                 </label>
                 {metaLoading ? (
-                  <Skeleton variant="rect" width="100%" height={40} className="mb-2" />
+                  <Skeleton variant="rect" width="100%" height={38} className="mb-2" />
                 ) : (
-                <select
-                  id="subject"
-                  name="subject"
-                  value={formData.subject}
-                  onChange={handleChange}
-                  className={`mt-1 block w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm ${
-                    errors.subject ? 'border-red-300' : 'border-gray-300'
-                  }`}
-                >
-                  <option value="">Select subject</option>
-                    {subjects.length === 0 ? (
-                      <option value="">No subjects found</option>
-                    ) : (
-                      subjects.map((subject) => (
-                        <option key={subject.id} value={subject.name}>{subject.name}</option>
-                      ))
-                    )}
-                </select>
+                  <Select
+                    name="subject"
+                    options={createSubjectOptions()}
+                    value={formData.subject ? { value: formData.subject, label: formData.subject } : null}
+                    onChange={handleSelectChange}
+                    styles={selectStyles}
+                    placeholder="Select subject"
+                    isClearable
+                    className={errors.subject ? 'border-red-300 rounded-md' : ''}
+                    components={{ MenuList: CustomMenuList }}
+                    // @ts-ignore - Custom props
+                    onAddNew={() => openAddModal('subjects', 'Subject')}
+                    addNewLabel="Add New Subject"
+                  />
                 )}
                 {errors.subject && (
                   <p className="mt-2 text-sm text-red-600">{errors.subject}</p>
@@ -492,30 +616,26 @@ const Upload = () => {
 
               {/* Exam Type */}
               <div>
-                <label htmlFor="examType" className="block text-sm font-medium text-gray-700">
+                <label htmlFor="examType" className="block text-sm font-medium text-gray-700 mb-1">
                   Exam Type *
                 </label>
                 {metaLoading ? (
-                  <Skeleton variant="rect" width="100%" height={40} className="mb-2" />
+                  <Skeleton variant="rect" width="100%" height={38} className="mb-2" />
                 ) : (
-                <select
-                  id="examType"
-                  name="examType"
-                  value={formData.examType}
-                  onChange={handleChange}
-                  className={`mt-1 block w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm ${
-                    errors.examType ? 'border-red-300' : 'border-gray-300'
-                  }`}
-                >
-                  <option value="">Select exam type</option>
-                    {examTypes.length === 0 ? (
-                      <option value="">No exam types found</option>
-                    ) : (
-                      examTypes.map((type) => (
-                        <option key={type.id} value={type.name}>{type.name}</option>
-                      ))
-                    )}
-                </select>
+                  <Select
+                    name="examType"
+                    options={createOptions(examTypes)}
+                    value={formData.examType ? { value: formData.examType, label: formData.examType } : null}
+                    onChange={handleSelectChange}
+                    styles={selectStyles}
+                    placeholder="Select exam type"
+                    isClearable
+                    className={errors.examType ? 'border-red-300 rounded-md' : ''}
+                    components={{ MenuList: CustomMenuList }}
+                    // @ts-ignore - Custom props
+                    onAddNew={() => openAddModal('examTypes', 'Exam Type')}
+                    addNewLabel="Add New Exam Type"
+                  />
                 )}
                 {errors.examType && (
                   <p className="mt-2 text-sm text-red-600">{errors.examType}</p>
@@ -565,8 +685,16 @@ const Upload = () => {
           <div className="text-xs text-gray-500 mt-1 text-center">{uploadProgress}%</div>
         </div>
       )}
+
+      <AddOptionModal
+        isOpen={modalOpen}
+        onClose={() => setModalOpen(false)}
+        type={modalType}
+        title={modalTitle}
+        onSuccess={handleModalSuccess}
+      />
     </div>
   );
 };
 
-export default Upload; 
+export default Upload;

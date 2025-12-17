@@ -9,7 +9,7 @@ import { useNavigate } from 'react-router-dom';
 import Modal from '../../components/Modal';
 
 // Helper to render cropped avatar using canvas
-function getCroppedAvatarUrl(imageUrl: string, crop: { x: number; y: number; width: number; height: number; zoom: number } | undefined, callback: (url: string) => void) {
+function getCroppedAvatarUrl(imageUrl: string, crop: { x: number; y: number; width: number; height: number; zoom: number } | undefined | null, callback: (url: string) => void) {
     if (!imageUrl || !crop) {
         callback(imageUrl);
         return;
@@ -47,7 +47,7 @@ function getCroppedAvatarUrl(imageUrl: string, crop: { x: number; y: number; wid
 }
 
 const Settings = () => {
-    const { userProfile, updateUserProfile, deleteAccount } = useAuth();
+    const { userProfile, updateUserProfile, deleteAccount, logout } = useAuth();
     const { colleges, semesters, courses, loading: metaLoading } = useMeta();
     const navigate = useNavigate();
     const [isLoading, setIsLoading] = useState(false);
@@ -55,6 +55,7 @@ const Settings = () => {
     const [message, setMessage] = useState('');
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [deleteConfirmation, setDeleteConfirmation] = useState('');
+    const [requiresReauth, setRequiresReauth] = useState(false);
     const [formData, setFormData] = useState<{
         name: string;
         email: string;
@@ -62,7 +63,7 @@ const Settings = () => {
         semester: string;
         course: string;
         avatarOriginal: string;
-        avatarCrop: { x: number; y: number; width: number; height: number; zoom: number } | undefined;
+        avatarCrop: { x: number; y: number; width: number; height: number; zoom: number } | undefined | null;
     }>(
         {
             name: userProfile?.name || '',
@@ -71,15 +72,16 @@ const Settings = () => {
             semester: userProfile?.semester || '',
             course: userProfile?.course || '',
             avatarOriginal: userProfile?.avatarOriginal || '',
-            avatarCrop: userProfile?.avatarCrop ?? undefined,
+            avatarCrop: userProfile?.avatarCrop ?? null,
         }
     );
+
+    const [avatarPreview, setAvatarPreview] = useState<string | undefined>(undefined);
+    const [editingExistingAvatar, setEditingExistingAvatar] = useState(false);
     const [avatarUploading, setAvatarUploading] = useState(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
     const [cropperOpen, setCropperOpen] = useState(false);
     const [rawAvatar, setRawAvatar] = useState<string | undefined>(undefined);
-    const [avatarPreview, setAvatarPreview] = useState<string | undefined>(undefined);
-    const [editingExistingAvatar, setEditingExistingAvatar] = useState(false);
 
     // Update form data when userProfile changes
     useEffect(() => {
@@ -91,7 +93,7 @@ const Settings = () => {
                 semester: userProfile.semester || '',
                 course: userProfile.course || '',
                 avatarOriginal: userProfile.avatarOriginal || '',
-                avatarCrop: userProfile.avatarCrop ?? undefined,
+                avatarCrop: userProfile.avatarCrop ?? null,
             });
         }
     }, [userProfile]);
@@ -212,7 +214,7 @@ const Settings = () => {
     };
 
     const handleRemoveAvatar = async () => {
-        setFormData(prev => ({ ...prev, avatarOriginal: '', avatarCrop: undefined }));
+        setFormData(prev => ({ ...prev, avatarOriginal: '', avatarCrop: null }));
         await updateUserProfile({ avatarOriginal: '', avatarCrop: null });
         toast.success('Avatar removed.');
     };
@@ -228,12 +230,16 @@ const Settings = () => {
             await deleteAccount();
             toast.success('Your account has been deleted');
             navigate('/');
+            setShowDeleteModal(false);
         } catch (error: any) {
             console.error('Error deleting account:', error);
-            toast.error(error.message || 'Failed to delete account. Please try again.');
+            if (error.code === 'auth/requires-recent-login') {
+                setRequiresReauth(true);
+            } else {
+                toast.error(error.message || 'Failed to delete account. Please try again.');
+            }
         } finally {
             setIsDeleteLoading(false);
-            setShowDeleteModal(false);
         }
     };
 
@@ -518,51 +524,83 @@ const Settings = () => {
                 <div className="p-6">
                     <div className="flex items-center space-x-3 mb-4 text-red-600">
                         <AlertTriangle className="w-6 h-6" />
-                        <h3 className="text-lg font-medium">This action cannot be undone</h3>
+                        <h3 className="text-lg font-medium">
+                            {requiresReauth ? 'Security Check Required' : 'This action cannot be undone'}
+                        </h3>
                     </div>
 
-                    <p className="text-gray-700 mb-4">
-                        Deleting your account will permanently remove all your data, including:
-                    </p>
+                    {requiresReauth ? (
+                        <div className="mb-6">
+                            <p className="text-gray-700 mb-4">
+                                For your security, you must have recently signed in to delete your account.
+                            </p>
+                            <p className="text-gray-700 font-medium">
+                                Please log out and log back in, then try again.
+                            </p>
+                        </div>
+                    ) : (
+                        <>
+                            <p className="text-gray-700 mb-4">
+                                Deleting your account will permanently remove all your data, including:
+                            </p>
 
-                    <ul className="list-disc pl-5 mb-6 text-gray-700 space-y-1">
-                        <li>Your profile information</li>
-                        <li>Your uploaded papers</li>
-                        <li>Your liked papers</li>
-                        <li>All other account data</li>
-                    </ul>
+                            <ul className="list-disc pl-5 mb-6 text-gray-700 space-y-1">
+                                <li>Your profile information</li>
+                                <li>Your uploaded papers</li>
+                                <li>Your liked papers</li>
+                                <li>All other account data</li>
+                            </ul>
 
-                    <p className="text-gray-700 mb-6">
-                        To confirm deletion, please type your email address: <strong>{userProfile?.email}</strong>
-                    </p>
+                            <p className="text-gray-700 mb-6">
+                                To confirm deletion, please type your email address: <strong>{userProfile?.email}</strong>
+                            </p>
 
-                    <input
-                        type="email"
-                        value={deleteConfirmation}
-                        onChange={(e) => setDeleteConfirmation(e.target.value)}
-                        placeholder="Enter your email"
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 mb-6"
-                    />
+                            <input
+                                type="email"
+                                value={deleteConfirmation}
+                                onChange={(e) => setDeleteConfirmation(e.target.value)}
+                                placeholder="Enter your email"
+                                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 mb-6"
+                            />
+                        </>
+                    )}
 
                     <div className="flex justify-end space-x-3">
                         <button
                             type="button"
-                            onClick={() => setShowDeleteModal(false)}
+                            onClick={() => {
+                                setShowDeleteModal(false);
+                                setRequiresReauth(false);
+                                setDeleteConfirmation('');
+                            }}
                             className="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-colors"
                         >
                             Cancel
                         </button>
-                        <button
-                            type="button"
-                            onClick={handleDeleteAccount}
-                            disabled={deleteConfirmation !== userProfile?.email || isDeleteLoading}
-                            className={`px-4 py-2 bg-red-600 text-white rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition-colors ${deleteConfirmation !== userProfile?.email
+                        {requiresReauth ? (
+                            <button
+                                type="button"
+                                onClick={async () => {
+                                    await logout();
+                                    navigate('/login');
+                                }}
+                                className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition-colors"
+                            >
+                                Log Out
+                            </button>
+                        ) : (
+                            <button
+                                type="button"
+                                onClick={handleDeleteAccount}
+                                disabled={deleteConfirmation !== userProfile?.email || isDeleteLoading}
+                                className={`px-4 py-2 bg-red-600 text-white rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition-colors ${deleteConfirmation !== userProfile?.email
                                     ? 'opacity-50 cursor-not-allowed'
                                     : 'hover:bg-red-700'
-                                }`}
-                        >
-                            {isDeleteLoading ? 'Deleting...' : 'Delete Account'}
-                        </button>
+                                    }`}
+                            >
+                                {isDeleteLoading ? 'Deleting...' : 'Delete Account'}
+                            </button>
+                        )}
                     </div>
                 </div>
             </Modal>
@@ -577,11 +615,11 @@ const Settings = () => {
                         setRawAvatar(undefined);
                         setEditingExistingAvatar(false);
                     }}
-                    initialCrop={editingExistingAvatar ? formData.avatarCrop : undefined}
+                    initialCrop={editingExistingAvatar ? (formData.avatarCrop ?? undefined) : undefined}
                 />
             )}
         </div>
     );
 };
 
-export default Settings; 
+export default Settings;

@@ -1,0 +1,89 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Helper functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    // Simplified admin check - robust against missing docs
+    function isAdmin() {
+      return isAuthenticated() && 
+        exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+    }
+
+    // Check if the request is trying to create a pending item owned by the user
+    function isPendingCreation() {
+      return isAuthenticated() &&
+        request.resource.data.status == 'pending' &&
+        request.resource.data.createdBy == request.auth.uid;
+    }
+
+    // Users collection
+    match /users/{userId} {
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated() && request.auth.uid == userId;
+      allow update: if isAuthenticated() && (request.auth.uid == userId || isAdmin());
+      allow delete: if isAuthenticated() && (request.auth.uid == userId || isAdmin());
+    }
+
+    // Metadata collections
+    match /colleges/{id} {
+      allow read: if true;
+      allow create: if isAdmin() || isPendingCreation();
+      allow update, delete: if isAdmin();
+    }
+    
+    match /courses/{id} {
+      allow read: if true;
+      allow create: if isAdmin() || isPendingCreation();
+      allow update, delete: if isAdmin();
+    }
+    
+    match /subjects/{id} {
+      allow read: if true;
+      allow create: if isAdmin() || isPendingCreation();
+      allow update, delete: if isAdmin();
+    }
+    
+    match /semesters/{id} {
+      allow read: if true;
+      allow create: if isAdmin() || isPendingCreation();
+      allow update, delete: if isAdmin();
+    }
+    
+    match /examTypes/{id} {
+      allow read: if true;
+      allow create: if isAdmin() || isPendingCreation();
+      allow update, delete: if isAdmin();
+    }
+
+    // Papers collection
+    match /papers/{paperId} {
+      allow read: if true;
+      allow create: if isAuthenticated();
+      allow update: if isAuthenticated() && (request.auth.uid == resource.data.uploaderId || isAdmin());
+      allow delete: if isAuthenticated() && (request.auth.uid == resource.data.uploaderId || isAdmin());
+    }
+
+    // Likes collection
+    match /likes/{likeId} {
+      allow read: if true;
+      allow create: if isAuthenticated();
+      allow delete: if isAuthenticated() && (request.auth.uid == resource.data.userId || isAdmin());
+    }
+
+    // Downloads collection
+    match /downloads/{downloadId} {
+      allow read: if isAuthenticated() && (request.auth.uid == resource.data.userId || isAdmin());
+      allow create: if isAuthenticated();
+    }
+    
+    // Default deny
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

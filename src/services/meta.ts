@@ -6,8 +6,11 @@ export type MetaType = 'subjects' | 'semesters' | 'courses' | 'colleges' | 'exam
 export interface MetaItem {
   id?: string;
   name: string;
+  category?: string;
   description?: string;
   order?: number;
+  status?: 'pending' | 'approved';
+  createdBy?: string;
 }
 
 export const getMetaItems = async (type: MetaType): Promise<MetaItem[]> => {
@@ -31,22 +34,43 @@ export const getMetaItems = async (type: MetaType): Promise<MetaItem[]> => {
   }
 };
 
-export const addMetaItem = async (type: MetaType, name: string): Promise<string> => {
+export const addMetaItem = async (
+  type: MetaType,
+  name: string,
+  category?: string,
+  userId?: string,
+  isAdmin?: boolean
+): Promise<string> => {
   // Get current max order to append to the end
   const items = await getMetaItems(type);
   // Filter out the MAX_SAFE_INTEGER items for calculation
   const orderedItems = items.filter(i => i.order !== undefined && i.order < Number.MAX_SAFE_INTEGER);
   const maxOrder = orderedItems.length > 0 ? Math.max(...orderedItems.map(i => i.order || 0)) : 0;
 
+  const status = isAdmin ? 'approved' : 'pending';
+
   const docRef = await addDoc(collection(db, type), {
     name,
-    order: maxOrder + 1
+    ...(category && { category }),
+    order: maxOrder + 1,
+    status,
+    ...(userId && { createdBy: userId })
   });
   return docRef.id;
 };
 
-export const updateMetaItem = async (type: MetaType, id: string, name: string, description?: string): Promise<void> => {
-  await updateDoc(doc(db, type, id), { name, ...(description !== undefined && { description }) });
+export const updateMetaItem = async (type: MetaType, id: string, name: string, description?: string, category?: string): Promise<void> => {
+  await updateDoc(doc(db, type, id), {
+    name,
+    ...(description !== undefined && { description }),
+    ...(category !== undefined && { category })
+  });
+};
+
+export const approveMetaItem = async (type: MetaType, id: string): Promise<void> => {
+  await updateDoc(doc(db, type, id), {
+    status: 'approved'
+  });
 };
 
 export const deleteMetaItem = async (type: MetaType, id: string): Promise<void> => {

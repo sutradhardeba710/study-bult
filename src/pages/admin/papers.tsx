@@ -285,7 +285,17 @@ const AdminPapers: React.FC = () => {
               <input className="border rounded px-3 py-2" name="title" value={form.title} onChange={handleFormChange} placeholder="Title" required />
               <Select
                 classNamePrefix="react-select"
-                options={subjects.map(s => ({ value: s.name, label: s.name }))}
+                options={Object.entries(
+                  subjects.reduce((acc, subject) => {
+                    const category = subject.category || 'Other';
+                    if (!acc[category]) acc[category] = [];
+                    acc[category].push(subject);
+                    return acc;
+                  }, {} as Record<string, MetaItem[]>)
+                ).map(([category, categorySubjects]) => ({
+                  label: category,
+                  options: categorySubjects.map(s => ({ value: s.name, label: s.name }))
+                }))}
                 value={form.subject ? { value: form.subject, label: form.subject } : null}
                 onChange={option => setForm(prev => ({ ...prev, subject: option ? option.value : '' }))}
                 isLoading={metaLoading}
@@ -367,7 +377,7 @@ const AdminPapers: React.FC = () => {
                 <span className="ml-2 text-sm text-gray-500">{selectedIds.length} selected</span>
               )}
             </div>
-            {/* Table */}
+
             {loading ? (
               <div className="flex justify-center py-12">
                 <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600"></div>
@@ -601,7 +611,17 @@ const AdminPapers: React.FC = () => {
                     <input className="border rounded px-3 py-2" name="title" value={editForm.title} onChange={e => setEditForm((f: any) => ({ ...f, title: e.target.value }))} placeholder="Title" required />
                     <Select
                       classNamePrefix="react-select"
-                      options={subjects.map(s => ({ value: s.name, label: s.name }))}
+                      options={Object.entries(
+                        subjects.reduce((acc, subject) => {
+                          const category = subject.category || 'Other';
+                          if (!acc[category]) acc[category] = [];
+                          acc[category].push(subject);
+                          return acc;
+                        }, {} as Record<string, MetaItem[]>)
+                      ).map(([category, categorySubjects]) => ({
+                        label: category,
+                        options: categorySubjects.map(s => ({ value: s.name, label: s.name }))
+                      }))}
                       value={editForm.subject ? { value: editForm.subject, label: editForm.subject } : null}
                       onChange={option => setEditForm((f: any) => ({ ...f, subject: option ? option.value : '' }))}
                       isLoading={metaLoading}
