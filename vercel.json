@@ -111,7 +111,7 @@
       ]
     },
     {
-      "source": "/assets/**/*.(png|jpg|jpeg|gif|webp|svg|ico)",
+      "source": "/assets/**/*.{png,jpg,jpeg,gif,webp,svg,ico}",
       "headers": [
         {
           "key": "Cache-Control",
@@ -120,7 +120,7 @@
       ]
     },
     {
-      "source": "/**/*.(png|jpg|jpeg|gif|webp|svg|ico)",
+      "source": "/**/*.{png,jpg,jpeg,gif,webp,svg,ico}",
       "headers": [
         {
           "key": "Cache-Control",
