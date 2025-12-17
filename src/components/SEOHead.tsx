@@ -18,7 +18,7 @@ const SEOHead: React.FC<SEOHeadProps> = ({
     title = 'Study Volte - Academic Resource Sharing Platform',
     description = 'Access and share question papers, study materials, and academic resources from universities and colleges. Download previous year papers, upload notes, and connect with students worldwide.',
     keywords = 'question papers, study materials, previous year papers, exam papers, university notes, college resources, academic sharing, study vault',
-    image = 'https://study-volte.site/og-image.png',
+    image = 'https://study-volte.site/logo.png',
     type = 'website',
     author,
     publishedTime,

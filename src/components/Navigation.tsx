@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { X, User, Upload, BookOpen, Home, LogOut, Shield, Settings, HelpCircle, MessageCircle, FileQuestion } from 'lucide-react';
+import { X, User, Upload, Home, LogOut, Shield, Settings, HelpCircle, MessageCircle, FileQuestion } from 'lucide-react';
 import Button from './Button';
 import { useState, useEffect, useRef } from 'react';
 
@@ -108,9 +108,7 @@ const Navigation = () => {
           {/* Logo */}
           <div className="flex items-center">
             <Link to="/" className="flex items-center space-x-2">
-              <div className="w-8 h-8 bg-primary-600 rounded-lg flex items-center justify-center">
-                <BookOpen className="w-5 h-5 text-white" />
-              </div>
+              <img src="/favicon.png" alt="Study Volte Logo" className="w-8 h-8" />
               <span className="text-xl font-bold text-gray-900">Study Volte</span>
             </Link>
           </div>
@@ -369,4 +367,4 @@ const Navigation = () => {
   );
 };
 
-export default Navigation; 
+export default Navigation;
