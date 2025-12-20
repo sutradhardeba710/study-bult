@@ -19,8 +19,15 @@ const Login = () => {
     const [showProfileCompletion, setShowProfileCompletion] = useState(false);
     const [googleUserProfile, setGoogleUserProfile] = useState<UserProfile | null>(null);
 
-    const { login, loginWithGoogle, checkGoogleRedirect } = useAuth();
+    const { currentUser, loading: authLoading, login, loginWithGoogle, checkGoogleRedirect } = useAuth();
     const navigate = useNavigate();
+
+    // Redirect already logged-in users to dashboard
+    useEffect(() => {
+        if (currentUser) {
+            navigate('/dashboard', { replace: true });
+        }
+    }, [currentUser, navigate]);
 
     // Check for Google redirect result on component mount
     useEffect(() => {
@@ -161,6 +168,22 @@ const Login = () => {
         setGoogleUserProfile(null);
         navigate('/dashboard');
     };
+
+    // Don't render login form if user is already authenticated or still loading
+    if (authLoading) {
+        return (
+            <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+                <div className="text-center">
+                    <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
+                    <p className="mt-4 text-gray-600">Loading...</p>
+                </div>
+            </div>
+        );
+    }
+
+    if (currentUser) {
+        return null; // Will redirect via useEffect
+    }
 
     return (
         <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
