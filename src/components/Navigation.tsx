@@ -78,9 +78,17 @@ const Navigation = () => {
     };
   }, []);
 
-  const navigation = [
+  // Desktop navigation
+  const desktopNavigation = [
     { name: 'Home', href: currentUser ? '/browse' : '/', icon: Home },
-    ...(currentUser ? [{ name: 'Upload Paper', href: '/upload', icon: Upload }] : []),
+    ...(currentUser ? [{ name: 'Dashboard', href: '/dashboard', icon: User }] : []),
+    ...(userProfile?.role === 'admin' ? [{ name: 'Admin Panel', href: '/admin', icon: Shield }] : []),
+  ];
+
+  // Mobile navigation
+  const mobileNavigation = [
+    { name: 'Home', href: currentUser ? '/browse' : '/', icon: Home },
+    { name: 'Upload Paper', href: '/upload', icon: Upload },
     ...(currentUser ? [{ name: 'Dashboard', href: '/dashboard', icon: User }] : []),
     ...(userProfile?.role === 'admin' ? [{ name: 'Admin Panel', href: '/admin', icon: Shield }] : []),
   ];
@@ -115,7 +123,7 @@ const Navigation = () => {
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-8">
-            {navigation.map((item) => (
+            {desktopNavigation.map((item) => (
               <Link
                 key={item.name}
                 to={item.href}
@@ -165,6 +173,14 @@ const Navigation = () => {
                 </div>
               )}
             </div>
+
+            {/* Upload Paper Link - Visible to all users */}
+            <Link
+              to="/upload"
+              className="text-gray-700 hover:text-primary-600 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200"
+            >
+              Upload Paper
+            </Link>
           </div>
 
           {/* Auth Buttons / User Menu */}
@@ -279,7 +295,7 @@ const Navigation = () => {
       {isMobileMenuOpen && (
         <div className="md:hidden">
           <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
-            {navigation.map((item) => (
+            {mobileNavigation.map((item) => (
               <Link
                 key={item.name}
                 to={item.href}
