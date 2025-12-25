@@ -1,5 +1,6 @@
 import { collection, addDoc, updateDoc, doc, increment, serverTimestamp } from 'firebase/firestore';
-import { db } from './firebase';
+import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
+import { db, storage } from './firebase';
 
 export interface PaperData {
   id?: string;
@@ -56,59 +57,49 @@ export const uploadPaper = async (
       throw new Error('Exam type is required.');
     }
 
-    // Cloudinary upload with progress
-    const formData = new FormData();
-    formData.append('file', file);
-    
-    const uploadPreset = import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET;
-    if (!uploadPreset) {
-      console.error('Cloudinary upload preset is not configured');
-      throw new Error('File upload configuration is missing. Please contact the administrator.');
-    }
-    
-    formData.append('upload_preset', uploadPreset);
-    formData.append('folder', 'papers');
+    // Firebase Storage upload with real-time progress
+    const timestamp = Date.now();
+    const sanitizedFileName = file.name.replace(/[^a-zA-Z0-9.-]/g, '_');
+    const storagePath = `papers/${paperData.uploaderId}/${timestamp}_${sanitizedFileName}`;
 
-    const cloudName = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME;
-    if (!cloudName) {
-      console.error('Cloudinary cloud name is not configured');
-      throw new Error('File upload configuration is missing. Please contact the administrator.');
-    }
-    
-    const url = `https://api.cloudinary.com/v1_1/${cloudName}/auto/upload`;
-
-    const xhr = new XMLHttpRequest();
-    const promise = new Promise<{ secure_url: string; original_filename: string }>((resolve, reject) => {
-      xhr.open('POST', url);
-      xhr.upload.onprogress = (event) => {
-        if (event.lengthComputable && onProgress) {
-          const percent = Math.round((event.loaded / event.total) * 100);
-          onProgress(percent);
-        }
-      };
-      xhr.onload = () => {
-        if (xhr.status >= 200 && xhr.status < 300) {
-          const data = JSON.parse(xhr.responseText);
-          if (!data.secure_url) {
-            reject(new Error('File upload failed. Please try again.'));
-          } else {
-            resolve(data);
-          }
-        } else {
-          reject(new Error('File upload failed. Please check your internet connection and try again.'));
-        }
-      };
-      xhr.onerror = () => reject(new Error('File upload failed. Please check your internet connection and try again.'));
-      xhr.send(formData);
+    const storageRef = ref(storage, storagePath);
+    const uploadTask = uploadBytesResumable(storageRef, file, {
+      contentType: 'application/pdf',
     });
 
-    const data = await promise;
+    // Real-time upload progress tracking
+    const fileUrl = await new Promise<string>((resolve, reject) => {
+      uploadTask.on(
+        'state_changed',
+        (snapshot) => {
+          // Calculate and report progress
+          const percent = Math.round((snapshot.bytesTransferred / snapshot.totalBytes) * 100);
+          if (onProgress) {
+            onProgress(percent);
+          }
+        },
+        (error) => {
+          // Handle upload errors
+          console.error('Firebase Storage upload error:', error);
+          reject(new Error('File upload failed. Please check your internet connection and try again.'));
+        },
+        async () => {
+          // Upload completed successfully
+          try {
+            const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
+            resolve(downloadURL);
+          } catch (error) {
+            reject(new Error('Failed to get file URL. Please try again.'));
+          }
+        }
+      );
+    });
 
-    // Save paper data to Firestore (or your DB)
+    // Save paper data to Firestore
     const paperDataToSave = {
       ...paperData,
-      fileUrl: data.secure_url,
-      fileName: data.original_filename,
+      fileUrl,
+      fileName: file.name,
       fileSize: file.size,
       createdAt: serverTimestamp(),
       updatedAt: serverTimestamp(),
@@ -126,17 +117,17 @@ export const uploadPaper = async (
       console.error('Failed to trigger sitemap regeneration:', error);
       // Non-critical error, don't throw
     }
-    
+
     return paperDoc.id;
   } catch (error: any) {
     console.error('Upload error:', error);
     // Provide more specific error messages
-    if (error.message.includes('Cloudinary') || error.message.includes('upload')) {
+    if (error.message.includes('storage') || error.message.includes('upload')) {
       throw new Error('File upload failed. Please check your internet connection and try again.');
     } else if (error.message.includes('Firestore')) {
       throw new Error('Failed to save paper data. Please try again.');
     } else {
-    throw error;
+      throw error;
     }
   }
 };
@@ -161,4 +152,4 @@ export const incrementLikeCount = async (paperId: string, shouldIncrement: boole
   } catch (error) {
     console.error('Error updating like count:', error);
   }
-}; 
+};
