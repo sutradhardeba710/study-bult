@@ -315,7 +315,7 @@ const Upload = () => {
     return Object.keys(newErrors).length === 0;
   };
 
-  const RATE_LIMIT_SECONDS = 60; // Recommend backend rate limiting for production
+  const RATE_LIMIT_SECONDS = 10; // Client-side rate limiting
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -418,8 +418,8 @@ const Upload = () => {
 
               <div
                 className={`border-2 border-dashed rounded-lg p-8 text-center ${isDragOver
-                    ? 'border-primary-500 bg-primary-50'
-                    : 'border-gray-300 hover:border-gray-400'
+                  ? 'border-primary-500 bg-primary-50'
+                  : 'border-gray-300 hover:border-gray-400'
                   }`}
                 onDragOver={handleDragOver}
                 onDragLeave={handleDragLeave}
