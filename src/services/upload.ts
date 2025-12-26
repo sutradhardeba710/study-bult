@@ -82,10 +82,11 @@ export const uploadPaper = async (
     const fileUrl = await getDownloadURL(uploadTask.snapshot.ref);
 
     // Save paper data to Firestore
-    const paperDataToSave: Omit<PaperData, 'id'> = {
+    const paperDataToSave: Omit<PaperData, 'id'> & { storagePath: string } = {
       ...paperData,
       fileUrl,
       fileName: file.name,
+      storagePath, // Save the storage path for reliable lookup by Cloud Function
       // thumbnailUrl will be added by Cloud Function after upload
       createdAt: serverTimestamp(),
       updatedAt: serverTimestamp(),
