@@ -73,8 +73,7 @@ export default defineConfig({
       output: {
         manualChunks: {
           'vendor': ['react', 'react-dom', 'react-router-dom'],
-          'ui': ['react-hot-toast', 'react-select', 'react-easy-crop', 'lucide-react'],
-          'pdf': ['react-pdf', 'pdfjs-dist']
+          'ui': ['react-hot-toast', 'react-select', 'react-easy-crop', 'lucide-react']
         },
         assetFileNames: 'assets/[name]-[hash][extname]',
         chunkFileNames: 'assets/[name]-[hash].js',
