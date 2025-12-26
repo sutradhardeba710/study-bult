@@ -20,6 +20,37 @@ if (!admin.apps.length) {
     admin.initializeApp();
 }
 
+// Factory for creating Canvas/Image instances in Node environment
+class NodeCanvasFactory {
+    create(width: number, height: number) {
+        if (width <= 0 || height <= 0) {
+            throw new Error('Invalid canvas size');
+        }
+        const canvas = createCanvas(width, height);
+        return {
+            canvas,
+            context: canvas.getContext('2d'),
+        };
+    }
+
+    reset(canvasAndContext: any, width: number, height: number) {
+        if (width <= 0 || height <= 0) {
+            throw new Error('Invalid canvas size');
+        }
+        canvasAndContext.canvas.width = width;
+        canvasAndContext.canvas.height = height;
+    }
+
+    destroy(canvasAndContext: any) {
+        if (canvasAndContext.canvas) {
+            canvasAndContext.canvas.width = 0;
+            canvasAndContext.canvas.height = 0;
+            canvasAndContext.canvas = null;
+            canvasAndContext.context = null;
+        }
+    }
+}
+
 /**
  * Cloud Function to generate PDF thumbnails
  * Triggers when a PDF is uploaded to /papers/{userId}/{fileName}
@@ -81,7 +112,8 @@ export const generateThumbnail = functions
                 data,
                 standardFontDataUrl,
                 disableFontFace: true, // Disable font face to avoid font loading issues in Node
-            });
+                canvasFactory: new NodeCanvasFactory(), // Use custom factory for Node environment
+            } as any);
 
             const pdfDocument = await loadingTask.promise;
 
@@ -99,16 +131,18 @@ export const generateThumbnail = functions
             const scaledViewport = page.getViewport({ scale });
 
             // Create canvas
-            const canvas = createCanvas(scaledViewport.width, scaledViewport.height);
-            const context = canvas.getContext('2d');
+            const canvasFactory = new NodeCanvasFactory();
+            const { canvas, context } = canvasFactory.create(scaledViewport.width, scaledViewport.height);
 
             // Render PDF page to canvas
             await page.render({
                 canvasContext: context as any,
                 viewport: scaledViewport,
+                canvasFactory: canvasFactory as any, // Pass factory to render method too
             } as any).promise;
 
             // Convert canvas to JPEG buffer
+            // @ts-ignore
             const thumbnailBuffer = canvas.toBuffer('image/jpeg', { quality: 0.8 });
 
             // Upload thumbnail to storage
