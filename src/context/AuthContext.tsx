@@ -231,7 +231,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             // Sanitize the profile object to remove undefined values
             const sanitizedProfile = Object.entries(profile).reduce((acc, [key, value]) => {
                 if (value !== undefined) {
-                    acc[key as keyof UserProfile] = value;
+                    (acc as any)[key] = value;
                 }
                 return acc;
             }, {} as Partial<UserProfile>);

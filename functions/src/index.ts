@@ -169,3 +169,6 @@ export const sendEmail = functions.https.onCall(async (data, context) => {
         throw new functions.https.HttpsError('internal', `Failed to send email: ${error.message}`);
     }
 });
+
+// Export thumbnail generation function
+export { generateThumbnail } from './generateThumbnail';

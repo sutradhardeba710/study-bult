@@ -55,7 +55,7 @@ const CustomMenuList = (props: MenuListProps<any, false>) => {
       {props.children}
       <div
         className="border-t border-gray-200 p-2 cursor-pointer hover:bg-gray-50 text-primary-600 font-medium text-sm flex items-center justify-center transition-colors"
-        onClick={(e) => {
+        onClick={(_e) => {
           // Prevent the dropdown from closing immediately if needed, or let it close
           // e.stopPropagation(); 
           if (onAddNew) onAddNew();

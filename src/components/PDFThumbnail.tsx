@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { FileText } from 'lucide-react';
 
 interface PDFThumbnailProps {
@@ -6,78 +6,110 @@ interface PDFThumbnailProps {
   width?: number;
   height?: number;
   className?: string;
+  title?: string;
+  thumbnailUrl?: string;
 }
 
 /**
  * A thumbnail component for PDFs
- * Attempts to generate a thumbnail from the PDF URL using Cloudinary
- * Falls back to a placeholder icon if the thumbnail cannot be generated
+ * Displays actual PDF preview using object tag
+ * Falls back to thumbnail image or clean placeholder
  */
-const PDFThumbnail: React.FC<PDFThumbnailProps> = ({ fileUrl, width = 40, height = 56, className = '' }) => {
-  const [thumbnailUrl, setThumbnailUrl] = useState<string | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(false);
+const PDFThumbnail: React.FC<PDFThumbnailProps> = ({
+  fileUrl,
+  width = 80,
+  height = 110,
+  className = '',
+  title = 'PDF',
+  thumbnailUrl
+}) => {
+  const [imageLoading, setImageLoading] = useState(true);
+  const [imageError, setImageError] = useState(false);
 
-  useEffect(() => {
-    if (!fileUrl) {
-      setLoading(false);
-      setError(true);
-      return;
-    }
+  const firstLetter = title.charAt(0).toUpperCase();
 
-    // Check if it's a Cloudinary URL
-    if (fileUrl.includes('cloudinary.com')) {
-      // Create a thumbnail URL by adding transformation parameters
-      // This uses Cloudinary's PDF to image conversion with page 1 at 40% quality
-      const baseUrl = fileUrl.split('/upload/')[0] + '/upload/';
-      const filePathAndOptions = fileUrl.split('/upload/')[1];
-      
-      // Add transformation for PDF: extract first page, convert to JPG, resize
-      const thumbnailUrl = `${baseUrl}w_${width*2},h_${height*2},c_fill,pg_1,q_40/f_jpg/${filePathAndOptions}`;
-      setThumbnailUrl(thumbnailUrl);
-    } else {
-      // For non-Cloudinary URLs, we can't generate thumbnails
-      setError(true);
-    }
-    
-    setLoading(false);
-  }, [fileUrl, width, height]);
-
-  if (loading) {
-    return (
-      <div 
-        style={{ width, height }} 
-        className={`flex items-center justify-center bg-gray-100 rounded overflow-hidden animate-pulse ${className}`}
-      >
-        <div className="w-2/3 h-2/3 bg-gray-200 rounded"></div>
-      </div>
-    );
-  }
-
-  if (error || !thumbnailUrl) {
-    return (
-      <div 
-        style={{ width, height }} 
-        className={`flex items-center justify-center bg-gray-100 rounded overflow-hidden ${className}`}
-      >
-        <FileText className="w-2/3 h-2/3 text-gray-400" />
-      </div>
-    );
-  }
-
-  return (
-    <div 
-      style={{ width, height }} 
-      className={`bg-gray-100 rounded overflow-hidden ${className}`}
+  // Clean white placeholder
+  const renderPlaceholder = () => (
+    <div
+      style={{ width, height }}
+      className={`rounded overflow-hidden flex flex-col items-center justify-center shadow-sm bg-white border border-gray-200 ${className}`}
     >
-      <img 
-        src={thumbnailUrl} 
-        alt="PDF Preview" 
-        className="w-full h-full object-cover"
-        onError={() => setError(true)}
-      />
+      <div className="bg-gray-50 rounded-lg p-3 mb-2 shadow-sm">
+        <FileText className="w-8 h-8 text-gray-400" />
+      </div>
+      <div className="text-sm font-semibold text-gray-700">{firstLetter}</div>
+      <div className="text-xs text-gray-500 mt-1 font-medium">PDF</div>
+    </div>
+  );
+
+  // If we have a pre-generated thumbnail, use it
+  if (thumbnailUrl && !imageError) {
+    return (
+      <div
+        style={{ width, height }}
+        className={`rounded overflow-hidden relative bg-white shadow-sm border border-gray-200 ${className}`}
+      >
+        {imageLoading && (
+          <div
+            style={{ width, height }}
+            className="absolute inset-0 flex flex-col items-center justify-center z-10 bg-white"
+          >
+            <div className="bg-gray-50 rounded-lg p-3 mb-2">
+              <FileText className="w-8 h-8 text-gray-400 animate-pulse" />
+            </div>
+            <div className="text-xs text-gray-500 mt-1">Loading...</div>
+          </div>
+        )}
+        <img
+          src={thumbnailUrl}
+          alt={`${title} thumbnail`}
+          className={`w-full h-full object-contain bg-white ${imageLoading ? 'opacity-0' : 'opacity-100'} transition-opacity duration-300`}
+          onLoad={() => setImageLoading(false)}
+          onError={() => {
+            setImageLoading(false);
+            setImageError(true);
+          }}
+          loading="lazy"
+        />
+      </div>
+    );
+  }
+
+  // Show actual PDF preview using object tag
+  return (
+    <div
+      style={{ width, height }}
+      className={`rounded overflow-hidden relative bg-white shadow-sm border border-gray-200 ${className}`}
+    >
+      <div
+        style={{
+          width,
+          height,
+          overflow: 'hidden',
+          position: 'relative',
+          backgroundColor: 'white'
+        }}
+      >
+        <object
+          data={`${fileUrl}#page=1&toolbar=0&navpanes=0&scrollbar=0&view=FitH`}
+          type="application/pdf"
+          width={width + 20}
+          height={height + 20}
+          style={{
+            position: 'absolute',
+            top: -10,
+            left: -10,
+            overflow: 'hidden',
+            pointerEvents: 'none',
+            border: 'none',
+            display: 'block'
+          }}
+        >
+          {renderPlaceholder()}
+        </object>
+      </div>
     </div>
   );
 };
 
-export default PDFThumbnail; 
+export default PDFThumbnail;

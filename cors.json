@@ -16,7 +16,9 @@
             "Authorization",
             "Content-Length",
             "User-Agent",
-            "X-Requested-With"
+            "X-Requested-With",
+            "Range",
+            "Accept-Ranges"
         ]
     }
 ]

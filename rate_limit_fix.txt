@@ -1,0 +1,6 @@
+﻿// Update line 318 in src/pages/Upload.tsx
+// Change from:
+const RATE_LIMIT_SECONDS = 10;
+
+// To inside handleSubmit function (around line 320):
+const RATE_LIMIT_SECONDS = userProfile.role === 'admin' ? 6 : 12;

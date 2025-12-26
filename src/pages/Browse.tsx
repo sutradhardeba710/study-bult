@@ -312,7 +312,7 @@ const Browse = () => {
                                 <div className="p-6">
                                     <div className="flex mb-4">
                                         <div className="mr-4 flex-shrink-0" onClick={() => handlePreview(paper)} style={{ cursor: 'pointer' }}>
-                                            <PDFThumbnail fileUrl={paper.fileUrl} width={80} height={110} className="shadow hover:shadow-md transition-shadow" />
+                                            <PDFThumbnail fileUrl={paper.fileUrl} title={paper.title} thumbnailUrl={paper.thumbnailUrl} width={80} height={110} className="shadow hover:shadow-md transition-shadow" />
                                         </div>
                                         <div>
                                             <h3 className="text-lg font-semibold text-gray-900 mb-2 line-clamp-2">

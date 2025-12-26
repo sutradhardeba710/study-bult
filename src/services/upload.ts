@@ -1,127 +1,103 @@
-import { collection, addDoc, updateDoc, doc, increment, serverTimestamp } from 'firebase/firestore';
 import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
-import { db, storage } from './firebase';
+import { collection, addDoc, updateDoc, doc, increment, serverTimestamp } from 'firebase/firestore';
+import { storage, db } from './firebase';
 
 export interface PaperData {
   id?: string;
   title: string;
-  subject: string;
-  course: string;
-  semester: string;
   college: string;
+  semester: string;
+  course: string;
+  subject: string;
   examType: string;
   description?: string;
   uploaderId: string;
   uploaderName: string;
-  status: 'pending' | 'approved' | 'rejected';
-  likeCount: number;
-  downloadCount: number;
   fileUrl: string;
   fileName: string;
-  fileSize: number;
-  createdAt: any; // Firestore Timestamp only
-  updatedAt?: any; // Firestore Timestamp only
+  thumbnailUrl?: string;
+  status: 'pending' | 'approved' | 'rejected';
+  createdAt: any;
+  updatedAt?: any;
+  likeCount: number;
+  downloadCount: number;
 }
 
+/**
+ * Upload a paper to Firebase Storage and save metadata to Firestore
+ * @param file - The PDF file to upload
+ * @param paperData - The paper metadata
+ * @param onProgress - Optional callback to track upload progress
+ * @returns Promise that resolves to the document ID
+ */
 export const uploadPaper = async (
   file: File,
-  paperData: Omit<PaperData, 'fileUrl' | 'fileName' | 'fileSize' | 'createdAt' | 'updatedAt' | 'likeCount' | 'downloadCount'>,
+  paperData: Omit<PaperData, 'id' | 'fileUrl' | 'fileName' | 'createdAt' | 'updatedAt' | 'likeCount' | 'downloadCount'>,
   onProgress?: (percent: number) => void
 ): Promise<string> => {
   try {
-    // Validate file
+    // Validate file type
     if (file.type !== 'application/pdf') {
-      throw new Error('Only PDF files are allowed. Please select a PDF file.');
-    }
-    if (file.size > 10 * 1024 * 1024) {
-      throw new Error('File size must be less than 10MB. Please compress your PDF or choose a smaller file.');
+      throw new Error('Only PDF files are allowed');
     }
 
-    // Validate required fields
-    if (!paperData.title.trim()) {
-      throw new Error('Paper title is required.');
-    }
-    if (!paperData.subject.trim()) {
-      throw new Error('Subject is required.');
-    }
-    if (!paperData.course.trim()) {
-      throw new Error('Course is required.');
-    }
-    if (!paperData.semester.trim()) {
-      throw new Error('Semester is required.');
-    }
-    if (!paperData.college.trim()) {
-      throw new Error('College is required.');
-    }
-    if (!paperData.examType.trim()) {
-      throw new Error('Exam type is required.');
-    }
-
-    // Firebase Storage upload with real-time progress
+    // Create a safe file name
     const timestamp = Date.now();
     const sanitizedFileName = file.name.replace(/[^a-zA-Z0-9.-]/g, '_');
+
+    // Note: Thumbnail generation is handled by Firebase Cloud Function
+    // The Cloud Function will automatically generate a thumbnail when the PDF is uploaded
+
+
     const storagePath = `papers/${paperData.uploaderId}/${timestamp}_${sanitizedFileName}`;
-
     const storageRef = ref(storage, storagePath);
-    const uploadTask = uploadBytesResumable(storageRef, file, {
-      contentType: 'application/pdf',
-    });
 
-    // Real-time upload progress tracking
-    const fileUrl = await new Promise<string>((resolve, reject) => {
+    // Upload file with progress tracking
+    const uploadTask = uploadBytesResumable(storageRef, file);
+
+    // Wait for upload to complete
+    await new Promise<void>((resolve, reject) => {
       uploadTask.on(
         'state_changed',
         (snapshot) => {
-          // Calculate and report progress
-          const percent = Math.round((snapshot.bytesTransferred / snapshot.totalBytes) * 100);
+          // Track progress from 0% to 100%
+          const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
           if (onProgress) {
-            onProgress(percent);
+            onProgress(Math.round(progress));
           }
         },
         (error) => {
-          // Handle upload errors
-          console.error('Firebase Storage upload error:', error);
+          // Handle upload error
+          console.error('Upload error:', error);
           reject(new Error('File upload failed. Please check your internet connection and try again.'));
         },
-        async () => {
+        () => {
           // Upload completed successfully
-          try {
-            const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
-            resolve(downloadURL);
-          } catch (error) {
-            reject(new Error('Failed to get file URL. Please try again.'));
-          }
+          resolve();
         }
       );
     });
 
+    // Get download URL
+    const fileUrl = await getDownloadURL(uploadTask.snapshot.ref);
+
     // Save paper data to Firestore
-    const paperDataToSave = {
+    const paperDataToSave: Omit<PaperData, 'id'> = {
       ...paperData,
       fileUrl,
       fileName: file.name,
-      fileSize: file.size,
+      // thumbnailUrl will be added by Cloud Function after upload
       createdAt: serverTimestamp(),
       updatedAt: serverTimestamp(),
       likeCount: 0,
-      downloadCount: 0
+      downloadCount: 0,
     };
-    const paperDoc = await addDoc(collection(db, 'papers'), paperDataToSave);
 
-    // Optionally, trigger sitemap regeneration after upload
-    // This could be implemented as a server function to keep the sitemap up-to-date
-    try {
-      // This is just a placeholder - implement based on your needs
-      // await fetch('/api/regenerate-sitemap', { method: 'POST' });
-    } catch (error) {
-      console.error('Failed to trigger sitemap regeneration:', error);
-      // Non-critical error, don't throw
-    }
+    const paperDoc = await addDoc(collection(db, 'papers'), paperDataToSave);
 
     return paperDoc.id;
   } catch (error: any) {
-    console.error('Upload error:', error);
-    // Provide more specific error messages
+    console.error('Error uploading paper:', error);
     if (error.message.includes('storage') || error.message.includes('upload')) {
       throw new Error('File upload failed. Please check your internet connection and try again.');
     } else if (error.message.includes('Firestore')) {
@@ -132,22 +108,31 @@ export const uploadPaper = async (
   }
 };
 
+/**
+ * Increment download count for a paper
+ * @param paperId - The ID of the paper
+ */
 export const incrementDownloadCount = async (paperId: string): Promise<void> => {
   try {
     const paperRef = doc(db, 'papers', paperId);
     await updateDoc(paperRef, {
-      downloadCount: increment(1)
+      downloadCount: increment(1),
     });
   } catch (error) {
     console.error('Error incrementing download count:', error);
   }
 };
 
+/**
+ * Update like count for a paper
+ * @param paperId - The ID of the paper
+ * @param shouldIncrement - If true, increment; if false, decrement
+ */
 export const incrementLikeCount = async (paperId: string, shouldIncrement: boolean): Promise<void> => {
   try {
     const paperRef = doc(db, 'papers', paperId);
     await updateDoc(paperRef, {
-      likeCount: shouldIncrement ? increment(1) : increment(-1)
+      likeCount: shouldIncrement ? increment(1) : increment(-1),
     });
   } catch (error) {
     console.error('Error updating like count:', error);
