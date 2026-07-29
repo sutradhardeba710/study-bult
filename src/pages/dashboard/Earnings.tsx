@@ -342,6 +342,23 @@ function WithdrawalCard({ item }: { item: Withdrawal }) {
                                 </div>
                                 {revealed.pin && <p className="mt-2 text-sm font-bold text-slate-700">PIN: {revealed.pin}</p>}
                                 {revealed.expiresAt && <p className="mt-1 text-xs text-slate-500">Expires: {revealed.expiresAt}</p>}
+                                
+                                <div className="mt-4 rounded-xl bg-white/60 p-3 text-sm text-slate-700">
+                                    <p className="font-bold text-slate-900 mb-1">How to claim:</p>
+                                    {item.brand === 'amazon' ? (
+                                        <ul className="list-disc pl-4 space-y-1 text-xs">
+                                            <li>Go to the <strong>Amazon app</strong> or <strong>Amazon.in</strong></li>
+                                            <li>Navigate to <strong>Amazon Pay</strong> &rarr; <strong>Add Gift Card</strong></li>
+                                            <li>Paste the code above and click Add to your balance.</li>
+                                        </ul>
+                                    ) : (
+                                        <ul className="list-disc pl-4 space-y-1 text-xs">
+                                            <li>Go to the <strong>Flipkart app</strong> or <strong>Flipkart.com</strong></li>
+                                            <li>Go to <strong>My Account</strong> &rarr; <strong>Saved Cards & Wallet</strong></li>
+                                            <li>Click <strong>Add Flipkart Gift Card</strong> and paste the Code and PIN.</li>
+                                        </ul>
+                                    )}
+                                </div>
                             </div>
                         ) : (
                             <button type="button" onClick={reveal} disabled={working} className="mt-3 inline-flex min-h-11 items-center gap-2 rounded-xl bg-emerald-600 px-4 text-sm font-black text-white hover:bg-emerald-700 disabled:opacity-50">

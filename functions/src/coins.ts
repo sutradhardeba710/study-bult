@@ -706,7 +706,7 @@ export const fulfilWithdrawal = callable.https.onCall(async (data, context) => {
         await sendMailSafe(
             email,
             `Your ${brand.toUpperCase()} ₹${amountInr} gift card is ready`,
-            `<p>Your Study Volte gift card is ready.</p><p><strong>Code:</strong> ${code}</p>${pin ? `<p><strong>PIN:</strong> ${pin}</p>` : ''}${expiresAt ? `<p><strong>Expiry:</strong> ${expiresAt}</p>` : ''}<p>The code is also available on your Earnings page.</p>`
+            `<p>Good news! Your ${brand.toUpperCase()} gift card for ₹${amountInr} is ready to be claimed.</p><p>For security, your voucher code is safely stored in your account.</p><p><strong>Please log in to your Study Volte Dashboard and go to the Rewards page to reveal and copy your code.</strong></p>`
         );
         return { success: true };
     } catch (error) {
