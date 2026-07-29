@@ -75,7 +75,7 @@ export interface VoucherReveal {
     expiresAt?: string | null;
 }
 
-const functions = getFunctions(app, 'asia-south1');
+const functions = getFunctions(app);
 
 function call<TInput, TOutput>(name: string, payload: TInput): Promise<TOutput> {
     return httpsCallable<TInput, TOutput>(functions, name)(payload).then((result) => result.data);
