@@ -1,0 +1,28 @@
+{
+    "name": "pdf-thumbnail-service",
+    "version": "1.0.0",
+    "description": "Cloud Run service for generating PDF thumbnails",
+    "main": "dist/index.js",
+    "scripts": {
+        "build": "tsc",
+        "start": "node dist/index.js",
+        "dev": "ts-node src/index.ts"
+    },
+    "dependencies": {
+        "express": "^4.18.2",
+        "@google-cloud/storage": "^7.7.0",
+        "@google-cloud/firestore": "^7.1.0",
+        "canvas": "^2.11.2",
+        "pdfjs-dist": "^3.11.174",
+        "sharp": "^0.33.2"
+    },
+    "devDependencies": {
+        "@types/express": "^4.17.21",
+        "@types/node": "^20.11.0",
+        "typescript": "^5.3.3",
+        "ts-node": "^10.9.2"
+    },
+    "engines": {
+        "node": "20"
+    }
+}

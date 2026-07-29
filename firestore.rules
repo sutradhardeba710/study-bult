@@ -1,0 +1,223 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    function isAdmin() {
+      return isAuthenticated() &&
+        exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+    }
+
+    function isPendingCreation() {
+      return isAuthenticated() &&
+        request.resource.data.status == 'pending' &&
+        request.resource.data.createdBy == request.auth.uid;
+    }
+
+    function protectsMoneyFields() {
+      return !request.resource.data.diff(resource.data).affectedKeys().hasAny([
+        'role',
+        'coins',
+        'coinBalance',
+        'wallet',
+        'walletStatus',
+        'lifetimeEarned',
+        'lifetimeWithdrawn'
+      ]);
+    }
+
+    function protectsPaperReviewFields() {
+      return !request.resource.data.diff(resource.data).affectedKeys().hasAny([
+        'status',
+        'reviewStatus',
+        'coinEligible',
+        'coinAwarded',
+        'coinSkipReason',
+        'coinRevoked',
+        'coinRevokedAt',
+        'duplicateOf',
+        'reviewedBy',
+        'reviewedAt'
+      ]);
+    }
+
+    match /users/{userId} {
+      allow read: if true;
+      allow create: if isOwner(userId) &&
+        (!request.resource.data.keys().hasAny(['role']) || request.resource.data.role == 'student');
+      allow update: if isAdmin() || (isOwner(userId) && protectsMoneyFields());
+      allow delete: if isAdmin() || isOwner(userId);
+
+      match /dailyTasks/{dateDoc} {
+        allow read, write: if isOwner(userId);
+      }
+    }
+
+    match /colleges/{id} {
+      allow read: if true;
+      allow create: if isAdmin() || isPendingCreation();
+      allow update, delete: if isAdmin();
+    }
+
+    match /courses/{id} {
+      allow read: if true;
+      allow create: if isAdmin() || isPendingCreation();
+      allow update, delete: if isAdmin();
+    }
+
+    match /subjects/{id} {
+      allow read: if true;
+      allow create: if isAdmin() || isPendingCreation();
+      allow update, delete: if isAdmin();
+    }
+
+    match /semesters/{id} {
+      allow read: if true;
+      allow create: if isAdmin() || isPendingCreation();
+      allow update, delete: if isAdmin();
+    }
+
+    match /examTypes/{id} {
+      allow read: if true;
+      allow create: if isAdmin() || isPendingCreation();
+      allow update, delete: if isAdmin();
+    }
+
+    match /papers/{paperId} {
+      allow read: if true;
+
+      allow create: if isAdmin() ||
+        (isAuthenticated() &&
+          request.resource.data.uploaderId == request.auth.uid &&
+          request.resource.data.status == 'pending' &&
+          !request.resource.data.keys().hasAny([
+            'coinEligible',
+            'coinAwarded',
+            'coinSkipReason',
+            'coinRevoked',
+            'reviewedBy',
+            'reviewedAt'
+          ]));
+
+      allow create: if !isAuthenticated() &&
+        request.resource.data.uploaderType == 'guest' &&
+        request.resource.data.status == 'pending' &&
+        request.resource.data.uploaderEmail is string &&
+        request.resource.data.uploaderEmail.matches('.*@.*\\..*') &&
+        request.resource.data.uploaderName is string &&
+        request.resource.data.uploaderName.size() > 0 &&
+        request.resource.data.uploaderId.matches('guest-.*') &&
+        !request.resource.data.keys().hasAny([
+          'coinEligible',
+          'coinAwarded',
+          'coinSkipReason',
+          'coinRevoked',
+          'reviewedBy',
+          'reviewedAt'
+        ]);
+
+      allow update: if isAuthenticated() &&
+        (request.auth.uid == resource.data.uploaderId || isAdmin()) &&
+        protectsPaperReviewFields();
+
+      allow update: if isAuthenticated() &&
+        request.resource.data.diff(resource.data).affectedKeys()
+          .hasOnly(['likeCount', 'downloadCount', 'updatedAt']);
+
+      allow delete: if isAuthenticated() &&
+        (request.auth.uid == resource.data.uploaderId || isAdmin());
+    }
+
+    match /likes/{likeId} {
+      allow read: if true;
+      allow create: if isAuthenticated() &&
+        request.resource.data.userId == request.auth.uid;
+      allow delete: if isAuthenticated() &&
+        (request.auth.uid == resource.data.userId || isAdmin());
+      allow update: if false;
+    }
+
+    match /downloads/{downloadId} {
+      allow read: if isAuthenticated() &&
+        (request.auth.uid == resource.data.userId || isAdmin());
+      allow create: if isAuthenticated() &&
+        request.resource.data.userId == request.auth.uid;
+      allow update: if false;
+      allow delete: if isAuthenticated() &&
+        (request.auth.uid == resource.data.userId || isAdmin());
+    }
+
+    // Money-related records are written only by Firebase Admin SDK in Cloud Functions.
+    match /wallets/{userId} {
+      allow read: if isOwner(userId) || isAdmin();
+      allow write: if false;
+    }
+
+    match /coinLedger/{entryId} {
+      allow read: if isAuthenticated() &&
+        (resource.data.userId == request.auth.uid || isAdmin());
+      allow write: if false;
+    }
+
+    match /withdrawals/{withdrawalId} {
+      allow read: if isAuthenticated() &&
+        (resource.data.userId == request.auth.uid || isAdmin());
+      allow write: if false;
+    }
+
+    match /voucherIssues/{issueId} {
+      allow read: if isAuthenticated() &&
+        (resource.data.userId == request.auth.uid || isAdmin());
+      allow write: if false;
+    }
+
+    match /coinProgram/{documentId} {
+      allow read: if isAuthenticated();
+      allow write: if false;
+    }
+
+    match /coinIdempotency/{documentId} {
+      allow read, write: if false;
+    }
+
+    match /coinBudget/{documentId} {
+      allow read: if isAdmin();
+      allow write: if false;
+    }
+
+    match /voucherStock/{documentId} {
+      allow read, write: if false;
+    }
+
+    match /voucherAccessLog/{documentId} {
+      allow read, write: if false;
+    }
+
+    match /modalAnalytics/{eventId} {
+      allow read: if isAdmin();
+      allow create: if true;
+      allow update, delete: if isAdmin();
+    }
+
+    match /contact_messages/{messageId} {
+      allow read, update, delete: if isAdmin();
+      allow create: if true;
+    }
+
+    match /system_logs/{logId} {
+      allow read: if isAdmin();
+      allow write: if false;
+    }
+
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

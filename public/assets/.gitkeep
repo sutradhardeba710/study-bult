@@ -1,0 +1,2 @@
+# This file ensures the assets directory is tracked by git
+# PDF.js worker files will be copied here during build 

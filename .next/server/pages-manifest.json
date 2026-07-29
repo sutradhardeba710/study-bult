@@ -1,0 +1,16 @@
+{
+  "/_app": "pages/_app.js",
+  "/_error": "pages/_error.js",
+  "/Browse": "pages/Browse.js",
+  "/Dashboard": "pages/Dashboard.js",
+  "/Home": "pages/Home.js",
+  "/Login": "pages/Login.js",
+  "/Register": "pages/Register.js",
+  "/Upload": "pages/Upload.js",
+  "/dashboard/DashboardHome": "pages/dashboard/DashboardHome.js",
+  "/dashboard/LikedPapers": "pages/dashboard/LikedPapers.js",
+  "/dashboard/MyUploads": "pages/dashboard/MyUploads.js",
+  "/dashboard/Settings": "pages/dashboard/Settings.js",
+  "/dashboard/UploadPaper": "pages/dashboard/UploadPaper.js",
+  "/_document": "pages/_document.js"
+}

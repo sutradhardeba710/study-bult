@@ -1,0 +1,35 @@
+# Study Volte robots.txt — Study Volte
+User-agent: *
+Allow: /
+
+# High-value SEO pages — explicitly allow
+Allow: /question-papers
+Allow: /browse
+Allow: /upload
+Allow: /about
+Allow: /faq
+Allow: /help-center
+Allow: /universities/
+
+# Disallow private/auth areas
+Disallow: /admin/
+Disallow: /dashboard/
+Disallow: /login
+Disallow: /register
+Disallow: /reset-password
+Disallow: /auth/
+
+# Googlebot — full access
+User-agent: Googlebot
+Allow: /
+Allow: /question-papers
+Allow: /browse
+Allow: /universities/
+
+# Bingbot
+User-agent: Bingbot
+Allow: /
+
+# Crawl hints
+Sitemap: https://study-volte.site/sitemap.xml
+Crawl-delay: 1

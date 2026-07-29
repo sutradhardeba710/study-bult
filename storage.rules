@@ -1,0 +1,54 @@
+rules_version = '2';
+
+service firebase.storage {
+  match /b/{bucket}/o {
+    // Helper function to check if user is admin
+    function isAdmin() {
+      return request.auth != null && 
+        firestore.get(/databases/(default)/documents/users/$(request.auth.uid)).data.role == 'admin';
+    }
+    
+    // Legacy papers - authenticated users can upload to their own folder
+    match /papers/{userId}/{allPaths=**} {
+      allow read: if true;
+      // Users can delete their own papers, admins can delete any paper
+      allow delete: if request.auth != null && (request.auth.uid == userId || isAdmin());
+      allow create, update: if request.auth != null 
+        && request.auth.uid == userId
+        && request.resource.size < 10 * 1024 * 1024 
+        && request.resource.contentType == 'application/pdf';
+    }
+    
+    // Organized papers structure (supports any depth: YEAR/MONTH/COLLEGE/SUBJECT/file)
+    match /papers/{year}/{month}/{allPaths=**} {
+      allow read: if true;
+      // Any authenticated user can upload
+      // Authenticated users OR Guest users (if filename starts with guest-)
+      allow create: if (request.auth != null || request.resource.name.matches('.*/guest-.*'))
+        && request.resource.size < 10 * 1024 * 1024 
+        && request.resource.contentType == 'application/pdf';
+      
+      allow update: if request.auth != null
+        && request.resource.size < 10 * 1024 * 1024 
+        && request.resource.contentType == 'application/pdf';
+      // Admins can delete any paper
+      allow delete: if request.auth != null && isAdmin();
+    }
+    
+    // Thumbnails - allow Cloud Functions to write, public read
+    match /thumbnails/{allPaths=**} {
+      allow read: if true;
+      // Allow Cloud Functions and admins to write thumbnails
+      allow write: if request.auth != null;
+    }
+    
+    // Avatars - users can upload to their own folder
+    match /avatars/{userId}/{allPaths=**} {
+      allow read: if true;
+      allow write: if request.auth != null 
+        && request.auth.uid == userId
+        && request.resource.size < 2 * 1024 * 1024 
+        && request.resource.contentType.matches('image/.*');
+    }
+  }
+}

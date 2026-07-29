@@ -1,0 +1,14 @@
+User-agent: *
+Allow: /
+
+# Disallow admin and API routes
+Disallow: /admin/
+Disallow: /api/
+Disallow: /_next/
+Disallow: /dev/
+
+# Sitemap location
+Sitemap: https://study-volte.site/sitemap.xml
+
+# Additional sitemap for better coverage
+Sitemap: https://study-volte.site/sitemap-2026-03-01.xml

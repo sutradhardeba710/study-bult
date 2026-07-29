@@ -1,0 +1,231 @@
+/* Mobile-Specific Home Page Enhancements */
+
+/* Improved mobile padding and spacing */
+@media (max-width: 640px) {
+
+    /* Hero Section Mobile Optimizations */
+    .hero-mobile-padding {
+        padding-left: 1rem;
+        padding-right: 1rem;
+    }
+
+    /* Larger touch targets for mobile buttons */
+    .mobile-touch-target {
+        min-height: 3rem;
+        padding-top: 0.875rem;
+        padding-bottom: 0.875rem;
+        width: 100%;
+    }
+
+    /* Better text sizing for mobile readability */
+    .mobile-hero-title {
+        font-size: 2rem;
+        line-height: 2.5rem;
+        padding-left: 1rem;
+        padding-right: 1rem;
+    }
+
+    .mobile-hero-subtitle {
+        font-size: 1rem;
+        line-height: 1.5rem;
+        padding-left: 1.5rem;
+        padding-right: 1.5rem;
+    }
+
+    /* Stats section mobile grid */
+    .mobile-stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1rem;
+    }
+
+    /* Feature cards mobile stacking */
+    .mobile-feature-grid {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+
+    /* CTA buttons full-width on mobile */
+    .mobile-cta-container {
+        width: 100%;
+        max-width: 28rem;
+        margin-left: auto;
+        margin-right: auto;
+        padding-left: 1rem;
+        padding-right: 1rem;
+    }
+
+    .mobile-cta-button {
+        width: 100%;
+        justify-content: center;
+    }
+
+    /* Removed blanket animation-duration override — it was forcing ALL animations
+       (scroll-reveals, blobs, glows, footer floats) to 0.2s which caused
+       every animation to look instant/jittery on mobile. Individual animations
+       that genuinely need to be shorter on mobile are handled per-class below. */
+
+    /* Better spacing for mobile badges */
+    .mobile-badge {
+        padding-left: 0.75rem;
+        padding-right: 0.75rem;
+        font-size: 0.75rem;
+        max-width: 100%;
+    }
+
+    .mobile-badge span {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    /* Mobile trust indicators */
+    .mobile-trust-indicators {
+        gap: 1rem;
+        font-size: 0.75rem;
+        padding-left: 1rem;
+        padding-right: 1rem;
+    }
+
+    .mobile-trust-indicators>div {
+        white-space: nowrap;
+    }
+
+    /* Optimize images for mobile bandwidth */
+    img {
+        image-rendering: -webkit-optimize-contrast;
+    }
+
+    /* Prevent zoom on input focus (iOS Safari fix) */
+    input,
+    select,
+    textarea {
+        font-size: 16px !important;
+    }
+}
+
+/* Tablet optimizations */
+@media (min-width: 641px) and (max-width: 1024px) {
+    .tablet-hero-title {
+        font-size: 3rem;
+        line-height: 1.2;
+    }
+
+    .tablet-stats-grid {
+        grid-template-columns: repeat(4, 1fr);
+        gap: 1.5rem;
+    }
+
+    .tablet-feature-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+/* Smooth scroll behavior for all devices */
+html {
+    scroll-behavior: auto;
+    -webkit-tap-highlight-color: transparent;
+    /* iOS Safari-specific fixes */
+    -webkit-text-size-adjust: 100%;
+    -webkit-overflow-scrolling: touch;
+}
+
+/* Better active states for touch devices */
+@media (hover: none) and (pointer: coarse) {
+
+    button:active,
+    a:active {
+        opacity: 0.88;
+        -webkit-tap-highlight-color: rgba(37, 99, 235, 0.12);
+        touch-action: manipulation;
+    }
+
+    button,
+    a {
+        touch-action: manipulation;
+    }
+
+    /* Disable hover animations on touch devices for better performance */
+    .group:hover .group-hover\:translate-x-1 {
+        transform: none !important;
+    }
+
+    .hover\:-translate-y-1:hover {
+        transform: none !important;
+    }
+
+    .hover\:scale-105:hover {
+        transform: none !important;
+    }
+}
+
+/* Improve readability on small screens */
+@media (max-width: 375px) {
+    .mobile-hero-title {
+        font-size: 1.75rem;
+        line-height: 2.25rem;
+    }
+
+    .mobile-cta-button {
+        font-size: 0.875rem;
+        padding-left: 1.25rem;
+        padding-right: 1.25rem;
+    }
+
+    .mobile-stats-grid {
+        gap: 0.75rem;
+    }
+}
+
+/* Accessibility: Respect user's motion preferences */
+@media (prefers-reduced-motion: reduce) {
+
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
+}
+
+/* iOS Safe Area Insets */
+@supports (padding: env(safe-area-inset-top)) {
+    body {
+        padding-top: env(safe-area-inset-top);
+        padding-bottom: env(safe-area-inset-bottom);
+        padding-left: env(safe-area-inset-left);
+        padding-right: env(safe-area-inset-right);
+    }
+}
+
+/* Removed hardware acceleration translateZ hack causing load anomalies */
+@media (max-width: 768px) {
+
+    /* Lazy load placeholder removed to stop breaking transparent images (e.g. logos) */
+
+    /* Reduce blur effects on mobile for better performance */
+    .blur-3xl {
+        filter: blur(40px) !important;
+    }
+
+    .blur-xl {
+        filter: blur(12px) !important;
+    }
+}
+/* Consistent keyboard focus and comfortable interaction targets */
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+    outline: 3px solid rgba(37, 99, 235, 0.45);
+    outline-offset: 3px;
+}
+
+@media (max-width: 640px) {
+    main a,
+    main button {
+        min-height: 44px;
+    }
+}

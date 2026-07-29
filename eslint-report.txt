@@ -1,0 +1,54 @@
+
+> study-vault@0.0.0 lint
+> eslint .
+
+
+D:\Trae\study-vault\functions\src\generateThumbnail.ts
+  18:34  error  Require statement not part of import statement  @typescript-eslint/no-var-requires
+  80:49  error  Require statement not part of import statement  @typescript-eslint/no-var-requires
+
+D:\Trae\study-vault\functions\src\index.ts
+  145:62  error  'context' is defined but never used  @typescript-eslint/no-unused-vars
+
+D:\Trae\study-vault\functions\src\regenerateThumbnail.ts
+   13:34  error  Require statement not part of import statement            @typescript-eslint/no-var-requires
+  198:49  error  Require statement not part of import statement            @typescript-eslint/no-var-requires
+  317:9   error  'thumbnailPath' is never reassigned. Use 'const' instead  prefer-const
+
+D:\Trae\study-vault\src\components\AnalyticsTracker.tsx
+  26:57  error  Use the rest parameters instead of 'arguments'  prefer-rest-params
+
+D:\Trae\study-vault\src\components\Navigation.tsx
+  81:6  warning  React Hook useEffect has a missing dependency: 'userProfile.avatarCrop'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+D:\Trae\study-vault\src\components\NudgeBanner.tsx
+  70:8  warning  React Hook useEffect has a missing dependency: 'nudge'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+D:\Trae\study-vault\src\components\UploadEncouragementModal.tsx
+  319:8  warning  React Hook useEffect has missing dependencies: 'checkRecentUpload' and 'stats'. Either include them or remove the dependency array  react-hooks/exhaustive-deps
+
+D:\Trae\study-vault\src\context\AuthContext.tsx
+  61:14  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+
+D:\Trae\study-vault\src\context\MetaContext.tsx
+  17:14  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+  57:6   warning  React Hook useEffect has a missing dependency: 'fetchMeta'. Either include it or remove the dependency array                    react-hooks/exhaustive-deps
+
+D:\Trae\study-vault\src\pages\AuthAction.tsx
+  34:8  warning  React Hook useEffect has a missing dependency: 'verifyCode'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+D:\Trae\study-vault\src\pages\Browse.tsx
+  51:41  warning  React Hook useEffect has a missing dependency: 'fetchPapers'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+D:\Trae\study-vault\src\pages\Upload.tsx
+  90:6  warning  React Hook useEffect has a missing dependency: 'liveCount'. Either include it or remove the dependency array                              react-hooks/exhaustive-deps
+  90:7  warning  React Hook useEffect has a complex expression in the dependency array. Extract it to a separate variable so it can be statically checked  react-hooks/exhaustive-deps
+
+D:\Trae\study-vault\src\pages\admin\modal-analytics.tsx
+  51:8  warning  React Hook useEffect has a missing dependency: 'fetchAnalytics'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+D:\Trae\study-vault\src\pages\dashboard\MyUploads.tsx
+  41:6  warning  React Hook useEffect has a missing dependency: 'fetchPapers'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+✖ 19 problems (7 errors, 12 warnings)
+
