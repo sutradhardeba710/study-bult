@@ -95,6 +95,7 @@ const routes = [
             { path: 'dashboard/*', element: <Dashboard /> },
 
             { path: 'admin', element: <ProtectedAdminRoute><AdminHome /></ProtectedAdminRoute> },
+            { path: 'admin/pending', element: <ProtectedAdminRoute><AdminPapers /></ProtectedAdminRoute> },
             { path: 'admin/papers', element: <ProtectedAdminRoute><AdminPapers /></ProtectedAdminRoute> },
             { path: 'admin/meta', element: <ProtectedAdminRoute><AdminMeta /></ProtectedAdminRoute> },
             { path: 'admin/users', element: <ProtectedAdminRoute><AdminUsers /></ProtectedAdminRoute> },

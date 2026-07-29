@@ -4,13 +4,14 @@ import { PanelLeft, X } from 'lucide-react';
 
 const links = [
   { to: '/admin', label: 'Dashboard' },
-  { to: '/admin/papers', label: 'Papers' },
+  { to: '/admin/pending', label: '⏳ Pending Papers' },
+  { to: '/admin/papers', label: '📚 All Papers' },
   { to: '/admin/meta', label: 'Subjects & Meta' },
   { to: '/admin/users', label: 'Users' },
   { to: '/admin/rewards', label: '🏆 Rewards Control' },
   { to: '/admin/withdrawals', label: '💳 Gift-card Withdrawals' },
   { to: '/admin/messages', label: 'Contact Messages' },
-  { to: '/admin/modal-analytics', label: 'Modal Analytics' },
+  { to: '/admin/modal-analytics', label: 'Analytics' },
 ];
 
 const AdminSidebar: React.FC<{ open?: boolean; onClose?: () => void }> = ({ open = true, onClose }) => {

@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useLocation } from 'react-router-dom';
 import AdminSidebar from '../../components/admin/AdminSidebar';
 import { getPapers, deletePaperById } from '../../services/papers';
 import { approvePaperWithCoins, rejectPaperReview } from '../../services/coins';
@@ -25,6 +26,8 @@ const initialForm = {
 };
 
 const AdminPapers: React.FC = () => {
+  const location = useLocation();
+  const isPendingView = location.pathname.includes('/admin/pending');
   const [papers, setPapers] = useState<PaperData[]>([]);
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
@@ -47,7 +50,8 @@ const AdminPapers: React.FC = () => {
   const fetchPapers = async () => {
     setLoading(true);
     try {
-      const allPapers = await getPapers({}, 100);
+      const filter = isPendingView ? { status: 'pending' as const } : {};
+      const allPapers = await getPapers(filter, 100);
       setPapers(allPapers);
     } catch (error) {
       toast.error('Failed to fetch papers');
@@ -81,7 +85,7 @@ const AdminPapers: React.FC = () => {
       }
     };
     fetchMeta();
-  }, []);
+  }, [isPendingView]);
 
   const handleApprove = async (id: string) => {
     setActionLoading(id + '-approve');
@@ -323,76 +327,78 @@ const AdminPapers: React.FC = () => {
       <div className="flex flex-col md:flex-row">
         <AdminSidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} />
         <main className="flex-1 p-2 sm:p-4 md:p-8 md:ml-0 mt-16 md:mt-0">
-          <h1 className="text-2xl font-bold mb-6">Manage Papers</h1>
-          {/* Add Paper Form */}
-          <form className="bg-white rounded-lg shadow p-6 mb-8 space-y-4" onSubmit={handleAddPaper}>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <input className="border rounded px-3 py-2" name="title" value={form.title} onChange={handleFormChange} placeholder="Title" required />
-              <Select
-                classNamePrefix="react-select"
-                options={Object.entries(
-                  subjects.reduce((acc, subject) => {
-                    const category = subject.category || 'Other';
-                    if (!acc[category]) acc[category] = [];
-                    acc[category].push(subject);
-                    return acc;
-                  }, {} as Record<string, MetaItem[]>)
-                ).map(([category, categorySubjects]) => ({
-                  label: category,
-                  options: categorySubjects.map(s => ({ value: s.name, label: s.name }))
-                }))}
-                value={form.subject ? { value: form.subject, label: form.subject } : null}
-                onChange={option => setForm(prev => ({ ...prev, subject: option ? option.value : '' }))}
-                isLoading={metaLoading}
-                placeholder={metaLoading ? 'Loading subjects...' : 'Select Subject'}
-                isClearable
-                required
-              />
-              <Select
-                classNamePrefix="react-select"
-                options={courses.map(c => ({ value: c.name, label: c.name }))}
-                value={form.course ? { value: form.course, label: form.course } : null}
-                onChange={option => setForm(prev => ({ ...prev, course: option ? option.value : '' }))}
-                isLoading={metaLoading}
-                placeholder={metaLoading ? 'Loading courses...' : 'Select Course'}
-                isClearable
-                required
-              />
-              <Select
-                classNamePrefix="react-select"
-                options={semesters.map(s => ({ value: s.name, label: s.name }))}
-                value={form.semester ? { value: form.semester, label: form.semester } : null}
-                onChange={option => setForm(prev => ({ ...prev, semester: option ? option.value : '' }))}
-                isLoading={metaLoading}
-                placeholder={metaLoading ? 'Loading semesters...' : 'Select Semester'}
-                isClearable
-                required
-              />
-              <Select
-                classNamePrefix="react-select"
-                options={colleges.map(c => ({ value: c.name, label: c.name }))}
-                value={form.college ? { value: form.college, label: form.college } : null}
-                onChange={option => setForm(prev => ({ ...prev, college: option ? option.value : '' }))}
-                isLoading={metaLoading}
-                placeholder={metaLoading ? 'Loading colleges...' : 'Select College'}
-                isClearable
-                required
-              />
-              <Select
-                classNamePrefix="react-select"
-                options={examTypes.map(type => ({ value: type.name, label: type.name }))}
-                value={form.examType ? { value: form.examType, label: form.examType } : null}
-                onChange={option => setForm(prev => ({ ...prev, examType: option ? option.value : '' }))}
-                isLoading={metaLoading}
-                placeholder={metaLoading ? 'Loading exam types...' : 'Select Exam Type'}
-                isClearable
-                required
-              />
-            </div>
-            <textarea className="border rounded px-3 py-2 w-full" name="description" value={form.description} onChange={handleFormChange} placeholder="Description (optional)" />
-            <input type="file" accept=".pdf" onChange={handleFileChange} required />
-            <button type="submit" className="btn-primary px-6 py-2" disabled={uploading}>{uploading ? 'Uploading...' : 'Add Paper'}</button>
-          </form>
+          <h1 className="text-2xl font-bold mb-6">{isPendingView ? 'Pending Papers Review' : 'Manage All Papers'}</h1>
+          {/* Add Paper Form - Only show on All Papers */}
+          {!isPendingView && (
+            <form className="bg-white rounded-lg shadow p-6 mb-8 space-y-4" onSubmit={handleAddPaper}>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <input className="border rounded px-3 py-2" name="title" value={form.title} onChange={handleFormChange} placeholder="Title" required />
+                <Select
+                  classNamePrefix="react-select"
+                  options={Object.entries(
+                    subjects.reduce((acc, subject) => {
+                      const category = subject.category || 'Other';
+                      if (!acc[category]) acc[category] = [];
+                      acc[category].push(subject);
+                      return acc;
+                    }, {} as Record<string, MetaItem[]>)
+                  ).map(([category, categorySubjects]) => ({
+                    label: category,
+                    options: categorySubjects.map(s => ({ value: s.name, label: s.name }))
+                  }))}
+                  value={form.subject ? { value: form.subject, label: form.subject } : null}
+                  onChange={option => setForm(prev => ({ ...prev, subject: option ? option.value : '' }))}
+                  isLoading={metaLoading}
+                  placeholder={metaLoading ? 'Loading subjects...' : 'Select Subject'}
+                  isClearable
+                  required
+                />
+                <Select
+                  classNamePrefix="react-select"
+                  options={courses.map(c => ({ value: c.name, label: c.name }))}
+                  value={form.course ? { value: form.course, label: form.course } : null}
+                  onChange={option => setForm(prev => ({ ...prev, course: option ? option.value : '' }))}
+                  isLoading={metaLoading}
+                  placeholder={metaLoading ? 'Loading courses...' : 'Select Course'}
+                  isClearable
+                  required
+                />
+                <Select
+                  classNamePrefix="react-select"
+                  options={semesters.map(s => ({ value: s.name, label: s.name }))}
+                  value={form.semester ? { value: form.semester, label: form.semester } : null}
+                  onChange={option => setForm(prev => ({ ...prev, semester: option ? option.value : '' }))}
+                  isLoading={metaLoading}
+                  placeholder={metaLoading ? 'Loading semesters...' : 'Select Semester'}
+                  isClearable
+                  required
+                />
+                <Select
+                  classNamePrefix="react-select"
+                  options={colleges.map(c => ({ value: c.name, label: c.name }))}
+                  value={form.college ? { value: form.college, label: form.college } : null}
+                  onChange={option => setForm(prev => ({ ...prev, college: option ? option.value : '' }))}
+                  isLoading={metaLoading}
+                  placeholder={metaLoading ? 'Loading colleges...' : 'Select College'}
+                  isClearable
+                  required
+                />
+                <Select
+                  classNamePrefix="react-select"
+                  options={examTypes.map(type => ({ value: type.name, label: type.name }))}
+                  value={form.examType ? { value: form.examType, label: form.examType } : null}
+                  onChange={option => setForm(prev => ({ ...prev, examType: option ? option.value : '' }))}
+                  isLoading={metaLoading}
+                  placeholder={metaLoading ? 'Loading exam types...' : 'Select Exam Type'}
+                  isClearable
+                  required
+                />
+              </div>
+              <textarea className="border rounded px-3 py-2 w-full" name="description" value={form.description} onChange={handleFormChange} placeholder="Description (optional)" />
+              <input type="file" accept=".pdf" onChange={handleFileChange} required />
+              <button type="submit" className="btn-primary px-6 py-2" disabled={uploading}>{uploading ? 'Uploading...' : 'Add Paper'}</button>
+            </form>
+          )}
           {/* Table of papers */}
           <div className="bg-white rounded-lg shadow p-6">
             {/* Bulk action bar */}
