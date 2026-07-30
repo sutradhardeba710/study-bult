@@ -228,6 +228,177 @@ function RedemptionModal({
     );
 }
 
+function PhoneVerificationModal({
+    onClose
+}: {
+    onClose: () => void;
+}) {
+    const { currentUser, updateUserProfile } = useAuth();
+    const [phone, setPhone] = useState('');
+    const [otp, setOtp] = useState('');
+    const [step, setStep] = useState<'phone' | 'otp'>('phone');
+    const [submitting, setSubmitting] = useState(false);
+    const [confirmationResult, setConfirmationResult] = useState<any>(null);
+
+    useEffect(() => {
+        const setupRecaptcha = async () => {
+            try {
+                if (!(window as any).recaptchaVerifier) {
+                    const { RecaptchaVerifier } = await import('firebase/auth');
+                    const { initFirebaseAuth } = await import('../../services/firebase');
+                    const auth = await initFirebaseAuth();
+                    (window as any).recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
+                        size: 'invisible'
+                    });
+                }
+            } catch (err) {
+                console.error("Recaptcha error:", err);
+            }
+        };
+        setupRecaptcha();
+    }, []);
+
+    const sendOtp = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (phone.length < 10) {
+            toast.error('Please enter a valid phone number (at least 10 digits).');
+            return;
+        }
+        setSubmitting(true);
+        try {
+            const { linkWithPhoneNumber } = await import('firebase/auth');
+            const appVerifier = (window as any).recaptchaVerifier;
+            if (!appVerifier) throw new Error('Recaptcha not loaded.');
+            if (!currentUser) throw new Error('You must be logged in.');
+
+            let formattedPhone = phone;
+            if (!formattedPhone.startsWith('+')) {
+                // assume India if no country code provided
+                formattedPhone = '+91' + formattedPhone.replace(/\D/g, '');
+            }
+
+            const result = await linkWithPhoneNumber(currentUser, formattedPhone, appVerifier);
+            setConfirmationResult(result);
+            setStep('otp');
+            toast.success('OTP sent to your phone!');
+        } catch (error: any) {
+            console.error('OTP Error:', error);
+            if (error.code === 'auth/credential-already-in-use') {
+                toast.error('This phone number is already linked to another account.');
+            } else if (error.code === 'auth/provider-already-linked') {
+                 toast.success('Phone number is already verified.');
+                 await updateUserProfile({ phoneNumber: phone, phoneVerified: true });
+                 onClose();
+            } else {
+                toast.error(error.message || 'Could not send OTP.');
+            }
+        } finally {
+            setSubmitting(false);
+        }
+    };
+
+    const verifyOtp = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (otp.length < 6) {
+            toast.error('Please enter the 6-digit OTP.');
+            return;
+        }
+        setSubmitting(true);
+        try {
+            await confirmationResult.confirm(otp);
+            let formattedPhone = phone;
+            if (!formattedPhone.startsWith('+')) {
+                formattedPhone = '+91' + formattedPhone.replace(/\D/g, '');
+            }
+            await updateUserProfile({ phoneNumber: formattedPhone, phoneVerified: true });
+            toast.success('Phone number verified successfully!');
+            onClose();
+        } catch (error: any) {
+            console.error('Verify Error:', error);
+            toast.error(error.message || 'Invalid OTP. Please try again.');
+        } finally {
+            setSubmitting(false);
+        }
+    };
+
+    return (
+        <div className="fixed inset-0 z-[10000] flex items-end justify-center bg-slate-950/65 p-0 backdrop-blur-sm sm:items-center sm:p-5">
+            <button type="button" className="absolute inset-0" onClick={onClose} aria-label="Close phone verification" />
+            <section role="dialog" aria-modal="true" aria-labelledby="phone-verify-title" className="relative w-full max-w-md overflow-hidden rounded-t-3xl bg-white shadow-2xl sm:rounded-3xl">
+                <header className="flex items-start gap-3 border-b border-indigo-100 bg-indigo-50/50 px-5 py-5 sm:px-6">
+                    <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-indigo-600 text-white shadow-inner">
+                        <ShieldCheck className="h-5 w-5" />
+                    </div>
+                    <div className="min-w-0 flex-1">
+                        <h2 id="phone-verify-title" className="mt-1 text-xl font-black text-slate-950">Phone Verification</h2>
+                        <p className="mt-1 text-sm text-slate-600">Secure your account for redemptions.</p>
+                    </div>
+                    <button type="button" onClick={onClose} className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl text-slate-500 hover:bg-white" aria-label="Close">
+                        <X className="h-5 w-5" />
+                    </button>
+                </header>
+
+                <div className="p-5 sm:p-6">
+                    <div className="mb-6 rounded-2xl border border-indigo-200 bg-indigo-50 p-4 text-sm text-indigo-900 leading-6">
+                        <strong>OTP Verification:</strong> Verify your phone number instantly using a one-time password (OTP) to enable redemptions.
+                    </div>
+                    
+                    {step === 'phone' ? (
+                        <form onSubmit={sendOtp} className="space-y-6">
+                            <div>
+                                <label htmlFor="phone" className="block text-sm font-bold text-slate-700 mb-2">Mobile / WhatsApp Number</label>
+                                <input
+                                    type="tel"
+                                    id="phone"
+                                    value={phone}
+                                    onChange={(e) => setPhone(e.target.value)}
+                                    placeholder="e.g. 9876543210 or +919876543210"
+                                    className="block w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-slate-900 placeholder-slate-400 focus:border-indigo-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-100"
+                                />
+                                <p className="mt-2 text-xs text-slate-500">We'll send a 6-digit verification code to this number.</p>
+                            </div>
+
+                            <button
+                                type="submit"
+                                disabled={submitting || phone.length < 10}
+                                className="flex min-h-12 w-full items-center justify-center gap-2 rounded-2xl bg-indigo-600 px-5 font-black text-white shadow-lg shadow-indigo-200 transition hover:bg-indigo-700 disabled:cursor-not-allowed disabled:opacity-50"
+                            >
+                                {submitting ? 'Sending OTP...' : 'Send Verification Code'} <ArrowRight className="h-4 w-4" />
+                            </button>
+                        </form>
+                    ) : (
+                        <form onSubmit={verifyOtp} className="space-y-6">
+                            <div>
+                                <label htmlFor="otp" className="block text-sm font-bold text-slate-700 mb-2">Enter 6-digit OTP</label>
+                                <input
+                                    type="text"
+                                    id="otp"
+                                    value={otp}
+                                    onChange={(e) => setOtp(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                                    placeholder="000000"
+                                    className="block w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-center tracking-widest text-xl text-slate-900 placeholder-slate-400 focus:border-indigo-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-100"
+                                    maxLength={6}
+                                />
+                            </div>
+
+                            <button
+                                type="submit"
+                                disabled={submitting || otp.length < 6}
+                                className="flex min-h-12 w-full items-center justify-center gap-2 rounded-2xl bg-indigo-600 px-5 font-black text-white shadow-lg shadow-indigo-200 transition hover:bg-indigo-700 disabled:cursor-not-allowed disabled:opacity-50"
+                            >
+                                {submitting ? 'Verifying...' : 'Verify Phone Number'} <Check className="h-4 w-4" />
+                            </button>
+                        </form>
+                    )}
+                </div>
+                
+                {/* Invisible reCAPTCHA container */}
+                <div id="recaptcha-container"></div>
+            </section>
+        </div>
+    );
+}
+
 function WithdrawalCard({ item }: { item: Withdrawal }) {
     const now = useClock();
     const [revealed, setRevealed] = useState<VoucherReveal | null>(null);
@@ -388,13 +559,15 @@ const LEDGER_LABELS: Record<CoinLedgerEntry['type'], string> = {
 };
 
 export default function Earnings() {
-    const { userProfile, currentUser } = useAuth();
+    const { userProfile, currentUser, updateUserProfile } = useAuth();
     const [wallet, setWallet] = useState<Wallet>(EMPTY_WALLET);
     const [ledger, setLedger] = useState<CoinLedgerEntry[]>([]);
     const [withdrawals, setWithdrawals] = useState<Withdrawal[]>([]);
     const [approvedPapers, setApprovedPapers] = useState(0);
     const [loading, setLoading] = useState(true);
     const [redeeming, setRedeeming] = useState(false);
+    const [emailVerifying, setEmailVerifying] = useState(false);
+    const [verifyingPhoneModalOpen, setVerifyingPhoneModalOpen] = useState(false);
 
     useEffect(() => {
         if (!userProfile?.uid) return;
@@ -412,10 +585,28 @@ export default function Earnings() {
     const progress = Math.min(100, (wallet.available / MIN_WITHDRAWAL_COINS) * 100);
     const papersToMinimum = Math.max(0, Math.ceil((MIN_WITHDRAWAL_COINS - wallet.available) / 100));
     const accountCreated = currentUser?.metadata.creationTime ? new Date(currentUser.metadata.creationTime).getTime() : Date.now();
+    const handleVerifyEmail = async () => {
+        if (!currentUser) return;
+        setEmailVerifying(true);
+        try {
+            const { sendEmailVerification } = await import('firebase/auth');
+            await sendEmailVerification(currentUser);
+            toast.success('Verification email sent! Check your inbox.');
+        } catch (error: any) {
+            toast.error(error.message || 'Failed to send verification email.');
+        } finally {
+            setEmailVerifying(false);
+        }
+    };
+
+    const handleVerifyPhone = () => {
+        setVerifyingPhoneModalOpen(true);
+    };
+
     const eligibility = [
         { label: '1,000 available coins', met: wallet.available >= 1_000 },
-        { label: 'Verified email', met: Boolean(currentUser?.emailVerified) },
-        { label: 'Verified phone', met: Boolean(currentUser?.phoneNumber || (userProfile as unknown as { phoneVerified?: boolean })?.phoneVerified) },
+        { label: 'Verified email', met: Boolean(currentUser?.emailVerified), action: { label: 'Verify', onClick: handleVerifyEmail, loading: emailVerifying } },
+        { label: 'Verified phone', met: Boolean(currentUser?.phoneNumber || (userProfile as unknown as { phoneNumber?: string })?.phoneNumber), action: { label: 'Verify', onClick: handleVerifyPhone, loading: false } },
         { label: 'Account at least 7 days old', met: Date.now() - accountCreated >= 7 * 24 * 60 * 60 * 1_000 },
         { label: '10 approved papers', met: approvedPapers >= 10 },
         { label: 'Wallet active', met: wallet.status === 'active' },
@@ -495,7 +686,18 @@ export default function Earnings() {
                 <div className="mt-5 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
                     {eligibility.map((item) => (
                         <div key={item.label} className={`flex items-center gap-2 rounded-xl px-3 py-3 text-sm font-bold ${item.met ? 'bg-emerald-50 text-emerald-800' : 'bg-slate-50 text-slate-500'}`}>
-                            {item.met ? <Check className="h-4 w-4 shrink-0" /> : <LockKeyhole className="h-4 w-4 shrink-0" />}{item.label}
+                            {item.met ? <Check className="h-4 w-4 shrink-0" /> : <LockKeyhole className="h-4 w-4 shrink-0" />}
+                            <span className="flex-1">{item.label}</span>
+                            {!item.met && item.action && (
+                                <button 
+                                    type="button" 
+                                    onClick={item.action.onClick} 
+                                    disabled={item.action.loading}
+                                    className="px-2 py-1 text-xs bg-white border border-slate-200 rounded-md text-slate-700 hover:bg-slate-50 hover:text-slate-900 transition-colors disabled:opacity-50"
+                                >
+                                    {item.action.loading ? 'Sending...' : item.action.label}
+                                </button>
+                            )}
                         </div>
                     ))}
                 </div>
@@ -531,6 +733,7 @@ export default function Earnings() {
             )}
 
             {redeeming && <RedemptionModal wallet={wallet} onClose={() => setRedeeming(false)} />}
+            {verifyingPhoneModalOpen && <PhoneVerificationModal onClose={() => setVerifyingPhoneModalOpen(false)} />}
         </div>
     );
 }
