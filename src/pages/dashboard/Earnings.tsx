@@ -326,7 +326,11 @@ function PhoneVerificationModal({
             onClose();
         } catch (error: any) {
             console.error('Verify Error:', error);
-            toast.error(error.message || 'Invalid OTP. Please try again.');
+            if (error.code === 'auth/credential-already-in-use' || error.code === 'auth/account-exists-with-different-credential') {
+                toast.error('This phone number is already linked to another account. Please use a different number or delete the old account.');
+            } else {
+                toast.error(error.message || 'Invalid OTP. Please try again.');
+            }
         } finally {
             setSubmitting(false);
         }
