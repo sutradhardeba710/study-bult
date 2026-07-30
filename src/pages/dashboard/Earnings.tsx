@@ -241,21 +241,32 @@ function PhoneVerificationModal({
     const [confirmationResult, setConfirmationResult] = useState<any>(null);
 
     useEffect(() => {
+        let verifier: any = null;
         const setupRecaptcha = async () => {
             try {
-                if (!(window as any).recaptchaVerifier) {
-                    const { RecaptchaVerifier } = await import('firebase/auth');
-                    const { initFirebaseAuth } = await import('../../services/firebase');
-                    const auth = await initFirebaseAuth();
-                    (window as any).recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
-                        size: 'invisible'
-                    });
-                }
+                const { RecaptchaVerifier } = await import('firebase/auth');
+                const { initFirebaseAuth } = await import('../../services/firebase');
+                const auth = await initFirebaseAuth();
+                
+                // Always create a new verifier when the modal mounts
+                verifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
+                    size: 'invisible'
+                });
+                (window as any).recaptchaVerifier = verifier;
             } catch (err) {
                 console.error("Recaptcha error:", err);
             }
         };
         setupRecaptcha();
+
+        return () => {
+            if (verifier) {
+                try {
+                    verifier.clear();
+                } catch (e) {}
+            }
+            delete (window as any).recaptchaVerifier;
+        };
     }, []);
 
     const sendOtp = async (e: React.FormEvent) => {
