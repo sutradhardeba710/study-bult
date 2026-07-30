@@ -1,6 +1,7 @@
 import { lazy } from 'react';
 import { Navigate } from 'react-router-dom';
 import App from './App';
+import RootErrorBoundary from './components/RootErrorBoundary';
 
 const Home = lazy(() => import('./pages/Home'));
 const Login = lazy(() => import('./pages/Login'));
@@ -53,6 +54,7 @@ const routes = [
     {
         path: '/',
         element: <App />,
+        errorElement: <RootErrorBoundary />,
         children: [
             { index: true, element: <Home /> },
             { path: 'login', element: <Login /> },
