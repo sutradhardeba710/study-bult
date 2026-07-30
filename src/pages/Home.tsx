@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import {
-    ArrowRight, BadgeCheck, BookOpen, CheckCircle, ChevronRight, Download,
+    ArrowRight, ArrowUp, BadgeCheck, BookOpen, CheckCircle, ChevronRight, Download,
     Eye, FileText, Filter, Search, Shield, Sparkles, Upload, Users, Zap,
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
@@ -416,14 +416,22 @@ const Home = () => {
                 </div>
             </section>
             <section className="bg-white py-14 sm:py-20 lg:py-24">
-                <div className="mx-auto max-w-5xl px-4 text-center sm:px-6 lg:px-8">
+                <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
                     <Reveal>
-                        <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-slate-950 text-white"><Sparkles className="h-6 w-6" /></div>
-                        <h2 className="mt-6 text-3xl font-black tracking-[-0.04em] text-slate-950 sm:mt-7 sm:text-5xl lg:text-6xl">Your next paper is probably already here.</h2>
-                        <p className="mx-auto mt-4 max-w-2xl text-base leading-7 text-slate-600 sm:mt-5 sm:text-lg sm:leading-8">Search the library for free. Create an account only when you want to upload, save activity, or earn contributor rewards.</p>
-                        <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
-                            <Link to="/browse" className="btn-primary cta-shine inline-flex min-h-12 items-center justify-center gap-2 px-7 py-3">Browse question papers <ArrowRight className="link-arrow h-4 w-4" /></Link>
-                            <Link to="/register" className="btn-secondary inline-flex min-h-12 items-center justify-center gap-2 px-7 py-3">Create free account</Link>
+                        <div className="flex flex-col items-start justify-between gap-8 rounded-3xl bg-[#4A55F5] p-8 sm:p-10 lg:flex-row lg:items-center lg:p-12">
+                            <div className="max-w-xl text-left">
+                                <p className="mb-3 text-[11px] font-black uppercase tracking-[0.18em] text-white/90">Free Academic Library</p>
+                                <h2 className="mb-2 text-3xl font-bold tracking-tight text-white sm:text-4xl">Ready to find your next paper?</h2>
+                                <p className="text-base text-white/90 sm:text-lg">Search the library free—no account needed.</p>
+                            </div>
+                            <div className="flex w-full flex-col gap-4 sm:w-auto sm:flex-row sm:items-center">
+                                <Link to="/browse" className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-white px-7 py-3 text-sm font-bold text-[#4A55F5] shadow-sm transition hover:bg-slate-50 focus:outline-none focus:ring-4 focus:ring-white/20">
+                                    Browse papers <ArrowRight className="h-4 w-4" />
+                                </Link>
+                                <Link to="/upload" className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl border border-white/25 bg-white/10 px-7 py-3 text-sm font-bold text-white transition hover:bg-white/20 focus:outline-none focus:ring-4 focus:ring-white/20">
+                                    Upload a paper <ArrowUp className="h-4 w-4" />
+                                </Link>
+                            </div>
                         </div>
                     </Reveal>
                 </div>
