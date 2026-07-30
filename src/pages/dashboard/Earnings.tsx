@@ -18,6 +18,7 @@ import {
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useAuth } from '../../context/AuthContext';
+import { getCleanErrorMessage } from '../../utils/errorHandling';
 import { getUserPapers } from '../../services/papers';
 import {
     COINS_PER_RUPEE,
@@ -127,8 +128,7 @@ function RedemptionModal({
             toast.success('Redemption requested — delivery within 24 hours');
             onClose();
         } catch (error) {
-            const message = error instanceof Error ? error.message.replace(/^Firebase:\s*/i, '') : 'Could not request redemption.';
-            toast.error(message);
+            toast.error(getCleanErrorMessage(error, 'Could not request redemption.'));
         } finally {
             setSubmitting(false);
         }
@@ -301,7 +301,7 @@ function PhoneVerificationModal({
                  await updateUserProfile({ phoneNumber: phone, phoneVerified: true });
                  onClose();
             } else {
-                toast.error(error.message || 'Could not send OTP.');
+                toast.error(getCleanErrorMessage(error, 'Could not send OTP.'));
             }
         } finally {
             setSubmitting(false);
@@ -329,7 +329,7 @@ function PhoneVerificationModal({
             if (error.code === 'auth/credential-already-in-use' || error.code === 'auth/account-exists-with-different-credential') {
                 toast.error('This phone number is already linked to another account. Please use a different number or delete the old account.');
             } else {
-                toast.error(error.message || 'Invalid OTP. Please try again.');
+                toast.error(getCleanErrorMessage(error, 'Invalid OTP. Please try again.'));
             }
         } finally {
             setSubmitting(false);

@@ -9,6 +9,7 @@ import { useMeta } from '../../context/MetaContext';
 import CustomSelect from '../../components/CustomSelect';
 import { buildSimpleOptions, collegeEmoji, semesterEmoji, courseEmoji, subjectEmoji, examTypeEmoji } from '../../utils/dropdownOptions';
 import confetti from 'canvas-confetti';
+import { getCleanErrorMessage } from '../../utils/errorHandling';
 
 const UploadPaper = () => {
   const { userProfile } = useAuth();
@@ -170,11 +171,12 @@ const UploadPaper = () => {
       navigate('/dashboard/my-uploads');
     } catch (error: any) {
       console.error('Upload error:', error);
+      const cleanError = getCleanErrorMessage(error, 'Failed to upload paper. Please try again.');
       setErrors(prev => ({
         ...prev,
-        submit: error.message || 'Failed to upload paper. Please try again.'
+        submit: cleanError
       }));
-      toast.error(error.message || 'Failed to upload paper. Please try again.');
+      toast.error(cleanError);
     } finally {
       setIsLoading(false);
     }

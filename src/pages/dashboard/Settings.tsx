@@ -12,6 +12,7 @@ import { useNavigate } from 'react-router-dom';
 import Modal from '../../components/Modal';
 import CustomSelect from '../../components/CustomSelect';
 import { buildSimpleOptions, collegeEmoji, semesterEmoji, courseEmoji } from '../../utils/dropdownOptions';
+import { getCleanErrorMessage } from '../../utils/errorHandling';
 
 // Helper to render cropped avatar using canvas
 function getCroppedAvatarUrl(imageUrl: string, crop: { x: number; y: number; width: number; height: number; zoom: number } | undefined | null, callback: (url: string) => void) {
@@ -154,7 +155,7 @@ const Settings = () => {
             setMessage('Profile updated successfully!');
             toast.success('Profile updated successfully!');
         } catch (error: any) {
-            const errorMessage = error.message || 'Failed to update profile. Please try again.';
+            const errorMessage = getCleanErrorMessage(error, 'Failed to update profile. Please try again.');
             setMessage(errorMessage);
             toast.error(errorMessage);
         } finally {
@@ -170,7 +171,7 @@ const Settings = () => {
             setPasswordResetSent(true);
             toast.success('Password reset email sent!');
         } catch (error: any) {
-            toast.error(error.message || 'Failed to send reset email.');
+            toast.error(getCleanErrorMessage(error, 'Failed to send reset email.'));
         } finally {
             setIsPasswordResetLoading(false);
         }
@@ -256,7 +257,7 @@ const Settings = () => {
             if (error.code === 'auth/requires-recent-login') {
                 setRequiresReauth(true);
             } else {
-                toast.error(error.message || 'Failed to delete account. Please try again.');
+                toast.error(getCleanErrorMessage(error, 'Failed to delete account. Please try again.'));
             }
         } finally {
             setIsDeleteLoading(false);
