@@ -674,7 +674,6 @@ body {
   height:1px;
   background: linear-gradient(90deg,transparent,rgba(59,110,246,.65),rgba(124,92,252,.55),transparent);
 }
-.footer-cta { background: linear-gradient(135deg,#2454db,#5b3fe0); }
 .contact-row {
   display:flex;
   align-items:center;

@@ -148,20 +148,6 @@ const Footer = () => {
       </div>
 
       <div className="relative mx-auto max-w-7xl px-4 pb-8 sm:px-6 lg:px-8">
-        {location.pathname !== '/browse' && (
-          <section className="footer-cta relative -mt-1 overflow-hidden rounded-3xl px-5 py-7 text-white shadow-2xl shadow-primary-950/30 sm:px-8 sm:py-9 lg:flex lg:items-center lg:justify-between lg:gap-10 lg:px-10">
-          <div className="academic-dot-grid absolute inset-0 opacity-20" aria-hidden="true" />
-          <div className="relative max-w-2xl">
-            <p className="text-xs font-black uppercase tracking-[0.14em] text-blue-100">Free academic library</p>
-            <h2 className="mt-2 text-2xl font-black tracking-tight sm:text-3xl">Ready to find your next paper?</h2>
-            <p className="mt-2 text-sm leading-6 text-blue-100 sm:text-base">Search the library free—no account needed.</p>
-          </div>
-          <div className="relative mt-6 flex flex-col gap-3 sm:flex-row lg:mt-0">
-            <Link to="/browse" className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-white px-5 font-bold text-primary-700 shadow-lg transition hover:-translate-y-0.5 hover:bg-primary-50">Browse papers <ArrowRight className="h-4 w-4" /></Link>
-            <Link to="/upload" className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl border border-white/25 bg-white/10 px-5 font-bold text-white backdrop-blur transition hover:-translate-y-0.5 hover:bg-white/20">Upload a paper <ArrowUp className="h-4 w-4" /></Link>
-          </div>
-          </section>
-        )}
 
         <div className="grid gap-0 py-12 md:grid-cols-2 md:gap-10 lg:grid-cols-[1.25fr_.72fr_.72fr_.72fr_1.15fr] lg:gap-8 lg:py-16">
           <div className="pb-8 md:pb-0">
