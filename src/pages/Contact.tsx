@@ -3,6 +3,7 @@ import { db } from '../services/firebaseDb';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import toast from 'react-hot-toast';
 import { Mail, Clock, HelpCircle, Send, MessageSquare, User, AtSign, CheckCircle2, ArrowRight, Zap, ChevronDown, Globe, Wrench, UserCircle, Lightbulb, AlertTriangle, MoreHorizontal } from 'lucide-react';
+import SEOHead from '../components/SEOHead';
 
 const TOPICS: { label: string; icon: React.ElementType; color: string }[] = [
   { label: 'General Inquiry', icon: Globe, color: 'text-blue-500 bg-blue-50' },
@@ -58,6 +59,7 @@ const Contact = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      <SEOHead title="Contact Us | Study Volte" description="Get in touch with the Study Volte team for support, paper requests, copyright concerns, or feedback." />
 
       {/* ── Hero Banner ── */}
       <div className="relative bg-gradient-to-br from-primary-700 via-primary-600 to-indigo-500 overflow-hidden">

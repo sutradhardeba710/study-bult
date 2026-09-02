@@ -12,6 +12,7 @@ import Earnings from './dashboard/Earnings';
 import { useState, useEffect } from 'react';
 import { Menu } from 'lucide-react';
 import NotificationsPanel from '../components/NotificationsPanel';
+import SEOHead from '../components/SEOHead';
 
 /* Map pathname → human-readable page title */
 function usePageTitle() {
@@ -58,6 +59,7 @@ const Dashboard = () => {
 
   return (
     <div className="min-h-screen bg-slate-50 font-sans text-slate-900">
+      <SEOHead title="Dashboard | Study Volte" description="Your Study Volte dashboard." noindex />
       <div className="flex flex-col md:flex-row min-h-screen max-w-[1600px] mx-auto relative">
 
         {/* ── Mobile top bar (hidden on md+) ── */}

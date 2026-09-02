@@ -4,6 +4,7 @@ import { confirmPasswordReset, verifyPasswordResetCode } from 'firebase/auth';
 import { auth } from '../services/firebase';
 import { Lock, Eye, EyeOff, BookOpen, CheckCircle2, XCircle } from 'lucide-react';
 import Button from '../components/Button';
+import SEOHead from '../components/SEOHead';
 
 const AuthAction = () => {
     const [searchParams] = useSearchParams();
@@ -111,6 +112,7 @@ const AuthAction = () => {
     if (isVerifying) {
         return (
             <div className="min-h-screen bg-gradient-to-br from-primary-50 via-white to-primary-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
+                <SEOHead title="Account Action | Study Volte" description="Complete your Study Volte account action." noindex />
                 <div className="sm:mx-auto sm:w-full sm:max-w-md">
                     <div className="flex justify-center">
                         <div className="w-10 h-10 bg-primary-600 rounded-lg flex items-center justify-center shadow-lg">
@@ -129,6 +131,7 @@ const AuthAction = () => {
     if (error && !email) {
         return (
             <div className="min-h-screen bg-gradient-to-br from-primary-50 via-white to-primary-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
+                <SEOHead title="Account Action | Study Volte" description="Complete your Study Volte account action." noindex />
                 <div className="sm:mx-auto sm:w-full sm:max-w-md">
                     <div className="flex justify-center">
                         <Link to="/" className="flex items-center space-x-2">
@@ -169,6 +172,7 @@ const AuthAction = () => {
     if (isSuccess) {
         return (
             <div className="min-h-screen bg-gradient-to-br from-primary-50 via-white to-primary-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
+                <SEOHead title="Account Action | Study Volte" description="Complete your Study Volte account action." noindex />
                 <div className="sm:mx-auto sm:w-full sm:max-w-md">
                     <div className="flex justify-center">
                         <Link to="/" className="flex items-center space-x-2">
@@ -214,6 +218,7 @@ const AuthAction = () => {
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-primary-50 via-white to-primary-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
+            <SEOHead title="Account Action | Study Volte" description="Complete your Study Volte account action." noindex />
             <div className="sm:mx-auto sm:w-full sm:max-w-md">
                 <div className="flex justify-center">
                     <Link to="/" className="flex items-center space-x-2">

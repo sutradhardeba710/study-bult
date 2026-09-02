@@ -1,5 +1,5 @@
 import React from 'react';
-import { Helmet } from 'react-helmet-async';
+import { Head } from 'vite-react-ssg';
 import { useLocation } from 'react-router-dom';
 
 interface SEOHeadProps {
@@ -35,7 +35,7 @@ const SEOHead: React.FC<SEOHeadProps> = ({
 
 
     return (
-        <Helmet>
+        <Head>
             {/* Primary Meta Tags */}
             <title>{fullTitle}</title>
             <meta name="title" content={fullTitle} />
@@ -90,7 +90,7 @@ const SEOHead: React.FC<SEOHeadProps> = ({
             <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 
 
-        </Helmet>
+        </Head>
     );
 };
 

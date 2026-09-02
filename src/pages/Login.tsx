@@ -14,6 +14,7 @@ import {
   PasswordToggle,
 } from '../components/AuthExperience';
 import { initRecaptcha } from '../services/google';
+import SEOHead from '../components/SEOHead';
 import type { UserProfile } from '../context/AuthContext';
 
 const GOOGLE_RECAPTCHA_SITE_KEY = import.meta.env.VITE_GOOGLE_RECAPTCHA_SITE_KEY || '';
@@ -178,6 +179,7 @@ const Login = () => {
 
   return (
     <AuthPageShell mode="login">
+      <SEOHead title="Log In | Study Volte" description="Log in to your Study Volte account to upload papers, save favourites, and track your contributions." noindex />
       {showProfileCompletion && googleUserProfile && (
         <GoogleProfileCompletion
           user={googleUserProfile}

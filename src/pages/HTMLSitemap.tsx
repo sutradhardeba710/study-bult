@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { Helmet } from 'react-helmet-async';
+import { Head } from 'vite-react-ssg';
 import { FileText, GraduationCap, BookOpen, HelpCircle, Shield, Home } from 'lucide-react';
 
 interface SitemapGroup {
@@ -75,11 +75,11 @@ const colorMap: Record<string, { bg: string; border: string; text: string; icon:
 const HTMLSitemap = () => {
     return (
         <>
-            <Helmet>
+            <Head>
                 <title>Sitemap | Study Volte — Browse All Pages</title>
                 <meta name="description" content="Complete sitemap of Study Volte. Find all pages including question paper libraries for MBBU, BBMC, CUET, SSC, and more." />
                 <link rel="canonical" href="https://study-volte.site/sitemap" />
-            </Helmet>
+            </Head>
 
             <div className="min-h-screen bg-gray-50 py-16">
                 <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">

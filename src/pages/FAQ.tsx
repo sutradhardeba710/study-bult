@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
+import SEOHead from '../components/SEOHead';
 
 // ─── Scroll-reveal hook ───────────────────────────────────────────────────────
 function useInView(threshold = 0.12) {
@@ -672,6 +673,7 @@ const FAQ: React.FC = () => {
 
   return (
     <>
+      <SEOHead title="Frequently Asked Questions | Study Volte" description="Answers to common questions about downloading free previous year question papers, uploading, accounts, and contributor rewards on Study Volte." />
       {/* Keyframe animation injected once */}
       <style>{`
         @keyframes fadeSlide {

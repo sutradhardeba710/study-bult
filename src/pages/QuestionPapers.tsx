@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Helmet } from 'react-helmet-async';
+import { Head } from 'vite-react-ssg';
 import {
     Search, Download, BookOpen, ChevronDown, ArrowRight,
     FileText, GraduationCap, Clock, Star, Users, CheckCircle,
@@ -8,6 +8,7 @@ import {
     Shield, Zap, Target, Hash, Calendar, BarChart2
 } from 'lucide-react';
 import { getPapers } from '../services/papers';
+import SEOHead from '../components/SEOHead';
 
 /* ── types ── */
 interface Paper {
@@ -169,32 +170,19 @@ export default function QuestionPapers() {
 
     return (
         <>
-            <Helmet>
-                <title>Previous Year Question Papers - Free PDF Download | Study Volte</title>
-                <meta name="description" content="Download free previous year question papers, last year question papers and old question papers for all semesters & courses in India. 100% free PDF download. 500+ papers available." />
-                <meta name="keywords" content="previous year question paper, last year question paper, question papers, question paper, previous year question papers, old question papers, university question papers, semester question papers, free question papers download, question paper pdf, previous year paper pdf download, college question papers, BCA question papers, BSc question papers, BA question papers" />
-                <link rel="canonical" href={PAGE} />
-                <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1" />
-                <meta name="revisit-after" content="3 days" />
-                <meta name="language" content="English" />
-                <meta name="category" content="Education" />
-                <meta property="og:type" content="website" />
-                <meta property="og:url" content={PAGE} />
-                <meta property="og:title" content="Previous Year Question Papers - Free PDF Download | Study Volte" />
-                <meta property="og:description" content="Download free previous year question papers for all semesters and courses. 500+ real question papers uploaded by students." />
-                <meta property="og:image" content={`${SITE}/logo-optimized.webp`} />
-                <meta property="og:site_name" content="Study Volte" />
-                <meta name="twitter:card" content="summary_large_image" />
-                <meta name="twitter:title" content="Previous Year Question Papers Free Download | Study Volte" />
-                <meta name="twitter:description" content="Find and download free previous year question papers and last year question papers for all courses and semesters in India." />
-                <meta name="twitter:image" content={`${SITE}/logo-optimized.webp`} />
+            <SEOHead
+                title="Previous Year Question Papers - Free PDF Download | Study Volte"
+                description="Download free previous year question papers, last year question papers and old question papers for all semesters & courses in India. 100% free PDF download. 500+ papers available."
+                keywords="previous year question paper, last year question paper, question papers, question paper, previous year question papers, old question papers, university question papers, semester question papers, free question papers download, question paper pdf, previous year paper pdf download, college question papers, BCA question papers, BSc question papers, BA question papers"
+            />
+            <Head>
                 <script type="application/ld+json">{JSON.stringify(s.faq)}</script>
                 <script type="application/ld+json">{JSON.stringify(s.breadcrumb)}</script>
                 <script type="application/ld+json">{JSON.stringify(s.howTo)}</script>
                 <script type="application/ld+json">{JSON.stringify(s.aggregate)}</script>
                 <script type="application/ld+json">{JSON.stringify(s.itemList)}</script>
                 <script type="application/ld+json">{JSON.stringify(s.eduOrg)}</script>
-            </Helmet>
+            </Head>
 
             <main className="min-h-screen bg-gray-50">
 

@@ -1,8 +1,10 @@
 import React from 'react';
+import SEOHead from '../components/SEOHead';
 
 const Terms: React.FC = () => {
   return (
     <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+      <SEOHead title="Terms of Service | Study Volte" description="The terms and conditions governing your use of Study Volte's free question paper platform." />
       <div className="max-w-3xl mx-auto bg-white border border-gray-200 shadow-sm p-8 sm:p-12 text-gray-800 text-sm leading-relaxed font-serif text-justify">
 
         <div className="text-center mb-10">

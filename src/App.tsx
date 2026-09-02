@@ -3,7 +3,6 @@ import { AuthProvider } from './context/AuthContext';
 import { MetaProvider } from './context/MetaContext';
 import { Toaster } from 'react-hot-toast';
 import { lazy, Suspense } from 'react';
-import { HelmetProvider } from 'react-helmet-async';
 
 // Common
 const UploadEncouragementModal = lazy(() => import('./components/UploadEncouragementModal'));
@@ -28,22 +27,20 @@ const DASHBOARD_PREFIXES = ['/dashboard', '/admin'];
 
 export default function App() {
   return (
-    <HelmetProvider>
-      <AuthProvider>
-        <MetaProvider>
-          <div className="App flex flex-col min-h-screen">
-            <ScrollRestoration getKey={(location) => location.pathname} />
-            <Toaster position="top-right" toastOptions={{ duration: 3000 }} />
-            <Suspense fallback={null}>
-              <UploadEncouragementModal />
-            </Suspense>
-            <Suspense fallback={<LoadingFallback />}>
-              <LayoutRouter />
-            </Suspense>
-          </div>
-        </MetaProvider>
-      </AuthProvider>
-    </HelmetProvider>
+    <AuthProvider>
+      <MetaProvider>
+        <div className="App flex flex-col min-h-screen">
+          <ScrollRestoration getKey={(location) => location.pathname} />
+          <Toaster position="top-right" toastOptions={{ duration: 3000 }} />
+          <Suspense fallback={null}>
+            <UploadEncouragementModal />
+          </Suspense>
+          <Suspense fallback={<LoadingFallback />}>
+            <LayoutRouter />
+          </Suspense>
+        </div>
+      </MetaProvider>
+    </AuthProvider>
   );
 }
 

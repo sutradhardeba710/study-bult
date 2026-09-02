@@ -7,6 +7,7 @@ import {
 import { useAuth } from '../context/AuthContext';
 import LandingLoggedIn from './LandingLoggedIn';
 import PaperCard from '../components/PaperCard';
+import SEOHead from '../components/SEOHead';
 import type { PaperData } from '../services/upload';
 
 function Reveal({ children, className = '', delay = 0 }: {
@@ -112,6 +113,11 @@ const Home = () => {
 
     return (
         <main className="overflow-x-hidden bg-[#fbfcff] text-[#0b1020]">
+            <SEOHead
+                title="Previous Year Question Paper | Download Free PDF | Study Volte"
+                description="Download free previous year question papers, last year papers, and old question papers for all semesters, courses, and universities in India. Real papers uploaded by students on Study Volte."
+                keywords="previous year question paper, last year question paper, question papers, free question papers pdf, college question papers, semester question papers, MBBU, BBMC, study volte"
+            />
             <section className="hero-mesh relative isolate overflow-hidden text-[#0b1020]">
 
                 <div className="academic-dot-grid absolute inset-0 -z-10 opacity-40 [mask-image:linear-gradient(to_bottom,black,transparent_92%)]" aria-hidden="true" />
@@ -379,17 +385,19 @@ const Home = () => {
                     </div>
                 </div>
             </section>
-            <section className="bg-gradient-to-br from-[#ff6b5a] via-[#f25566] to-[#7c5cfc] py-14 text-white sm:py-20 lg:py-24">
-                <div className="mx-auto grid max-w-7xl items-center gap-8 px-4 sm:gap-12 sm:px-6 lg:grid-cols-[1fr_auto] lg:px-8">
+            <section className="relative overflow-hidden bg-gradient-to-br from-[#0b1020] via-[#141d3a] to-[#1b3fa8] py-14 text-white sm:py-20 lg:py-24">
+                <div className="absolute -right-24 -top-24 h-80 w-80 rounded-full bg-primary-500/20 blur-3xl" aria-hidden="true" />
+                <div className="absolute -bottom-28 left-1/4 h-72 w-72 rounded-full bg-primary-400/10 blur-3xl" aria-hidden="true" />
+                <div className="relative mx-auto grid max-w-7xl items-center gap-8 px-4 sm:gap-12 sm:px-6 lg:grid-cols-[1fr_auto] lg:px-8">
                     <Reveal>
                         <div className="min-w-0 max-w-3xl">
-                            <div className="mb-5 flex items-center gap-2 text-sm font-semibold text-blue-100"><Users className="h-5 w-5" />A student-powered library</div>
+                            <div className="mb-5 flex items-center gap-2 text-sm font-semibold text-primary-200"><Users className="h-5 w-5" />A student-powered library</div>
                             <h2 className="text-3xl font-black leading-tight tracking-[-0.035em] sm:text-5xl">One useful upload can help an entire class.</h2>
-                            <p className="mt-4 max-w-2xl text-base leading-7 text-blue-100 sm:mt-5 sm:text-lg sm:leading-8">If you have a clear previous-year paper, add it to the library. Study Volte keeps the process straightforward and credits community contribution.</p>
-                            <div className="mt-6 grid grid-cols-1 gap-3 text-sm text-blue-100 sm:mt-7 sm:flex sm:flex-wrap sm:gap-x-5">{['Simple upload flow', 'Paper review', 'Contributor rewards'].map((item) => <span key={item} className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-emerald-300" />{item}</span>)}</div>
+                            <p className="mt-4 max-w-2xl text-base leading-7 text-slate-300 sm:mt-5 sm:text-lg sm:leading-8">If you have a clear previous-year paper, add it to the library. Study Volte keeps the process straightforward and credits community contribution.</p>
+                            <div className="mt-6 grid grid-cols-1 gap-3 text-sm text-slate-300 sm:mt-7 sm:flex sm:flex-wrap sm:gap-x-5">{['Simple upload flow', 'Paper review', 'Contributor rewards'].map((item) => <span key={item} className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-emerald-400" />{item}</span>)}</div>
                         </div>
                     </Reveal>
-                    <Reveal delay={80}><Link to="/upload" className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-white px-7 py-4 font-bold text-primary-800 shadow-lg transition-colors hover:bg-blue-50 sm:w-auto">Share a question paper<Upload className="h-5 w-5" /></Link></Reveal>
+                    <Reveal delay={80}><Link to="/upload" className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-white px-7 py-4 font-bold text-primary-800 shadow-lg transition-colors hover:bg-primary-50 sm:w-auto">Share a question paper<Upload className="h-5 w-5" /></Link></Reveal>
                 </div>
             </section>
 
@@ -418,14 +426,15 @@ const Home = () => {
             <section className="bg-white py-14 sm:py-20 lg:py-24">
                 <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
                     <Reveal>
-                        <div className="flex flex-col items-start justify-between gap-8 rounded-3xl bg-[#4A55F5] p-8 sm:p-10 lg:flex-row lg:items-center lg:p-12">
-                            <div className="max-w-xl text-left">
-                                <p className="mb-3 text-[11px] font-black uppercase tracking-[0.18em] text-white/90">Free Academic Library</p>
+                        <div className="relative flex flex-col items-start justify-between gap-8 overflow-hidden rounded-3xl bg-gradient-to-br from-[#2454db] to-[#1b3fa8] p-8 shadow-xl shadow-primary-900/20 sm:p-10 lg:flex-row lg:items-center lg:p-12">
+                            <div className="absolute -right-16 -top-16 h-56 w-56 rounded-full bg-white/10 blur-2xl" aria-hidden="true" />
+                            <div className="relative max-w-xl text-left">
+                                <p className="mb-3 text-[11px] font-black uppercase tracking-[0.18em] text-primary-200">Free Academic Library</p>
                                 <h2 className="mb-2 text-3xl font-bold tracking-tight text-white sm:text-4xl">Ready to find your next paper?</h2>
-                                <p className="text-base text-white/90 sm:text-lg">Search the library free—no account needed.</p>
+                                <p className="text-base text-primary-100 sm:text-lg">Search the library free—no account needed.</p>
                             </div>
-                            <div className="flex w-full flex-col gap-4 sm:w-auto sm:flex-row sm:items-center">
-                                <Link to="/browse" className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-white px-7 py-3 text-sm font-bold text-[#4A55F5] shadow-sm transition hover:bg-slate-50 focus:outline-none focus:ring-4 focus:ring-white/20">
+                            <div className="relative flex w-full flex-col gap-4 sm:w-auto sm:flex-row sm:items-center">
+                                <Link to="/browse" className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-white px-7 py-3 text-sm font-bold text-primary-700 shadow-sm transition hover:bg-primary-50 focus:outline-none focus:ring-4 focus:ring-white/20">
                                     Browse papers <ArrowRight className="h-4 w-4" />
                                 </Link>
                                 <Link to="/upload" className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl border border-white/25 bg-white/10 px-7 py-3 text-sm font-bold text-white transition hover:bg-white/20 focus:outline-none focus:ring-4 focus:ring-white/20">

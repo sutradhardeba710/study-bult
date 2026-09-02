@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { Mail, ArrowLeft, BookOpen, CheckCircle2 } from 'lucide-react';
 import Button from '../components/Button';
+import SEOHead from '../components/SEOHead';
 
 const ResetPassword = () => {
     const [email, setEmail] = useState('');
@@ -50,6 +51,7 @@ const ResetPassword = () => {
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-primary-50 via-white to-primary-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
+            <SEOHead title="Reset Password | Study Volte" description="Reset your Study Volte account password." noindex />
             <div className="sm:mx-auto sm:w-full sm:max-w-md">
                 <div className="flex justify-center">
                     <Link to="/" className="flex items-center space-x-2">

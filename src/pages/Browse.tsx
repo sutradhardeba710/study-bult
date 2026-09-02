@@ -9,7 +9,7 @@ import Fuse from 'fuse.js';
 import toast from 'react-hot-toast';
 import { useAuth } from '../context/AuthContext';
 import { markTaskDone } from '../services/engagement';
-import { addDownload, getPapers, getUserLikedPaperIds, likePaper, unlikePaper } from '../services/papers';
+import { addDownload, getPaperById, getPapers, getUserLikedPaperIds, likePaper, unlikePaper } from '../services/papers';
 import { incrementDownloadCount, type PaperData } from '../services/upload';
 import EditPaperModal from '../components/admin/EditPaperModal';
 import PDFThumbnail from '../components/PDFThumbnail';
@@ -213,6 +213,40 @@ function PaperResultCard({ paper, isLiked, canLike, onPreview, onDownload, onLik
         </article>
     );
 }
+function LibraryIntro() {
+    return (
+        <section className="border-t border-slate-200 bg-white">
+            <div className="mx-auto max-w-3xl px-4 py-14 sm:px-6 lg:px-8">
+                <h2 className="text-2xl font-black tracking-tight text-slate-950 sm:text-3xl">About the Study Volte question paper library</h2>
+                <div className="mt-6 space-y-5 text-[15px] leading-7 text-slate-700">
+                    <p>
+                        Study Volte is a free, student-driven library of previous year question papers. Every paper you see here was uploaded by a student who sat the exam and wanted to help the batch coming after them. Instead of hunting through WhatsApp groups, seniors' folders, and photocopy shops the week before an exam, you can search one organised collection by subject, semester, course, and institution — and preview the actual PDF before you commit to downloading it.
+                    </p>
+                    <p>
+                        Previous year papers are the single most reliable guide to how an exam is actually set. They show you the recurring topics, the weight each unit carries, the phrasing examiners favour, and the difference between what the syllabus lists and what the paper genuinely tests. Working through three to five years of papers for a subject usually reveals a clear pattern: a handful of topics appear almost every year, and a few are all but guaranteed. That pattern is where your revision time earns the most marks.
+                    </p>
+                    <p>
+                        We currently focus on Tripura institutions — Maharaja Bir Bikram University (MBBU) and Bir Bikram Memorial College (BBMC) — across BA, BSc, BCom, and BCA programmes, alongside national entrance and recruitment exams such as CUET and the SSC series. Coverage grows every time a student contributes, so if a paper you need is missing, uploading it takes a couple of minutes and immediately helps everyone searching for the same subject.
+                    </p>
+                    <h3 className="pt-2 text-lg font-bold text-slate-900">How to get the most out of these papers</h3>
+                    <p>
+                        Start with the most recent year to understand the current pattern, then work backwards. Attempt at least one paper under real exam conditions — same time limit, no notes — before you look at any solutions; it is the fastest way to find the gap between what you can recognise and what you can actually reproduce under pressure. Keep a running list of questions that repeat across years and treat them as your high-priority revision set. Our{' '}
+                        <Link to="/guides/how-to-use-previous-year-papers" className="font-semibold text-blue-700 hover:underline">step-by-step guide</Link>{' '}
+                        walks through the full method, and{' '}
+                        <Link to="/guides/are-questions-repeated-in-exams" className="font-semibold text-blue-700 hover:underline">this breakdown</Link>{' '}
+                        explains just how often questions actually repeat.
+                    </p>
+                    <p>
+                        Every download is free and no paper sits behind a paywall. Uploaded papers are reviewed for readable scans and complete pages before they appear here, and all materials are shared for educational use. If you own the rights to any paper and would like it removed, our{' '}
+                        <Link to="/copyright" className="font-semibold text-blue-700 hover:underline">content removal policy</Link>{' '}
+                        explains how to request a takedown.
+                    </p>
+                </div>
+            </div>
+        </section>
+    );
+}
+
 const Browse = () => {
     const { userProfile } = useAuth();
     const urlParams = useMemo(() => typeof window === 'undefined' ? new URLSearchParams() : new URLSearchParams(window.location.search), []);
@@ -247,6 +281,20 @@ const Browse = () => {
 
     useEffect(() => { fetchPapers(); }, [fetchPapers]);
     useEffect(() => { if (userProfile?.uid) markTaskDone(userProfile.uid, 'visit_browse'); }, [userProfile?.uid]);
+
+    // Open a paper directly from ?paper=<id> (shared/deep link). Runs once after papers load.
+    const [deepLinkHandled, setDeepLinkHandled] = useState(false);
+    useEffect(() => {
+        if (deepLinkHandled || loading) return;
+        const paperId = urlParams.get('paper');
+        if (!paperId) return;
+        setDeepLinkHandled(true);
+        const existing = papers.find((item) => item.id === paperId);
+        if (existing) { setSelectedPaper(existing); setShowPreview(true); return; }
+        void getPaperById(paperId)
+            .then((paper) => { if (paper) { setSelectedPaper(paper); setShowPreview(true); } })
+            .catch(() => { /* invalid id — leave listing as-is */ });
+    }, [deepLinkHandled, loading, papers, urlParams]);
 
     useEffect(() => {
         if (!mobileFiltersOpen || typeof document === 'undefined') return;
@@ -340,8 +388,15 @@ const Browse = () => {
         [key]: current[key].includes(value) ? current[key].filter((item) => item !== value) : [...current[key], value],
     }));
     const clearFilters = () => setFilters(EMPTY_FILTERS);
-    const handlePreview = (paper: PaperData) => { setSelectedPaper(paper); setShowPreview(true); };
-    const closePreview = () => { setShowPreview(false); setSelectedPaper(null); };
+    const syncPaperParam = (paperId: string | null) => {
+        if (typeof window === 'undefined') return;
+        const url = new URL(window.location.href);
+        if (paperId) url.searchParams.set('paper', paperId);
+        else url.searchParams.delete('paper');
+        window.history.replaceState(window.history.state, '', url.toString());
+    };
+    const handlePreview = (paper: PaperData) => { setSelectedPaper(paper); setShowPreview(true); syncPaperParam(paper.id || null); };
+    const closePreview = () => { setShowPreview(false); setSelectedPaper(null); syncPaperParam(null); };
 
     const handleDownload = async (paper: PaperData) => {
         if (!paper.id) return;
@@ -379,7 +434,9 @@ const Browse = () => {
 
     const handleShare = async (paper: PaperData) => {
         if (typeof window === 'undefined') return;
-        const url = `${window.location.origin}/browse?q=${encodeURIComponent(paper.title)}`;
+        const url = paper.id
+            ? `${window.location.origin}/browse?paper=${encodeURIComponent(paper.id)}`
+            : `${window.location.origin}/browse?q=${encodeURIComponent(paper.title)}`;
         try {
             if (navigator.share) await navigator.share({ title: paper.title, text: 'View this question paper on Study Volte', url });
             else { await navigator.clipboard.writeText(url); toast.success('Paper link copied'); }
@@ -392,11 +449,17 @@ const Browse = () => {
     if (loading) {
         return (
             <div className="min-h-screen bg-slate-50">
+                <SEOHead
+                    title="Browse Previous Year Question Papers | Study Volte"
+                    description="Find free MBBU and BBMC previous year question papers by subject, course, semester, and college. Preview each PDF before downloading."
+                    keywords="browse question papers, previous year paper PDF, MBBU papers, BBMC papers, semester question papers"
+                />
                 <div className="bg-slate-950 px-4 py-16"><div className="mx-auto max-w-6xl"><Skeleton variant="text" width={180} height={20} /><div className="mt-5 max-w-2xl"><Skeleton variant="text" width="90%" height={52} /></div><div className="mt-8 max-w-3xl"><Skeleton variant="rect" width="100%" height={56} /></div></div></div>
                 <div className="mx-auto grid max-w-7xl gap-8 px-4 py-10 lg:grid-cols-[240px_minmax(0,1fr)]">
                     <div className="hidden space-y-3 lg:block">{[1, 2, 3, 4, 5].map((item) => <Skeleton key={item} variant="rect" width="100%" height={42} />)}</div>
                     <div className="grid gap-5 xl:grid-cols-2">{[1, 2, 3, 4, 5, 6].map((item) => <div key={item} className="rounded-2xl border border-slate-200 bg-white p-5"><div className="flex gap-5"><Skeleton variant="rect" width={124} height={170} /><div className="flex-1 space-y-3"><Skeleton variant="text" width="40%" height={18} /><Skeleton variant="text" width="90%" height={24} /><Skeleton variant="text" width="65%" height={16} /></div></div></div>)}</div>
                 </div>
+                <LibraryIntro />
             </div>
         );
     }
@@ -411,8 +474,12 @@ const Browse = () => {
     return (
         <div className="min-h-screen bg-slate-50 text-slate-900">
             <SEOHead
-                title="Browse Previous Year Question Papers | Study Volte"
-                description="Find free MBBU and BBMC previous year question papers by subject, course, semester, and college. Preview each PDF before downloading."
+                title={showPreview && selectedPaper
+                    ? `${selectedPaper.title}${selectedPaper.subject ? ` — ${selectedPaper.subject}` : ''} | Study Volte`
+                    : "Browse Previous Year Question Papers | Study Volte"}
+                description={showPreview && selectedPaper
+                    ? `${selectedPaper.title}${selectedPaper.college ? ` from ${selectedPaper.college}` : ''}${selectedPaper.semester ? `, ${selectedPaper.semester}` : ''}. Free previous year question paper PDF on Study Volte — preview and download.`
+                    : "Find free MBBU and BBMC previous year question papers by subject, course, semester, and college. Preview each PDF before downloading."}
                 keywords="browse question papers, previous year paper PDF, MBBU papers, BBMC papers, semester question papers"
             />
 
@@ -518,6 +585,8 @@ const Browse = () => {
                         )}
                     </section>
                 </div>
+
+                <LibraryIntro />
             </main>
 
             {mobileFiltersOpen && (

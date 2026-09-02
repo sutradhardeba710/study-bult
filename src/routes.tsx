@@ -27,6 +27,7 @@ const Terms = lazy(() => import('./pages/Terms'));
 const HelpCenter = lazy(() => import('./pages/HelpCenter'));
 const FAQ = lazy(() => import('./pages/FAQ'));
 const CookiePolicy = lazy(() => import('./pages/CookiePolicy'));
+const Copyright = lazy(() => import('./pages/Copyright'));
 const DiagnosticsDashboard = lazy(() => import('./components/DiagnosticsDashboard'));
 const MBBUQuestionPapers = lazy(() => import('./pages/universities/MBBUQuestionPapers'));
 const BBMCQuestionPapers = lazy(() => import('./pages/universities/BBMCQuestionPapers'));
@@ -50,6 +51,16 @@ const HowToUsePYQ = lazy(() => import('./pages/guides/HowToUsePYQ'));
 const AreQuestionsRepeated = lazy(() => import('./pages/guides/AreQuestionsRepeated'));
 const ExamPreparationStrategy = lazy(() => import('./pages/guides/ExamPreparationStrategy'));
 
+// ── SEO SILO — Cluster E: Exams ──────────────────────────────────────────────
+const ExamsHub = lazy(() => import('./pages/exams/ExamsHub'));
+const CUETQuestionPapers = lazy(() => import('./pages/exams/CUETQuestionPapers'));
+const CUET2025 = lazy(() => import('./pages/exams/CUET2025'));
+const CUET2024 = lazy(() => import('./pages/exams/CUET2024'));
+const SSCQuestionPapers = lazy(() => import('./pages/exams/SSCQuestionPapers'));
+const SSCCGLQuestionPapers = lazy(() => import('./pages/exams/SSCCGLQuestionPapers'));
+const SSCCHSLQuestionPapers = lazy(() => import('./pages/exams/SSCCHSLQuestionPapers'));
+const SSCGDQuestionPapers = lazy(() => import('./pages/exams/SSCGDQuestionPapers'));
+
 const routes = [
     {
         path: '/',
@@ -68,6 +79,7 @@ const routes = [
             { path: 'privacy', element: <Privacy /> },
             { path: 'terms', element: <Terms /> },
             { path: 'cookie-policy', element: <CookiePolicy /> },
+            { path: 'copyright', element: <Copyright /> },
             { path: 'help-center', element: <HelpCenter /> },
             { path: 'faq', element: <FAQ /> },
             { path: 'diagnostics', element: import.meta.env?.DEV ? <DiagnosticsDashboard /> : <Error404 /> },
@@ -91,6 +103,16 @@ const routes = [
             { path: 'guides/how-to-use-previous-year-papers', element: <HowToUsePYQ /> },
             { path: 'guides/are-questions-repeated-in-exams', element: <AreQuestionsRepeated /> },
             { path: 'guides/exam-preparation-strategy', element: <ExamPreparationStrategy /> },
+
+            // ── Cluster E: Exams ─────────────────────────────────────────────
+            { path: 'exams', element: <ExamsHub /> },
+            { path: 'exams/cuet', element: <CUETQuestionPapers /> },
+            { path: 'exams/cuet/2025', element: <CUET2025 /> },
+            { path: 'exams/cuet/2024', element: <CUET2024 /> },
+            { path: 'exams/ssc', element: <SSCQuestionPapers /> },
+            { path: 'exams/ssc-cgl', element: <SSCCGLQuestionPapers /> },
+            { path: 'exams/ssc-chsl', element: <SSCCHSLQuestionPapers /> },
+            { path: 'exams/ssc-gd', element: <SSCGDQuestionPapers /> },
 
             // ── Utility ──────────────────────────────────────────────────────
             { path: 'sitemap', element: <HTMLSitemap /> },

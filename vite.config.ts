@@ -94,6 +94,16 @@ export default defineConfig({
           { route: '/guides/are-questions-repeated-in-exams', priority: 0.75, changefreq: 'monthly' },
           { route: '/guides/exam-preparation-strategy', priority: 0.75, changefreq: 'monthly' },
 
+          // ── Cluster E: Exams ─────────────────────────────────────────────
+          { route: '/exams', priority: 0.8, changefreq: 'weekly' },
+          { route: '/exams/cuet', priority: 0.8, changefreq: 'weekly' },
+          { route: '/exams/cuet/2025', priority: 0.75, changefreq: 'weekly' },
+          { route: '/exams/cuet/2024', priority: 0.7, changefreq: 'monthly' },
+          { route: '/exams/ssc', priority: 0.8, changefreq: 'weekly' },
+          { route: '/exams/ssc-cgl', priority: 0.75, changefreq: 'weekly' },
+          { route: '/exams/ssc-chsl', priority: 0.75, changefreq: 'weekly' },
+          { route: '/exams/ssc-gd', priority: 0.75, changefreq: 'weekly' },
+
           // ── Utilities ────────────────────────────────────────────────────
           { route: '/about', priority: 0.7, changefreq: 'monthly' },
           { route: '/faq', priority: 0.7, changefreq: 'monthly' },
@@ -101,6 +111,7 @@ export default defineConfig({
           { route: '/contact', priority: 0.6, changefreq: 'monthly' },
           { route: '/privacy', priority: 0.4, changefreq: 'yearly' },
           { route: '/terms', priority: 0.4, changefreq: 'yearly' },
+          { route: '/copyright', priority: 0.4, changefreq: 'yearly' },
           // Note: /test-meta deliberately excluded from sitemap
         ];
 

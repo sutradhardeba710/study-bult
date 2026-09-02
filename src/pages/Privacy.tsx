@@ -1,8 +1,10 @@
 import React from 'react';
+import SEOHead from '../components/SEOHead';
 
 const Privacy: React.FC = () => {
   return (
     <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+      <SEOHead title="Privacy Policy | Study Volte" description="Read the Study Volte privacy policy: how we collect, use, and protect your personal data, including cookies and third-party advertising." />
       <div className="max-w-3xl mx-auto bg-white border border-gray-200 shadow-sm p-8 sm:p-12 text-gray-800 text-sm leading-relaxed font-serif text-justify">
 
         <div className="text-center mb-10">
@@ -130,16 +132,35 @@ const Privacy: React.FC = () => {
           </section>
 
           <section>
-            <h2 className="text-lg font-bold uppercase tracking-wide mt-8 mb-3 border-b border-gray-300 pb-1">9. Changes to this Privacy Policy</h2>
+            <h2 className="text-lg font-bold uppercase tracking-wide mt-8 mb-3 border-b border-gray-300 pb-1">9. Advertising and Third-Party Cookies</h2>
             <p className="mb-3">
-              9.1. We systematically reserve the right to revise Our Privacy Policy on an intermittent schedule. Any applicable modifications shall be publicly transmitted to You by actively posting the novel Privacy Policy contiguous to this specific platform page. Active updates are accompanied by a revised "Last updated" temporal stamp preceding the document title.
+              9.1. The Service may display advertisements served by third-party advertising networks, including <strong>Google AdSense</strong>. These partners use cookies and similar technologies to serve ads based on Your prior visits to this Website and other websites across the Internet.
+            </p>
+            <p className="mb-3">
+              9.2. Google, as a third-party vendor, uses cookies — including the <strong>DoubleClick DART cookie</strong> — to serve ads to Users based on their visit to this Site and other sites on the Internet. Third-party vendors and ad networks may also use cookies to serve ads based on a User's prior activity.
+            </p>
+            <p className="mb-3">
+              9.3. You may opt out of personalized advertising by visiting Google's Ads Settings at{' '}
+              <a href="https://www.google.com/settings/ads" target="_blank" rel="noopener noreferrer" className="text-blue-600 underline">www.google.com/settings/ads</a>. You may additionally opt out of third-party vendor cookies for personalized advertising by visiting{' '}
+              <a href="https://www.aboutads.info/choices" target="_blank" rel="noopener noreferrer" className="text-blue-600 underline">www.aboutads.info/choices</a>.
+            </p>
+            <p className="mb-3">
+              9.4. For further information regarding how Google collects and uses data through its advertising services, please review Google's own policy at{' '}
+              <a href="https://policies.google.com/technologies/partner-sites" target="_blank" rel="noopener noreferrer" className="text-blue-600 underline">policies.google.com/technologies/partner-sites</a>.
             </p>
           </section>
 
           <section>
-            <h2 className="text-lg font-bold uppercase tracking-wide mt-8 mb-3 border-b border-gray-300 pb-1">10. Contact Us</h2>
+            <h2 className="text-lg font-bold uppercase tracking-wide mt-8 mb-3 border-b border-gray-300 pb-1">10. Changes to this Privacy Policy</h2>
+            <p className="mb-3">
+              10.1. We systematically reserve the right to revise Our Privacy Policy on an intermittent schedule. Any applicable modifications shall be publicly transmitted to You by actively posting the novel Privacy Policy contiguous to this specific platform page. Active updates are accompanied by a revised "Last updated" temporal stamp preceding the document title.
+            </p>
+          </section>
+
+          <section>
+            <h2 className="text-lg font-bold uppercase tracking-wide mt-8 mb-3 border-b border-gray-300 pb-1">11. Contact Us</h2>
             <p>
-              10.1. Should any questions, concerns, or legal ambiguities emerge concerning this structured Privacy Policy, do not hesitate to direct communication to our authoritative department via email at: <strong>support@study-volte.site</strong>.
+              11.1. Should any questions, concerns, or legal ambiguities emerge concerning this structured Privacy Policy, do not hesitate to direct communication to our authoritative department via email at: <strong>support@study-volte.site</strong>.
             </p>
           </section>
 

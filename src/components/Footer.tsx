@@ -17,8 +17,8 @@ const browseLinks = [
   { to: '/universities/tripura/mbbu-question-papers', label: 'MBBU papers' },
   { to: '/universities/tripura/bbmc-question-papers', label: 'BBMC papers' },
   { to: '/courses/ba', label: 'BA papers' },
-  { to: '/courses/bsc', label: 'BSc papers' },
-  { to: '/browse?search=Semester%201', label: 'Semester 1–6' },
+  { to: '/exams/cuet', label: 'CUET papers' },
+  { to: '/exams/ssc', label: 'SSC papers' },
 ];
 
 const supportLinks = [
@@ -27,6 +27,7 @@ const supportLinks = [
   { to: '/contact', label: 'Contact us' },
   { to: '/privacy', label: 'Privacy policy' },
   { to: '/terms', label: 'Terms of service' },
+  { to: '/copyright', label: 'Copyright / DMCA' },
 ];
 
 const socialLinks = [

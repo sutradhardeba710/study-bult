@@ -1,8 +1,10 @@
 import React from 'react';
+import SEOHead from '../components/SEOHead';
 
 const CookiePolicy: React.FC = () => {
   return (
     <div className="max-w-4xl mx-auto py-12 px-4">
+      <SEOHead title="Cookie Policy | Study Volte" description="How Study Volte uses cookies and similar technologies, including analytics and third-party advertising cookies." />
       <h1 className="text-3xl font-bold mb-6 text-gray-900">Cookie Policy</h1>
 
       <div className="prose prose-lg max-w-none">

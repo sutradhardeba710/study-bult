@@ -30,6 +30,7 @@ import {
 } from '../components/AuthExperience';
 import type { UserProfile } from '../context/AuthContext';
 import { initRecaptcha, trackSignupConversion } from '../services/google';
+import SEOHead from '../components/SEOHead';
 
 const GOOGLE_RECAPTCHA_SITE_KEY = import.meta.env.VITE_GOOGLE_RECAPTCHA_SITE_KEY || '';
 type RegisterField = 'fullName' | 'email' | 'password' | 'confirmPassword' | 'college' | 'semester' | 'course';
@@ -280,6 +281,7 @@ const Register = () => {
 
   return (
     <AuthPageShell mode="register">
+      <SEOHead title="Create Account | Study Volte" description="Create a free Study Volte account to upload question papers, earn contributor rewards, and save papers for later." noindex />
       {showProfileCompletion && googleUserProfile && (
         <GoogleProfileCompletion
           user={googleUserProfile}
