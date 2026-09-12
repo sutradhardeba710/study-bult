@@ -67,7 +67,7 @@ function SearchField({ value, onChange, suggestions, compact = false }: {
     const inputId = compact ? 'sticky-paper-search' : 'hero-paper-search';
     return (
         <div className="relative">
-            <Search className={cx('pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-slate-400', compact ? 'h-4 w-4' : 'h-5 w-5')} aria-hidden="true" />
+            <Search className={cx('pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-400', compact ? 'h-3.5 w-3.5' : 'h-4 w-4')} aria-hidden="true" />
             <label htmlFor={inputId} className="sr-only">Search question papers</label>
             <input
                 id={inputId}
@@ -78,8 +78,8 @@ function SearchField({ value, onChange, suggestions, compact = false }: {
                 placeholder="Try “BA 2nd semester History”"
                 autoComplete="off"
                 className={cx(
-                    'w-full rounded-xl border bg-white text-slate-950 outline-none transition placeholder:text-slate-400 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/15',
-                    compact ? 'h-11 border-slate-200 pl-11 pr-11 text-sm' : 'h-14 border-white/15 pl-12 pr-12 text-base shadow-2xl shadow-slate-950/25'
+                    'w-full rounded-lg border bg-white text-slate-950 outline-none transition placeholder:text-slate-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20',
+                    compact ? 'h-9 border-slate-200 pl-9 pr-9 text-xs' : 'h-10 sm:h-11 border-white/20 pl-9 pr-9 text-xs sm:text-sm shadow-md shadow-slate-950/20'
                 )}
             />
             <datalist id={`${inputId}-suggestions`}>
@@ -89,10 +89,10 @@ function SearchField({ value, onChange, suggestions, compact = false }: {
                 <button
                     type="button"
                     onClick={() => onChange('')}
-                    className="absolute right-1.5 top-1/2 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-lg text-slate-400 hover:bg-slate-100 hover:text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="absolute right-1 top-1/2 flex h-7 w-7 -translate-y-1/2 items-center justify-center rounded-md text-slate-400 hover:bg-slate-100 hover:text-slate-700 focus:outline-none focus:ring-1 focus:ring-blue-500"
                     aria-label="Clear search"
                 >
-                    <X className="h-4 w-4" />
+                    <X className="h-3.5 w-3.5" />
                 </button>
             )}
         </div>
@@ -174,41 +174,41 @@ function PaperResultCard({ paper, isLiked, canLike, onPreview, onDownload, onLik
 }) {
     const year = getPaperYear(paper);
     return (
-        <article className="group overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition duration-200 hover:-translate-y-1 hover:border-slate-300 hover:shadow-xl hover:shadow-slate-900/10">
-            <div className="grid grid-cols-[104px_minmax(0,1fr)] gap-4 p-4 sm:grid-cols-[132px_minmax(0,1fr)] sm:gap-5 sm:p-5">
-                <button type="button" onClick={onPreview} className="relative flex min-h-[142px] items-center justify-center overflow-hidden rounded-xl border border-slate-200 bg-slate-100 p-2 transition group-hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 sm:min-h-[174px]" aria-label={`Preview ${paper.title}`}>
-                    <div className="transition duration-200 group-hover:scale-[1.025] group-hover:shadow-lg">
-                        <PDFThumbnail fileUrl={paper.fileUrl} title={paper.title} thumbnailUrl={paper.thumbnailUrl} width={112} height={154} className="rounded-sm shadow-md" />
+        <article className="group overflow-hidden rounded-xl border border-slate-200/90 bg-white shadow-2xs transition duration-200 hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-md">
+            <div className="grid grid-cols-[88px_minmax(0,1fr)] gap-3 p-3 sm:grid-cols-[108px_minmax(0,1fr)] sm:gap-4 sm:p-3.5">
+                <button type="button" onClick={onPreview} className="relative flex min-h-[116px] items-center justify-center overflow-hidden rounded-lg border border-slate-200 bg-slate-100 p-1.5 transition group-hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 sm:min-h-[142px]" aria-label={`Preview ${paper.title}`}>
+                    <div className="transition duration-200 group-hover:scale-[1.02]">
+                        <PDFThumbnail fileUrl={paper.fileUrl} title={paper.title} thumbnailUrl={paper.thumbnailUrl} width={92} height={128} className="rounded-xs shadow-sm" />
                     </div>
-                    <span className="absolute bottom-2 left-2 right-2 hidden min-h-9 items-center justify-center gap-1.5 rounded-lg bg-slate-950/90 px-2 text-xs font-bold text-white opacity-0 backdrop-blur transition group-hover:opacity-100 sm:flex"><Eye className="h-3.5 w-3.5" /> Open preview</span>
+                    <span className="absolute bottom-1.5 left-1.5 right-1.5 hidden min-h-7 items-center justify-center gap-1 rounded-md bg-slate-950/90 px-1.5 text-[10px] font-bold text-white opacity-0 backdrop-blur transition group-hover:opacity-100 sm:flex"><Eye className="h-3 w-3" /> Preview</span>
                 </button>
                 <div className="min-w-0">
-                    <div className="mb-3 flex flex-wrap items-center gap-1.5">
-                        <span className="inline-flex items-center gap-1 rounded-md bg-emerald-50 px-2 py-1 text-[11px] font-bold text-emerald-800 ring-1 ring-inset ring-emerald-200"><BadgeCheck className="h-3.5 w-3.5" /> Approved</span>
-                        {(paper.downloadCount || 0) > 0 && <span className="inline-flex items-center gap-1 rounded-md bg-amber-50 px-2 py-1 text-[11px] font-bold text-amber-800 ring-1 ring-inset ring-amber-200"><Flame className="h-3.5 w-3.5" /> Downloaded</span>}
+                    <div className="mb-1.5 flex flex-wrap items-center gap-1">
+                        <span className="inline-flex items-center gap-1 rounded-md bg-emerald-50 px-1.5 py-0.5 text-[10px] font-bold text-emerald-800 ring-1 ring-inset ring-emerald-200"><BadgeCheck className="h-3 w-3" /> Approved</span>
+                        {(paper.downloadCount || 0) > 0 && <span className="inline-flex items-center gap-1 rounded-md bg-amber-50 px-1.5 py-0.5 text-[10px] font-bold text-amber-800 ring-1 ring-inset ring-amber-200"><Flame className="h-3 w-3" /> Popular</span>}
                     </div>
-                    <button type="button" onClick={onPreview} className="block w-full text-left focus:outline-none focus:ring-2 focus:ring-blue-500">
-                        <h3 className="line-clamp-2 text-base font-extrabold leading-snug text-slate-950 transition group-hover:text-blue-700 sm:text-lg">{paper.title}</h3>
+                    <button type="button" onClick={onPreview} className="block w-full text-left focus:outline-none focus:ring-1 focus:ring-blue-500">
+                        <h3 className="line-clamp-2 text-xs sm:text-sm font-bold leading-snug text-slate-900 transition group-hover:text-blue-700">{paper.title}</h3>
                     </button>
-                    <p className="mt-2 line-clamp-1 text-sm font-semibold text-blue-700">{paper.subject || 'General paper'}</p>
-                    <p className="mt-1 line-clamp-2 text-xs leading-5 text-slate-500">{paper.college}</p>
-                    <dl className="mt-4 grid grid-cols-2 gap-x-3 gap-y-2 text-xs">
-                        <div><dt className="text-slate-400">Course</dt><dd className="mt-0.5 truncate font-semibold text-slate-700">{paper.course || '—'}</dd></div>
-                        <div><dt className="text-slate-400">Semester</dt><dd className="mt-0.5 truncate font-semibold text-slate-700">{paper.semester || '—'}</dd></div>
-                        <div><dt className="text-slate-400">{year ? 'Year' : 'Format'}</dt><dd className="mt-0.5 font-semibold text-slate-700">{year || 'PDF'}</dd></div>
-                        <div><dt className="text-slate-400">File</dt><dd className="mt-0.5 font-semibold text-slate-700">{formatFileSize(paper.fileSize)}</dd></div>
+                    <p className="mt-1 line-clamp-1 text-xs font-semibold text-blue-700">{paper.subject || 'General paper'}</p>
+                    <p className="mt-0.5 line-clamp-1 text-[11px] text-slate-500">{paper.college}</p>
+                    <dl className="mt-2.5 grid grid-cols-2 gap-x-2 gap-y-1 text-[11px]">
+                        <div><dt className="text-slate-400">Course</dt><dd className="truncate font-semibold text-slate-700">{paper.course || '—'}</dd></div>
+                        <div><dt className="text-slate-400">Semester</dt><dd className="truncate font-semibold text-slate-700">{paper.semester || '—'}</dd></div>
+                        <div><dt className="text-slate-400">{year ? 'Year' : 'Format'}</dt><dd className="font-semibold text-slate-700">{year || 'PDF'}</dd></div>
+                        <div><dt className="text-slate-400">File</dt><dd className="font-semibold text-slate-700">{formatFileSize(paper.fileSize)}</dd></div>
                     </dl>
                 </div>
             </div>
-            <div className="flex items-center gap-2 border-t border-slate-100 bg-slate-50/80 px-4 py-3 sm:px-5">
-                <div className="mr-auto flex items-center gap-3 text-xs font-semibold tabular-nums text-slate-500">
-                    <span className="flex items-center gap-1.5" title="Downloads"><Download className="h-3.5 w-3.5 text-emerald-600" /> {paper.downloadCount || 0}</span>
-                    <span className="flex items-center gap-1.5" title="Likes"><Heart className="h-3.5 w-3.5 text-rose-500" /> {paper.likeCount || 0}</span>
+            <div className="flex items-center gap-1.5 border-t border-slate-100 bg-slate-50/70 px-3 py-2 sm:px-3.5">
+                <div className="mr-auto flex items-center gap-2.5 text-[11px] font-semibold tabular-nums text-slate-500">
+                    <span className="flex items-center gap-1" title="Downloads"><Download className="h-3 w-3 text-emerald-600" /> {paper.downloadCount || 0}</span>
+                    <span className="flex items-center gap-1" title="Likes"><Heart className="h-3 w-3 text-rose-500" /> {paper.likeCount || 0}</span>
                 </div>
-                {canLike && <button type="button" onClick={onLike} className={cx('flex h-11 w-11 items-center justify-center rounded-xl border transition focus:outline-none focus:ring-2 focus:ring-blue-500', isLiked ? 'border-rose-200 bg-rose-50 text-rose-600' : 'border-slate-200 bg-white text-slate-500 hover:border-rose-200 hover:text-rose-600')} aria-label={isLiked ? `Unlike ${paper.title}` : `Like ${paper.title}`}><Heart className={cx('h-4 w-4', isLiked && 'fill-current')} /></button>}
-                <button type="button" onClick={onShare} className="flex h-11 w-11 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-500 transition hover:border-slate-300 hover:text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500" aria-label={`Share ${paper.title}`}><Share2 className="h-4 w-4" /></button>
-                <button type="button" onClick={onPreview} className="hidden min-h-11 items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-4 text-sm font-bold text-slate-700 transition hover:bg-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-500 sm:flex"><Eye className="h-4 w-4" /> Preview</button>
-                <button type="button" onClick={onDownload} className="flex min-h-11 items-center justify-center gap-2 rounded-xl bg-blue-600 px-4 text-sm font-bold text-white shadow-sm transition hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"><Download className="h-4 w-4" /><span className="hidden sm:inline">Download</span></button>
+                {canLike && <button type="button" onClick={onLike} className={cx('flex h-8 w-8 items-center justify-center rounded-lg border transition focus:outline-none focus:ring-1 focus:ring-blue-500', isLiked ? 'border-rose-200 bg-rose-50 text-rose-600' : 'border-slate-200 bg-white text-slate-500 hover:border-rose-200 hover:text-rose-600')} aria-label={isLiked ? `Unlike ${paper.title}` : `Like ${paper.title}`}><Heart className={cx('h-3.5 w-3.5', isLiked && 'fill-current')} /></button>}
+                <button type="button" onClick={onShare} className="flex h-8 w-8 items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-500 transition hover:border-slate-300 hover:text-slate-900 focus:outline-none focus:ring-1 focus:ring-blue-500" aria-label={`Share ${paper.title}`}><Share2 className="h-3.5 w-3.5" /></button>
+                <button type="button" onClick={onPreview} className="hidden min-h-8 items-center justify-center gap-1 rounded-lg border border-slate-200 bg-white px-3 text-xs font-bold text-slate-700 transition hover:bg-slate-100 focus:outline-none focus:ring-1 focus:ring-blue-500 sm:flex"><Eye className="h-3.5 w-3.5" /> Preview</button>
+                <button type="button" onClick={onDownload} className="flex min-h-8 items-center justify-center gap-1 rounded-lg bg-blue-600 px-3 text-xs font-bold text-white shadow-2xs transition hover:bg-blue-700 focus:outline-none focus:ring-1 focus:ring-blue-500"><Download className="h-3.5 w-3.5" /><span className="hidden sm:inline">Download</span></button>
             </div>
         </article>
     );
@@ -486,58 +486,58 @@ const Browse = () => {
             />
 
             <section className="site-academic-bg relative overflow-hidden border-b border-slate-800 text-white">
-                <div className="relative mx-auto grid max-w-7xl gap-10 px-4 py-14 sm:px-6 lg:grid-cols-[minmax(0,1.15fr)_minmax(320px,.85fr)] lg:px-8 lg:py-20">
+                <div className="relative mx-auto grid max-w-7xl gap-6 px-4 py-8 sm:px-6 lg:grid-cols-[minmax(0,1.15fr)_minmax(300px,.85fr)] lg:px-8 lg:py-10">
                     <div>
-                        <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-blue-400/30 bg-blue-400/10 px-3 py-1.5 text-xs font-bold uppercase tracking-[0.15em] text-blue-200"><BookOpen className="h-4 w-4" /> Previous-year paper library</div>
-                        <h1 className="max-w-3xl text-4xl font-black leading-[1.05] tracking-tight sm:text-5xl lg:text-6xl">Find the paper.<span className="block text-blue-400">Start revising.</span></h1>
-                        <p className="mt-5 max-w-2xl text-base leading-7 text-slate-300 sm:text-lg">Search real student-contributed question papers by subject, semester, course, or institution—then preview the PDF before you download.</p>
-                        <dl className="mt-8 flex flex-wrap gap-x-8 gap-y-4">
-                            <div><dt className="text-xs font-semibold uppercase tracking-wider text-slate-400">Available now</dt><dd className="mt-1 text-2xl font-black tabular-nums">{papers.length}</dd></div>
-                            <div><dt className="text-xs font-semibold uppercase tracking-wider text-slate-400">Subjects</dt><dd className="mt-1 text-2xl font-black tabular-nums">{filterOptions.subject.length}</dd></div>
-                            <div><dt className="text-xs font-semibold uppercase tracking-wider text-slate-400">Institutions</dt><dd className="mt-1 text-2xl font-black tabular-nums">{filterOptions.college.length}</dd></div>
-                            <div><dt className="text-xs font-semibold uppercase tracking-wider text-slate-400">Access</dt><dd className="mt-1 text-2xl font-black">Free</dd></div>
+                        <div className="mb-3 inline-flex items-center gap-1.5 rounded-full border border-blue-400/30 bg-blue-400/10 px-2.5 py-1 text-[11px] font-bold uppercase tracking-[0.14em] text-blue-200"><BookOpen className="h-3.5 w-3.5" /> Previous-year paper library</div>
+                        <h1 className="max-w-3xl text-2xl font-bold leading-snug tracking-tight sm:text-3xl lg:text-4xl">Find the paper.<span className="block text-blue-400">Start revising.</span></h1>
+                        <p className="mt-2.5 max-w-xl text-xs sm:text-sm leading-relaxed text-slate-300">Search real student-contributed question papers by subject, semester, course, or institution—then preview the PDF before you download.</p>
+                        <dl className="mt-5 flex flex-wrap gap-x-6 gap-y-2.5">
+                            <div><dt className="text-[10px] font-semibold uppercase tracking-wider text-slate-400">Available now</dt><dd className="mt-0.5 text-lg sm:text-xl font-bold tabular-nums">{papers.length}</dd></div>
+                            <div><dt className="text-[10px] font-semibold uppercase tracking-wider text-slate-400">Subjects</dt><dd className="mt-0.5 text-lg sm:text-xl font-bold tabular-nums">{filterOptions.subject.length}</dd></div>
+                            <div><dt className="text-[10px] font-semibold uppercase tracking-wider text-slate-400">Institutions</dt><dd className="mt-0.5 text-lg sm:text-xl font-bold tabular-nums">{filterOptions.college.length}</dd></div>
+                            <div><dt className="text-[10px] font-semibold uppercase tracking-wider text-slate-400">Access</dt><dd className="mt-0.5 text-lg sm:text-xl font-bold">Free</dd></div>
                         </dl>
                     </div>
-                    <div className="self-center rounded-2xl border border-white/10 bg-white/[0.06] p-4 shadow-2xl shadow-black/30 backdrop-blur-sm sm:p-6">
-                        <div className="mb-4 flex items-center gap-3">
-                            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-500 text-white"><Search className="h-5 w-5" /></div>
-                            <div><p className="font-bold text-white">Search in plain language</p><p className="text-sm text-slate-400">Title, subject, course, semester, or college</p></div>
+                    <div className="self-center rounded-xl border border-white/10 bg-white/[0.06] p-3.5 shadow-xl shadow-black/20 backdrop-blur-sm sm:p-4">
+                        <div className="mb-3 flex items-center gap-2.5">
+                            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-500 text-white"><Search className="h-4 w-4" /></div>
+                            <div><p className="text-xs sm:text-sm font-bold text-white">Search in plain language</p><p className="text-[11px] text-slate-400">Title, subject, course, semester, or college</p></div>
                         </div>
                         <SearchField value={searchTerm} onChange={setSearchTerm} suggestions={searchSuggestions} />
-                        <div className="mt-4">
-                            <p className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">Popular searches</p>
-                            <div className="mt-2 flex flex-wrap gap-2">
-                                {filterOptions.subject.slice(0, 3).map((option) => <button key={option.value} type="button" onClick={() => setSearchTerm(option.value)} className="min-h-10 rounded-lg border border-white/10 bg-white/[0.04] px-3 text-sm font-semibold text-slate-200 transition hover:border-blue-400/50 hover:bg-blue-400/10 focus:outline-none focus:ring-2 focus:ring-blue-400">{option.value}</button>)}
+                        <div className="mt-3">
+                            <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-400">Popular searches</p>
+                            <div className="mt-1.5 flex flex-wrap gap-1.5">
+                                {filterOptions.subject.slice(0, 3).map((option) => <button key={option.value} type="button" onClick={() => setSearchTerm(option.value)} className="min-h-7 rounded-md border border-white/10 bg-white/[0.04] px-2.5 py-1 text-xs font-semibold text-slate-200 transition hover:border-blue-400/50 hover:bg-blue-400/10 focus:outline-none focus:ring-1 focus:ring-blue-400">{option.value}</button>)}
                             </div>
                         </div>
                     </div>
                 </div>
             </section>
 
-            <div className="sticky top-16 z-40 border-b border-slate-200 bg-white/95 shadow-sm backdrop-blur-xl">
-                <div className="mx-auto flex max-w-7xl items-center gap-3 px-4 py-3 sm:px-6 lg:px-8">
-                    <div className="min-w-0 flex-1 lg:max-w-2xl"><SearchField value={searchTerm} onChange={setSearchTerm} suggestions={searchSuggestions} compact /></div>
-                    <button type="button" onClick={() => setMobileFiltersOpen(true)} className="relative flex h-11 items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-3 text-sm font-bold text-slate-700 hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-blue-500 lg:hidden">
-                        <Filter className="h-4 w-4" /><span className="hidden sm:inline">Filters</span>
-                        {activeFilterCount > 0 && <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-blue-600 px-1 text-[11px] text-white">{activeFilterCount}</span>}
+            <div className="sticky top-16 z-40 border-b border-slate-200 bg-white/95 shadow-2xs backdrop-blur-xl">
+                <div className="mx-auto flex max-w-7xl items-center gap-2.5 px-4 py-2 sm:px-6 lg:px-8">
+                    <div className="min-w-0 flex-1 lg:max-w-xl"><SearchField value={searchTerm} onChange={setSearchTerm} suggestions={searchSuggestions} compact /></div>
+                    <button type="button" onClick={() => setMobileFiltersOpen(true)} className="relative flex h-9 items-center justify-center gap-1.5 rounded-lg border border-slate-200 bg-white px-2.5 text-xs font-bold text-slate-700 hover:bg-slate-50 focus:outline-none focus:ring-1 focus:ring-blue-500 lg:hidden">
+                        <Filter className="h-3.5 w-3.5" /><span className="hidden sm:inline">Filters</span>
+                        {activeFilterCount > 0 && <span className="flex h-4 min-w-4 items-center justify-center rounded-full bg-blue-600 px-1 text-[10px] text-white">{activeFilterCount}</span>}
                     </button>
-                    <div className="hidden items-center gap-2 border-l border-slate-200 pl-3 lg:flex"><GraduationCap className="h-4 w-4 text-slate-400" /><span className="text-sm font-semibold text-slate-600">{filteredPapers.length} paper{filteredPapers.length === 1 ? '' : 's'}</span></div>
+                    <div className="hidden items-center gap-1.5 border-l border-slate-200 pl-3 lg:flex"><GraduationCap className="h-3.5 w-3.5 text-slate-400" /><span className="text-xs font-semibold text-slate-600">{filteredPapers.length} paper{filteredPapers.length === 1 ? '' : 's'}</span></div>
                 </div>
             </div>
 
             <main>
                 {isDiscoveryView && featuredPapers.length > 0 && (
                     <section className="border-b border-slate-200 bg-white">
-                        <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-                            <div className="mb-5 flex items-end justify-between gap-4">
-                                <div><p className="flex items-center gap-2 text-xs font-bold uppercase tracking-[0.16em] text-amber-700"><Flame className="h-4 w-4" /> Start here</p><h2 className="mt-1 text-2xl font-black tracking-tight text-slate-950">{papers.some((paper) => (paper.downloadCount || 0) > 0) ? 'Popular with students' : 'Recently added'}</h2></div>
-                                <p className="hidden text-sm text-slate-500 sm:block">Preview before downloading</p>
+                        <div className="mx-auto max-w-7xl px-4 py-5 sm:px-6 lg:px-8">
+                            <div className="mb-3.5 flex items-end justify-between gap-4">
+                                <div><p className="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-[0.15em] text-amber-700"><Flame className="h-3.5 w-3.5" /> Start here</p><h2 className="mt-0.5 text-base sm:text-lg font-bold tracking-tight text-slate-950">{papers.some((paper) => (paper.downloadCount || 0) > 0) ? 'Popular with students' : 'Recently added'}</h2></div>
+                                <p className="hidden text-xs text-slate-500 sm:block">Preview before downloading</p>
                             </div>
-                            <div className="grid gap-4 md:grid-cols-3">
+                            <div className="grid gap-3 md:grid-cols-3">
                                 {featuredPapers.map((paper, index) => (
-                                    <button key={paper.id} type="button" onClick={() => handlePreview(paper)} className="group flex min-h-32 items-center gap-4 rounded-2xl border border-slate-200 bg-slate-50 p-4 text-left transition hover:-translate-y-0.5 hover:border-amber-300 hover:bg-white hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
-                                        <div className="flex h-14 w-12 shrink-0 items-center justify-center rounded-lg border border-slate-200 bg-white shadow-sm"><span className="text-lg font-black tabular-nums text-slate-400">{String(index + 1).padStart(2, '0')}</span></div>
-                                        <div className="min-w-0"><p className="line-clamp-2 font-bold leading-snug text-slate-900 group-hover:text-blue-700">{paper.title}</p><p className="mt-2 truncate text-xs font-semibold text-slate-500">{paper.subject} · {paper.semester}</p><p className="mt-1 flex items-center gap-1 text-xs text-emerald-700"><Download className="h-3.5 w-3.5" /> {paper.downloadCount || 0} downloads</p></div>
+                                    <button key={paper.id} type="button" onClick={() => handlePreview(paper)} className="group flex min-h-24 items-center gap-3 rounded-xl border border-slate-200 bg-slate-50 p-3 text-left transition hover:-translate-y-0.5 hover:border-amber-300 hover:bg-white hover:shadow-xs focus:outline-none focus:ring-1 focus:ring-blue-500">
+                                        <div className="flex h-11 w-10 shrink-0 items-center justify-center rounded-lg border border-slate-200 bg-white shadow-2xs"><span className="text-sm font-black tabular-nums text-slate-400">{String(index + 1).padStart(2, '0')}</span></div>
+                                        <div className="min-w-0"><p className="line-clamp-2 text-xs sm:text-sm font-bold leading-snug text-slate-900 group-hover:text-blue-700">{paper.title}</p><p className="mt-1 truncate text-[11px] font-semibold text-slate-500">{paper.subject} · {paper.semester}</p><p className="mt-0.5 flex items-center gap-1 text-[11px] text-emerald-700"><Download className="h-3 w-3" /> {paper.downloadCount || 0} downloads</p></div>
                                     </button>
                                 ))}
                             </div>
@@ -545,19 +545,19 @@ const Browse = () => {
                     </section>
                 )}
 
-                <div className="mx-auto grid max-w-7xl gap-8 px-4 py-8 sm:px-6 lg:grid-cols-[250px_minmax(0,1fr)] lg:px-8 lg:py-10">
-                    <aside className="hidden min-w-0 lg:block"><div className="sticky top-40 min-w-0 overflow-hidden rounded-2xl border border-slate-200 bg-white p-5 shadow-sm"><FilterPanel filters={filters} options={filterOptions} activeCount={activeFilterCount} onToggle={toggleFilter} onClear={clearFilters} /></div></aside>
+                <div className="mx-auto grid max-w-7xl gap-6 px-4 py-6 sm:px-6 lg:grid-cols-[230px_minmax(0,1fr)] lg:px-8 lg:py-8">
+                    <aside className="hidden min-w-0 lg:block"><div className="sticky top-32 min-w-0 overflow-hidden rounded-xl border border-slate-200 bg-white p-4 shadow-2xs"><FilterPanel filters={filters} options={filterOptions} activeCount={activeFilterCount} onToggle={toggleFilter} onClear={clearFilters} /></div></aside>
                     <section aria-labelledby="paper-results-title" className="min-w-0">
-                        <div className="mb-6">
-                            <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+                        <div className="mb-4">
+                            <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
                                 <div>
-                                    <p className="text-xs font-bold uppercase tracking-[0.16em] text-blue-700">{searchTerm ? 'Search results' : 'Paper library'}</p>
-                                    <h2 id="paper-results-title" className="mt-1 text-2xl font-black tracking-tight text-slate-950 sm:text-3xl">{searchTerm ? `Results for “${searchTerm}”` : 'All question papers'}</h2>
-                                    <p className="mt-2 text-sm text-slate-500">Showing <span className="font-bold tabular-nums text-slate-800">{filteredPapers.length}</span> of {papers.length} available papers</p>
+                                    <p className="text-[11px] font-bold uppercase tracking-[0.15em] text-blue-700">{searchTerm ? 'Search results' : 'Paper library'}</p>
+                                    <h2 id="paper-results-title" className="mt-0.5 text-lg sm:text-xl font-bold tracking-tight text-slate-950">{searchTerm ? `Results for “${searchTerm}”` : 'All question papers'}</h2>
+                                    <p className="mt-1 text-xs text-slate-500">Showing <span className="font-bold tabular-nums text-slate-800">{filteredPapers.length}</span> of {papers.length} available papers</p>
                                 </div>
                                 <div className="shrink-0">
-                                    <label htmlFor="paper-sort" className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-slate-500">Sort by</label>
-                                    <select id="paper-sort" value={sortMode} onChange={(event) => setSortMode(event.target.value as SortMode)} className="h-11 min-w-44 rounded-xl border border-slate-200 bg-white px-3 text-sm font-bold text-slate-700 outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/15">
+                                    <label htmlFor="paper-sort" className="mb-1 block text-[10px] font-bold uppercase tracking-wider text-slate-500">Sort by</label>
+                                    <select id="paper-sort" value={sortMode} onChange={(event) => setSortMode(event.target.value as SortMode)} className="h-9 min-w-36 rounded-lg border border-slate-200 bg-white px-2.5 text-xs font-semibold text-slate-700 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20">
                                         {sortOptions.map((option) => <option key={option.id} value={option.id}>{option.label}</option>)}
                                     </select>
                                 </div>

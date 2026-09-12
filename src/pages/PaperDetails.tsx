@@ -188,65 +188,65 @@ export default function PaperDetails() {
             </nav>
 
             {/* Header / Hero */}
-            <header className="bg-slate-900 text-white py-8 sm:py-12 border-b border-slate-800">
+            <header className="bg-slate-900 text-white py-6 sm:py-8 border-b border-slate-800">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="flex flex-wrap items-center gap-2 mb-3">
-                        <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 px-2.5 py-0.5 text-xs font-bold text-emerald-400">
+                    <div className="flex flex-wrap items-center gap-1.5 mb-2">
+                        <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 px-2 py-0.5 text-[11px] font-bold text-emerald-400">
                             <CheckCircle className="h-3 w-3" /> Verified Paper
                         </span>
-                        <span className="rounded-full bg-primary-500/10 border border-primary-500/30 px-2.5 py-0.5 text-xs font-bold text-primary-300">
+                        <span className="rounded-full bg-primary-500/10 border border-primary-500/30 px-2 py-0.5 text-[11px] font-bold text-primary-300">
                             {paper.college}
                         </span>
-                        <span className="rounded-full bg-slate-800 border border-slate-700 px-2.5 py-0.5 text-xs font-medium text-slate-300">
+                        <span className="rounded-full bg-slate-800 border border-slate-700 px-2 py-0.5 text-[11px] font-medium text-slate-300">
                             {paper.course} · {paper.semester}
                         </span>
                         {paper.year && (
-                            <span className="rounded-full bg-amber-500/10 border border-amber-500/30 px-2.5 py-0.5 text-xs font-bold text-amber-300">
+                            <span className="rounded-full bg-amber-500/10 border border-amber-500/30 px-2 py-0.5 text-[11px] font-bold text-amber-300">
                                 Year {paper.year}
                             </span>
                         )}
                     </div>
 
-                    <h1 className="text-2xl sm:text-4xl font-extrabold text-white tracking-tight leading-snug">
+                    <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-white tracking-tight leading-snug">
                         {paper.title}
                     </h1>
 
-                    <p className="mt-3 text-sm sm:text-base text-slate-300 max-w-3xl">
+                    <p className="mt-1.5 text-xs sm:text-sm text-slate-300 max-w-2xl leading-relaxed">
                         Official {paper.subject ? `${paper.subject} ` : ''}examination question paper from {paper.college}. Free PDF download for semester exam preparation.
                     </p>
 
                     {/* Action Bar */}
-                    <div className="mt-6 flex flex-wrap items-center gap-3">
+                    <div className="mt-4 flex flex-wrap items-center gap-2.5">
                         <button
                             onClick={handleDownload}
-                            className="inline-flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold px-6 py-3 rounded-xl text-sm sm:text-base shadow-lg transition-colors cursor-pointer"
+                            className="inline-flex items-center justify-center gap-1.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold px-4 py-2 rounded-lg text-xs sm:text-sm shadow-md transition-colors cursor-pointer"
                         >
-                            <Download className="h-5 w-5" /> Download PDF
+                            <Download className="h-4 w-4" /> Download PDF
                         </button>
                         <button
                             onClick={handleShareWhatsApp}
-                            className="inline-flex items-center justify-center gap-2 bg-[#25D366] hover:bg-[#20bd5a] text-white font-bold px-5 py-3 rounded-xl text-sm transition-colors cursor-pointer"
+                            className="inline-flex items-center justify-center gap-1.5 bg-[#25D366] hover:bg-[#20bd5a] text-white font-bold px-3.5 py-2 rounded-lg text-xs transition-colors cursor-pointer"
                         >
-                            <MessageCircle className="h-4 w-4" /> Share on WhatsApp
+                            <MessageCircle className="h-3.5 w-3.5" /> Share on WhatsApp
                         </button>
                         <button
                             onClick={handleCopyLink}
-                            className="inline-flex items-center justify-center gap-2 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 font-semibold px-4 py-3 rounded-xl text-sm transition-colors cursor-pointer"
+                            className="inline-flex items-center justify-center gap-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 font-semibold px-3 py-2 rounded-lg text-xs transition-colors cursor-pointer"
                         >
-                            <Copy className="h-4 w-4" /> Copy Link
+                            <Copy className="h-3.5 w-3.5" /> Copy Link
                         </button>
                     </div>
                 </div>
             </header>
 
             {/* Content Body */}
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8">
-                <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_340px] gap-8">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-5">
+                <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_320px] gap-5">
                     {/* Left Column: PDF Viewer */}
-                    <section aria-label="PDF Document Viewer" className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden p-4 sm:p-6">
-                        <div className="flex items-center justify-between border-b border-slate-200 pb-4 mb-4">
-                            <h2 className="text-lg font-bold text-slate-900 flex items-center gap-2">
-                                <BookOpen className="h-5 w-5 text-primary-600" />
+                    <section aria-label="PDF Document Viewer" className="bg-white rounded-xl border border-slate-200/90 shadow-2xs overflow-hidden p-3.5 sm:p-4">
+                        <div className="flex items-center justify-between border-b border-slate-200 pb-3 mb-3">
+                            <h2 className="text-xs sm:text-sm font-bold text-slate-900 flex items-center gap-1.5">
+                                <BookOpen className="h-4 w-4 text-primary-600" />
                                 Document Preview
                             </h2>
                             <a
@@ -259,7 +259,7 @@ export default function PaperDetails() {
                             </a>
                         </div>
 
-                        <div className="w-full h-[650px] bg-slate-100 rounded-xl overflow-hidden border border-slate-200">
+                        <div className="w-full h-[520px] sm:h-[580px] bg-slate-100 rounded-lg overflow-hidden border border-slate-200">
                             <iframe
                                 src={googleDocsViewerUrl}
                                 title={paper.title}
@@ -268,8 +268,8 @@ export default function PaperDetails() {
                             />
                         </div>
 
-                        <div className="mt-4 flex items-center justify-between text-xs text-slate-500">
-                            <span>Having trouble viewing? Use the Direct PDF link or click Download.</span>
+                        <div className="mt-3 flex items-center justify-between text-xs text-slate-500">
+                            <span>Having trouble viewing? Use Direct PDF link or click Download.</span>
                             <button
                                 onClick={handleDownload}
                                 className="text-primary-600 font-bold hover:underline"
@@ -280,13 +280,13 @@ export default function PaperDetails() {
                     </section>
 
                     {/* Right Column: Paper Metadata & Silo Links */}
-                    <aside className="space-y-6">
+                    <aside className="space-y-4">
                         {/* Paper Details Card */}
-                        <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
-                            <h3 className="text-base font-bold text-slate-900 mb-4 pb-2 border-b border-slate-100">
+                        <div className="bg-white rounded-xl border border-slate-200/90 p-4 shadow-2xs">
+                            <h3 className="text-xs sm:text-sm font-bold uppercase tracking-wider text-slate-700 mb-3 pb-2 border-b border-slate-100">
                                 Paper Details
                             </h3>
-                            <dl className="space-y-3 text-sm">
+                            <dl className="space-y-2 text-xs">
                                 <div className="flex justify-between">
                                     <dt className="text-slate-500">Institution</dt>
                                     <dd className="font-semibold text-slate-800 text-right">{paper.college}</dd>
@@ -321,23 +321,23 @@ export default function PaperDetails() {
                         </div>
 
                         {/* More Papers from this Semester */}
-                        <div className="bg-gradient-to-br from-primary-50 to-indigo-50/50 rounded-2xl border border-primary-100 p-6 shadow-sm">
-                            <h3 className="text-base font-bold text-primary-900 mb-2">
+                        <div className="bg-gradient-to-br from-primary-50 to-indigo-50/50 rounded-xl border border-primary-100 p-4 shadow-2xs">
+                            <h3 className="text-xs sm:text-sm font-bold text-primary-900 mb-1.5">
                                 More {paper.college} Papers
                             </h3>
-                            <p className="text-xs text-primary-700 mb-4">
+                            <p className="text-[11px] text-primary-700 mb-3">
                                 Browse all subjects and semesters for {paper.course} at {paper.college}.
                             </p>
                             <Link
                                 to={semesterUrl}
-                                className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-primary-600 px-4 py-2.5 text-xs font-bold text-white hover:bg-primary-700 transition-colors shadow-sm"
+                                className="inline-flex w-full items-center justify-center gap-1.5 rounded-lg bg-primary-600 px-3.5 py-2 text-xs font-bold text-white hover:bg-primary-700 transition-colors shadow-2xs"
                             >
                                 Browse {paper.semester} Papers
                             </Link>
                         </div>
 
                         {/* Contributor Callout */}
-                        <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm text-center">
+                        <div className="bg-white rounded-xl border border-slate-200/90 p-4 shadow-2xs text-center">
                             <GraduationCap className="h-8 w-8 text-primary-600 mx-auto mb-2" />
                             <h4 className="text-sm font-bold text-slate-900 mb-1">Have more exam papers?</h4>
                             <p className="text-xs text-slate-500 mb-4">

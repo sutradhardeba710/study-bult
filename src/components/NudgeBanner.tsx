@@ -77,30 +77,30 @@ export default function NudgeBanner(props: NudgeBannerProps) {
     };
 
     return (
-        <div className={`flex items-center justify-between gap-3 px-4 py-3 sm:px-5 sm:py-3.5 rounded-2xl border text-sm font-medium ${nudge.color} shadow-xs backdrop-blur-sm transition-all`}>
-            <div className="flex items-center gap-2.5 min-w-0">
-                <span className="flex h-2 w-2 relative shrink-0">
+        <div className={`flex items-center justify-between gap-3 px-3.5 py-2 sm:px-4 sm:py-2.5 rounded-xl border text-xs font-medium ${nudge.color} shadow-xs backdrop-blur-sm transition-all`}>
+            <div className="flex items-center gap-2 min-w-0">
+                <span className="flex h-1.5 w-1.5 relative shrink-0">
                     <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary-400 opacity-75"></span>
-                    <span className="relative inline-flex rounded-full h-2 w-2 bg-primary-600"></span>
+                    <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-primary-600"></span>
                 </span>
                 <span className="truncate">{nudge.message}</span>
             </div>
-            <div className="flex items-center gap-3 shrink-0">
+            <div className="flex items-center gap-2.5 shrink-0">
                 {nudge.cta && (
                     <Link
                         to={nudge.cta.to}
-                        className="inline-flex items-center gap-1.5 rounded-lg bg-white/90 hover:bg-white px-3 py-1 text-xs font-bold text-slate-800 shadow-2xs border border-slate-200/80 transition-all hover:shadow-xs"
+                        className="inline-flex items-center gap-1 rounded-md bg-white/90 hover:bg-white px-2.5 py-0.5 text-[11px] font-bold text-slate-800 shadow-2xs border border-slate-200/80 transition-all hover:shadow-xs"
                     >
                         {nudge.cta.label}
-                        <ArrowRight className="w-3 h-3 text-primary-600" />
+                        <ArrowRight className="w-2.5 h-2.5 text-primary-600" />
                     </Link>
                 )}
                 <button
                     onClick={dismiss}
                     aria-label="Dismiss notification"
-                    className="p-1 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-black/5 transition-colors"
+                    className="p-0.5 rounded-md text-slate-400 hover:text-slate-700 hover:bg-black/5 transition-colors"
                 >
-                    <X className="w-4 h-4" />
+                    <X className="w-3.5 h-3.5" />
                 </button>
             </div>
         </div>
