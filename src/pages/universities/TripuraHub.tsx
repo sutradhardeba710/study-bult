@@ -52,9 +52,9 @@ export default function TripuraHub() {
     return (
         <>
             <SEOHead
-                title="Tripura University Question Papers | MBBU & BBMC Free PDF | Study Volte"
+                title="Tripura University Question Papers | MBBU & BBMC Free PDF Download | Study Volte"
                 description="Download previous year question papers from Tripura's top colleges — MBBU and BBMC. Free PDF for all courses (BA, BSc, BCom, BCA) and all semesters. Maharaja Bir Bikram University and Bir Bikram Memorial College papers."
-                keywords="tripura university question papers, MBBU question papers, BBMC question papers, tripura college papers, MBB university papers, Bir Bikram Memorial College, Tripura exam papers PDF, semester question papers Tripura"
+                keywords="tripura university question papers, tripura university previous year question paper pdf download, MBBU question papers, BBMC question papers, tripura college papers, tripura university cbcs question paper, MBB university papers, Bir Bikram Memorial College agartala, Tripura exam papers PDF, semester question papers Tripura, study volte"
             />
             <script type="application/ld+json">{JSON.stringify(breadcrumbSchema)}</script>
             <script type="application/ld+json">{JSON.stringify(itemListSchema)}</script>

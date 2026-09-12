@@ -15,8 +15,8 @@ const breadcrumbSchema = {
     itemListElement: [
         { '@type': 'ListItem', position: 1, name: 'Home', item: SITE },
         { '@type': 'ListItem', position: 2, name: 'Question Papers', item: `${SITE}/question-papers` },
-        { '@type': 'ListItem', position: 3, name: 'By Course', item: `${SITE}/question-papers/courses` },
-        { '@type': 'ListItem', position: 4, name: 'BA Question Papers', item: `${SITE}/question-papers/courses/ba` },
+        { '@type': 'ListItem', position: 3, name: 'By Course', item: `${SITE}/courses` },
+        { '@type': 'ListItem', position: 4, name: 'BA Question Papers', item: `${SITE}/courses/ba` },
     ],
 };
 
@@ -46,7 +46,7 @@ const faqSchema = {
         },
         {
             '@type': 'Question',
-            name: 'Are BA question papers repeated every year?',
+            name: 'Are BA previous year questions repeated in university exams?',
             acceptedAnswer: { '@type': 'Answer', text: 'Yes, many BA exam questions repeat across years. Practicing with 3–5 years of previous papers helps identify recurring topics in History, Political Science, English, Economics, and other BA subjects.' },
         },
         {
@@ -61,9 +61,9 @@ export default function BACourseHub() {
     return (
         <>
             <SEOHead
-                title="BA Previous Year Question Papers | All Semesters Free PDF | Study Volte"
+                title="BA Previous Year Question Papers PDF Download | All Semesters | Study Volte"
                 description="Download BA (Bachelor of Arts) previous year question papers from MBBU and BBMC for all 6 semesters. History, Political Science, English, Economics and all subjects. Free PDF download."
-                keywords="BA question papers, BA previous year question paper, Bachelor of Arts question papers, BA semester papers, BA 1st semester question paper, BA 2nd semester question paper, MBBU BA papers, BBMC BA papers, BA exam papers PDF"
+                keywords="BA question papers, BA previous year question paper pdf download, BA 1st semester question paper, BA 2nd semester question paper, BA 3rd semester question paper, Bachelor of Arts question papers, MBBU BA papers, BBMC BA papers, BA political science question paper, BA history question paper, BA english question paper, BA exam papers PDF, study volte"
             />
             <script type="application/ld+json">{JSON.stringify(breadcrumbSchema)}</script>
             <script type="application/ld+json">{JSON.stringify(itemListSchema)}</script>
@@ -78,7 +78,7 @@ export default function BACourseHub() {
                             <li><ChevronRight className="w-3.5 h-3.5 text-gray-300" /></li>
                             <li><Link to="/question-papers" className="hover:text-primary-600 transition-colors">Question Papers</Link></li>
                             <li><ChevronRight className="w-3.5 h-3.5 text-gray-300" /></li>
-                            <li><Link to="/question-papers/courses" className="hover:text-primary-600 transition-colors">By Course</Link></li>
+                            <li><Link to="/courses" className="hover:text-primary-600 transition-colors">By Course</Link></li>
                             <li><ChevronRight className="w-3.5 h-3.5 text-gray-300" /></li>
                             <li className="font-semibold text-gray-800">BA</li>
                         </ol>

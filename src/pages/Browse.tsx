@@ -480,7 +480,9 @@ const Browse = () => {
                 description={showPreview && selectedPaper
                     ? `${selectedPaper.title}${selectedPaper.college ? ` from ${selectedPaper.college}` : ''}${selectedPaper.semester ? `, ${selectedPaper.semester}` : ''}. Free previous year question paper PDF on Study Volte — preview and download.`
                     : "Find free MBBU and BBMC previous year question papers by subject, course, semester, and college. Preview each PDF before downloading."}
-                keywords="browse question papers, previous year paper PDF, MBBU papers, BBMC papers, semester question papers"
+                keywords={showPreview && selectedPaper
+                    ? `${selectedPaper.title}, ${selectedPaper.subject || ''} question paper, ${selectedPaper.college || ''} previous year question paper, ${selectedPaper.course || ''} ${selectedPaper.semester || ''} question paper pdf download, ${selectedPaper.college || ''} pyq, study volte`
+                    : "browse question papers, previous year paper PDF download, MBBU papers, BBMC papers, semester question papers, college question papers, study volte"}
             />
 
             <section className="site-academic-bg relative overflow-hidden border-b border-slate-800 text-white">

@@ -92,9 +92,9 @@ const CUETQuestionPapers = () => {
     return (
         <>
             <SEOHead
-                title="CUET Previous Year Question Paper | Free PDF Download | Study Volte"
-                description="Download the latest CUET previous year question paper for Domain, Language, and General Test. Get free PDF downloads and help others by uploading your papers on Study Volte."
-                keywords="cuet previous year question paper, cuet paper, cuet question papers, cuet exam paper, cuet domain subject papers, cuet general test previous year paper, free cuet pdf download, study volte cuet"
+                title="CUET Previous Year Question Paper PDF Download | UG 2024 2025 | Study Volte"
+                description="Download the latest CUET UG previous year question paper for Domain, Language, and General Test. Free PDF downloads and answer keys on Study Volte."
+                keywords="cuet previous year question paper, cuet ug previous year question paper with solutions pdf download, cuet question paper 2024, cuet question paper 2025, nta cuet question papers, cuet domain subject papers, cuet general test previous year paper, free cuet pdf download, study volte cuet"
             />
 
             <script type="application/ld+json">

@@ -111,13 +111,58 @@ const Home = () => {
         { question: 'Can I contribute a paper without an account?', answer: 'Guest upload is available with your name and email. Creating an account adds activity history and contributor rewards.' },
     ];
 
+    const homeFaqSchema = {
+        '@context': 'https://schema.org',
+        '@type': 'FAQPage',
+        mainEntity: faqs.map(f => ({
+            '@type': 'Question',
+            name: f.question,
+            acceptedAnswer: {
+                '@type': 'Answer',
+                text: f.answer,
+            },
+        })),
+    };
+
+    const websiteSchema = {
+        '@context': 'https://schema.org',
+        '@type': 'WebSite',
+        name: 'Study Volte',
+        alternateName: ['Study Bult', 'studybult', 'StudyVolte'],
+        url: 'https://study-volte.site',
+        potentialAction: {
+            '@type': 'SearchAction',
+            target: 'https://study-volte.site/browse?search={search_term_string}',
+            'query-input': 'required name=search_term_string',
+        },
+    };
+
+    const eduOrgSchema = {
+        '@context': 'https://schema.org',
+        '@type': 'EducationalOrganization',
+        name: 'Study Volte',
+        url: 'https://study-volte.site',
+        logo: 'https://study-volte.site/logo-optimized.webp',
+        description: 'Free academic platform for downloading previous year question papers, semester exam papers, and university study materials for MBBU, BBMC, BA, BSc, BCom, BCA, CUET and SSC.',
+        sameAs: [
+            'https://www.facebook.com/profile.php?id=61586033282836',
+            'https://x.com/@studybult',
+            'https://www.instagram.com/studybult/',
+            'https://linkedin.com/company/studyvolte',
+            'https://www.youtube.com/@StudyVolte'
+        ]
+    };
+
     return (
         <main className="overflow-x-hidden bg-[#fbfcff] text-[#0b1020]">
             <SEOHead
-                title="Previous Year Question Paper | Download Free PDF | Study Volte"
-                description="Download free previous year question papers, last year papers, and old question papers for all semesters, courses, and universities in India. Real papers uploaded by students on Study Volte."
-                keywords="previous year question paper, last year question paper, question papers, free question papers pdf, college question papers, semester question papers, MBBU, BBMC, study volte"
+                title="Previous Year Question Paper PDF Download | MBBU, BBMC & University Exams | Study Volte"
+                description="Download free previous year question papers (PYQ), last year papers, and semester exams for MBBU, BBMC, Tripura University, BA, BSc, BCom, BCA, CUET & SSC. Fast PDF downloads."
+                keywords="previous year question paper, previous year question paper pdf download, last year question paper, question papers, free question papers pdf, college question papers, semester question papers, mbbu previous year question paper, bbmc question paper, tripura university question paper, ba question papers, bsc question papers, bcom question papers, bca question papers, pyq download, study volte, studybult, study bult"
             />
+            <script type="application/ld+json">{JSON.stringify(homeFaqSchema)}</script>
+            <script type="application/ld+json">{JSON.stringify(websiteSchema)}</script>
+            <script type="application/ld+json">{JSON.stringify(eduOrgSchema)}</script>
             <section className="hero-mesh relative isolate overflow-hidden text-[#0b1020]">
 
                 <div className="academic-dot-grid absolute inset-0 -z-10 opacity-40 [mask-image:linear-gradient(to_bottom,black,transparent_92%)]" aria-hidden="true" />
@@ -128,12 +173,12 @@ const Home = () => {
                             <span className="h-2 w-2 animate-pulse rounded-full bg-emerald-500 ring-4 ring-emerald-100" aria-hidden="true" />
                             Built for MBBU and BBMC students
                         </div>
-                        <h1 className="text-[2.35rem] font-black leading-[0.98] tracking-[-0.05em] text-[#0b1020] min-[360px]:text-[2.65rem] min-[360px]:leading-[0.96] sm:text-6xl lg:text-7xl">
-                            Less searching.
-                            <span className="hero-gradient-text block">More studying.</span>
+                        <h1 className="text-[2.1rem] font-black leading-[1.02] tracking-[-0.04em] text-[#0b1020] min-[360px]:text-[2.4rem] min-[360px]:leading-[1.0] sm:text-5xl lg:text-6xl">
+                            Previous Year Question Papers
+                            <span className="hero-gradient-text block mt-1 text-[1.85rem] sm:text-3xl lg:text-4xl font-extrabold text-primary-600">Free PDF Download for MBBU, BBMC & University Exams</span>
                         </h1>
                         <p className="mt-5 max-w-xl text-base leading-7 text-[#4a5570] sm:mt-7 sm:max-w-2xl sm:text-xl sm:leading-8">
-                            Find previous-year question papers by university, course, semester, and subject—then preview and download the right PDF in seconds.
+                            Less searching. More studying. Find and download previous-year question papers (PYQ) by university, course, semester, and subject—then preview and save the right PDF in seconds.
                         </p>
 
                         <form onSubmit={submitSearch} className="mt-6 min-w-0 max-w-2xl sm:mt-9" role="search">

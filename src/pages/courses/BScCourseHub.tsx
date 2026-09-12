@@ -14,8 +14,8 @@ const breadcrumbSchema = {
     itemListElement: [
         { '@type': 'ListItem', position: 1, name: 'Home', item: SITE },
         { '@type': 'ListItem', position: 2, name: 'Question Papers', item: `${SITE}/question-papers` },
-        { '@type': 'ListItem', position: 3, name: 'By Course', item: `${SITE}/question-papers/courses` },
-        { '@type': 'ListItem', position: 4, name: 'BSc Question Papers', item: `${SITE}/question-papers/courses/bsc` },
+        { '@type': 'ListItem', position: 3, name: 'By Course', item: `${SITE}/courses` },
+        { '@type': 'ListItem', position: 4, name: 'BSc Question Papers', item: `${SITE}/courses/bsc` },
     ],
 };
 
@@ -46,9 +46,9 @@ export default function BScCourseHub() {
     return (
         <>
             <SEOHead
-                title="BSc Previous Year Question Papers | All Semesters Free PDF | Study Volte"
+                title="BSc Previous Year Question Papers PDF Download | All Semesters | Study Volte"
                 description="Download BSc (Bachelor of Science) previous year question papers from MBBU and BBMC. Physics, Chemistry, Maths, Botany, Zoology — all 6 semesters. Free PDF download."
-                keywords="BSc question papers, BSc previous year question paper, Bachelor of Science question papers, BSc semester papers, MBBU BSc papers, BBMC BSc papers, physics question paper, chemistry question paper, mathematics question paper"
+                keywords="BSc question papers, BSc previous year question paper pdf download, BSc 1st sem question paper, BSc 2nd sem question paper, BSc 3rd sem question paper, Bachelor of Science question papers, MBBU BSc papers, BBMC BSc papers, BSc physics question paper, BSc chemistry question paper, BSc mathematics question paper pdf, study volte"
             />
             <script type="application/ld+json">{JSON.stringify(breadcrumbSchema)}</script>
             <script type="application/ld+json">{JSON.stringify(itemListSchema)}</script>
@@ -62,7 +62,7 @@ export default function BScCourseHub() {
                             <li><ChevronRight className="w-3.5 h-3.5 text-gray-300" /></li>
                             <li><Link to="/question-papers" className="hover:text-primary-600 transition-colors">Question Papers</Link></li>
                             <li><ChevronRight className="w-3.5 h-3.5 text-gray-300" /></li>
-                            <li><Link to="/question-papers/courses" className="hover:text-primary-600 transition-colors">By Course</Link></li>
+                            <li><Link to="/courses" className="hover:text-primary-600 transition-colors">By Course</Link></li>
                             <li><ChevronRight className="w-3.5 h-3.5 text-gray-300" /></li>
                             <li className="font-semibold text-gray-800">BSc</li>
                         </ol>

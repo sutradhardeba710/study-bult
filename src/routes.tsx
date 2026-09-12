@@ -29,6 +29,8 @@ const FAQ = lazy(() => import('./pages/FAQ'));
 const CookiePolicy = lazy(() => import('./pages/CookiePolicy'));
 const Copyright = lazy(() => import('./pages/Copyright'));
 const DiagnosticsDashboard = lazy(() => import('./components/DiagnosticsDashboard'));
+const QuestionPapers = lazy(() => import('./pages/QuestionPapers'));
+const PaperDetails = lazy(() => import('./pages/PaperDetails'));
 const MBBUQuestionPapers = lazy(() => import('./pages/universities/MBBUQuestionPapers'));
 const BBMCQuestionPapers = lazy(() => import('./pages/universities/BBMCQuestionPapers'));
 const CollegeCourseSemester = lazy(() => import('./pages/CollegeCourseSemester'));
@@ -82,6 +84,13 @@ const routes = [
             { path: 'copyright', element: <Copyright /> },
             { path: 'help-center', element: <HelpCenter /> },
             { path: 'faq', element: <FAQ /> },
+            { path: 'question-papers', element: <QuestionPapers /> },
+            { path: 'paper/:id', element: <PaperDetails /> },
+            { path: 'paper/:id/:slug', element: <PaperDetails /> },
+            { path: 'question-papers/courses', element: <Navigate to="/courses" replace /> },
+            { path: 'question-papers/courses/:course', element: <Navigate to="/courses" replace /> },
+            { path: 'question-papers/universities/tripura', element: <Navigate to="/universities/tripura" replace /> },
+            { path: 'question-papers/exams', element: <Navigate to="/exams" replace /> },
             { path: 'diagnostics', element: import.meta.env?.DEV ? <DiagnosticsDashboard /> : <Error404 /> },
 
             // ── Cluster A: Universities ──────────────────────────────────────

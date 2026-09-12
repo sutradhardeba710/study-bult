@@ -32,17 +32,25 @@
   <!-- Title, description, keywords, canonical, OG/Twitter are injected per-page by SEOHead (react-helmet-async via vite-react-ssg). -->
 
   <!-- Technical SEO: Geo + Language targeting -->
-  <meta name="geo.region" content="IN" />
+  <meta name="geo.region" content="IN-TR" />
   <meta name="geo.country" content="India" />
+  <meta name="geo.placename" content="Agartala, Tripura, India" />
+  <meta name="geo.position" content="23.8315;91.2868" />
+  <meta name="ICBM" content="23.8315, 91.2868" />
   <meta name="language" content="English" />
   <meta name="content-language" content="en-IN" />
   <meta name="author" content="Study Volte" />
   <meta name="publisher" content="Study Volte" />
   <meta name="category" content="Education" />
-  <meta name="classification" content="Education, Academic Resources" />
-  <meta name="revisit-after" content="3 days" />
+  <meta name="classification" content="Education, Academic Resources, Question Papers" />
+  <meta name="revisit-after" content="1 days" />
   <meta name="referrer" content="origin-when-cross-origin" />
   <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+
+  <!-- Base Search Fallback Meta -->
+  <title>Previous Year Question Paper PDF Download | MBBU, BBMC & University Exams | Study Volte</title>
+  <meta name="description" content="Download free previous year question papers (PYQ) PDF for MBBU, BBMC, Bir Bikram Memorial College Agartala, Maharaja Bir Bikram College, Tripura University, BA, BSc, BCom, BCA. Instant free download." />
+  <meta name="keywords" content="bbmc, mbbu, question papers, previous year question paper, bir bikram memorial college agartala papers, maharaja bir bikram college papers, bbmc question paper, mbbu previous year question paper, previous year question paper pdf download, study volte, studybult" />
 
   <!-- Favicon -->
   <link rel="icon" type="image/png" sizes="32x32" href="/favicon-optimized.png?v=8" fetchpriority="low" />
@@ -110,9 +118,16 @@
       "@context": "https://schema.org",
       "@type": "Organization",
       "name": "Study Volte",
+      "alternateName": ["Study Bult", "studybult", "StudyVolte", "Study Volte Agartala"],
       "url": "https://study-volte.site",
       "logo": "https://study-volte.site/logo-optimized.webp",
-      "description": "Platform for accessing and sharing academic question papers and study materials",
+      "description": "Platform for accessing and downloading BBMC, MBBU, and university previous year question papers and study materials in Agartala, Tripura.",
+      "address": {
+        "@type": "PostalAddress",
+        "addressLocality": "Agartala",
+        "addressRegion": "Tripura",
+        "addressCountry": "IN"
+      },
       "sameAs": [
         "https://www.facebook.com/profile.php?id=61586033282836",
         "https://x.com/@studybult",

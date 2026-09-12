@@ -173,7 +173,7 @@ export default function QuestionPapers() {
             <SEOHead
                 title="Previous Year Question Papers - Free PDF Download | Study Volte"
                 description="Download free previous year question papers, last year question papers and old question papers for all semesters & courses in India. 100% free PDF download. 500+ papers available."
-                keywords="previous year question paper, last year question paper, question papers, question paper, previous year question papers, old question papers, university question papers, semester question papers, free question papers download, question paper pdf, previous year paper pdf download, college question papers, BCA question papers, BSc question papers, BA question papers"
+                keywords="previous year question paper, last year question paper, question papers, question paper, previous year question papers, old question papers, university question papers, semester question papers, bbmc, mbbu, bir bikram memorial college agartala papers, maharaja bir bikram college papers, free question papers download, question paper pdf, previous year paper pdf download, college question papers, BCA question papers, BSc question papers, BA question papers, study volte, studybult"
             />
             <Head>
                 <script type="application/ld+json">{JSON.stringify(s.faq)}</script>

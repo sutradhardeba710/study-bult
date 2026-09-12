@@ -16,9 +16,9 @@ interface SEOHeadProps {
 }
 
 const SEOHead: React.FC<SEOHeadProps> = ({
-    title = 'Previous Year Question Paper | Study Volte - Academic Resource Sharing Platform',
-    description = 'Access and share previous year question papers, study materials, and academic resources from universities and colleges. Download previous year papers, upload notes, and connect with students worldwide.',
-    keywords = 'previous year question paper, question papers, study materials, previous year papers, exam papers, university notes, college resources, academic sharing, study volte',
+    title = 'Previous Year Question Paper PDF Download | All Semesters & Exams | Study Volte',
+    description = 'Free download previous year question papers (PYQ), last year papers, and semester exam papers for MBBU, BBMC, Tripura University, BA, BSc, BCom, BCA, CUET & SSC. Fast PDF downloads.',
+    keywords = 'previous year question paper, previous year question paper pdf, previous year question paper pdf download, last year question paper, question paper download, semester question papers, college question papers, mbbu previous year question paper, bbmc question paper, tripura university question paper, ba question paper, bsc question paper, bcom question paper, bca question paper, pyq download, study volte, studybult, study bult',
     image = 'https://study-volte.site/logo-optimized.webp',
     type = 'website',
     author,

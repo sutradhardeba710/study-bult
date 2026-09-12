@@ -23,11 +23,15 @@ export default function CollegeCourseSemester() {
     const formattedCollege = collegeKey.toUpperCase();
     const formattedCourse = courseKey.toUpperCase();
     const formattedSemester = semesterKey.replace(/-/g, ' ').toUpperCase();
+    const readableSemester = formattedSemester.toLowerCase();
+    const collegeFullName = collegeKey === 'mbbu' ? 'Maharaja Bir Bikram University' : collegeKey === 'bbmc' ? 'Bir Bikram Memorial College' : formattedCollege;
 
     const hub = COLLEGE_HUB[collegeKey];
 
-    const title = `${formattedCollege} ${formattedCourse} ${formattedSemester} Question Papers | Free PDF | Study Volte`;
-    const description = `Download ${formattedCollege} ${formattedCourse} ${formattedSemester} previous year question papers PDF for free. All subjects covered. Prepare better for your ${formattedCollege} ${formattedSemester} exams with Study Volte.`;
+    const title = `${formattedCollege} ${formattedCourse} ${formattedSemester} Question Papers PDF Download | Study Volte`;
+    const description = `Download ${formattedCollege} (${collegeFullName}) ${formattedCourse} ${formattedSemester} previous year question papers PDF for free. All subjects covered. Prepare better for your ${formattedCollege} exams with Study Volte.`;
+
+    const dynamicKeywords = `${formattedCollege} ${formattedCourse} ${readableSemester} question papers, ${formattedCollege} ${formattedCourse} ${readableSemester} previous year question paper pdf download, ${collegeKey} ${courseKey} ${semesterKey} question paper, ${collegeFullName} ${formattedCourse} ${readableSemester} exam papers, ${formattedCollege} ${formattedCourse} semester question papers, ${formattedCollege} PYQ download, study volte`;
 
     const canonicalUrl = `${SITE}/${collegeKey}/${courseKey}/${semesterKey}-question-papers`;
 
@@ -57,9 +61,40 @@ export default function CollegeCourseSemester() {
         })),
     };
 
+    const semesterFaqSchema = {
+        '@context': 'https://schema.org',
+        '@type': 'FAQPage',
+        mainEntity: [
+            {
+                '@type': 'Question',
+                name: `Where can I download ${formattedCollege} ${formattedCourse} ${formattedSemester} question papers in PDF?`,
+                acceptedAnswer: {
+                    '@type': 'Answer',
+                    text: `You can download authentic ${formattedCollege} (${collegeFullName}) ${formattedCourse} ${formattedSemester} previous year question papers in PDF format for free on Study Volte. Preview before downloading.`,
+                },
+            },
+            {
+                '@type': 'Question',
+                name: `Are questions repeated in ${formattedCollege} ${formattedCourse} ${formattedSemester} exams?`,
+                acceptedAnswer: {
+                    '@type': 'Answer',
+                    text: `Yes, exam analysis shows that recurring key concepts, numericals, and core topics frequently repeat in ${formattedCollege} ${formattedSemester} semester exams. Practicing past papers helps you score higher.`,
+                },
+            },
+            {
+                '@type': 'Question',
+                name: `Which subjects are included in ${formattedCollege} ${formattedCourse} ${formattedSemester} papers?`,
+                acceptedAnswer: {
+                    '@type': 'Answer',
+                    text: `All core and elective syllabus subjects for ${formattedCollege} ${formattedCourse} ${formattedSemester} are covered, contributed and verified by students.`,
+                },
+            },
+        ],
+    };
+
     return (
         <>
-            <SEOHead title={title} description={description} />
+            <SEOHead title={title} description={description} keywords={dynamicKeywords} />
 
             {/* BreadcrumbList JSON-LD */}
             <script type="application/ld+json">
@@ -68,6 +103,10 @@ export default function CollegeCourseSemester() {
             {/* Semester ItemList JSON-LD */}
             <script type="application/ld+json">
                 {JSON.stringify(semesterItemListSchema)}
+            </script>
+            {/* FAQ JSON-LD */}
+            <script type="application/ld+json">
+                {JSON.stringify(semesterFaqSchema)}
             </script>
 
             <div className="min-h-screen bg-gray-50">

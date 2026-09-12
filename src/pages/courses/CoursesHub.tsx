@@ -53,9 +53,9 @@ export default function CoursesHub() {
     return (
         <>
             <SEOHead
-                title="Course-Based Question Papers | BA, BSc, BCom, BCA | Free PDF | Study Volte"
+                title="Course-Wise Previous Year Question Papers | BA, BSc, BCom, BCA | Free PDF | Study Volte"
                 description="Download previous year question papers sorted by course — BA, BSc, BCom, BCA. Find papers from MBBU, BBMC and other colleges for all semesters. Free PDF download."
-                keywords="BA question papers, BSc question papers, BCom question papers, BCA question papers, course wise question papers, semester papers by course, undergraduate question papers PDF"
+                keywords="course wise question papers, BA question papers, BSc question papers, BCom question papers, BCA question papers, degree previous year question papers pdf, semester papers by course, undergraduate question papers PDF, study volte"
             />
             <script type="application/ld+json">{JSON.stringify(breadcrumbSchema)}</script>
 

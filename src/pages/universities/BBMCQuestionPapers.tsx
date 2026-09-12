@@ -116,12 +116,26 @@ const BBMCQuestionPapers = () => {
         ]
     };
 
+    const bbmcOrgSchema = {
+        '@context': 'https://schema.org',
+        '@type': 'EducationalOrganization',
+        name: 'Bir Bikram Memorial College',
+        alternateName: ['BBMC', 'BBMC Agartala', 'Bir Bikram Memorial College Agartala'],
+        url: 'https://study-volte.site/universities/tripura/bbmc-question-papers',
+        address: {
+            '@type': 'PostalAddress',
+            addressLocality: 'Agartala',
+            addressRegion: 'Tripura',
+            addressCountry: 'IN',
+        },
+    };
+
     return (
         <>
             <SEOHead
-                title="BBMC Previous Year Question Papers 2025 | All Semesters Free PDF | Study Volte"
-                description="Download Bir Bikram Memorial College (BBMC) previous year question papers for all semesters. Free PDF downloads for BA, BSc, BCom. All 6 semesters, all subjects covered."
-                keywords="bbmc previous year question paper, bbmc, bbmc paper, bbmc question papers, bbmc semester papers, Bir Bikram Memorial College papers, bbmc exam papers PDF, Tripura college question papers"
+                title="BBMC Previous Year Question Papers PDF Download | Bir Bikram Memorial College Agartala | Study Volte"
+                description="Download Bir Bikram Memorial College (BBMC), Agartala previous year question papers for all semesters. Free PDF download for BA, BSc, BCom. All 6 semesters, all subjects covered."
+                keywords="bbmc, bbmc previous year question paper, bir bikram memorial college agartala papers, bir bikram memorial college question paper, bbmc question papers, bbmc question paper 2024 2025, bbmc 1st sem question paper, bbmc 2nd sem question paper, bbmc 3rd sem question paper, bbmc ba question paper, bbmc bsc question paper, bbmc bcom paper, bir bikram memorial college previous years papers, bbmc pyq download, tripura college question papers, study volte"
             />
 
             <script type="application/ld+json">
@@ -130,6 +144,9 @@ const BBMCQuestionPapers = () => {
             {/* ItemList Schema for semester pages */}
             <script type="application/ld+json">
                 {JSON.stringify(itemListSchema)}
+            </script>
+            <script type="application/ld+json">
+                {JSON.stringify(bbmcOrgSchema)}
             </script>
 
             <div className="min-h-screen bg-gray-50">
@@ -142,16 +159,15 @@ const BBMCQuestionPapers = () => {
                                 <span>Trusted by BBMC Students</span>
                             </div>
 
-                            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6">
-                                BBMC
-                                <span className="block mt-2 bg-gradient-to-r from-yellow-200 to-white bg-clip-text text-transparent">
-                                    Previous Year Question Paper
+                            <h1 className="text-3xl sm:text-5xl lg:text-6xl font-extrabold mb-6 leading-tight">
+                                Bir Bikram Memorial College (BBMC), Agartala
+                                <span className="block mt-2 bg-gradient-to-r from-yellow-200 to-white bg-clip-text text-transparent text-2xl sm:text-4xl lg:text-5xl">
+                                    Previous Year Question Papers Free PDF Download
                                 </span>
                             </h1>
 
-                            <p className="text-xl md:text-2xl text-purple-100 mb-8 max-w-3xl mx-auto">
-                                Download Bir Bikram Memorial College previous year papers.
-                                All semesters, all subjects - completely free!
+                            <p className="text-lg md:text-2xl text-purple-100 mb-8 max-w-3xl mx-auto">
+                                Download Bir Bikram Memorial College (BBMC) Agartala previous year question papers. All semesters, all courses (BA, BSc, BCom), all subjects — completely free PDF.
                             </p>
 
                             <div className="flex flex-wrap justify-center gap-8 mt-12">

@@ -122,9 +122,9 @@ const SSCCGLQuestionPapers = () => {
     return (
         <>
             <SEOHead
-                title="SSC CGL Previous Year Question Paper | Free Tier 1 & Tier 2 PDF | Study Volte"
-                description="Download SSC CGL previous year question paper for Tier 1 and Tier 2 absolutely free. Authentic papers from 2019-2024 uploaded by real aspirants. Upload yours & help others crack SSC CGL."
-                keywords="ssc cgl previous year question paper, ssc cgl previous paper pdf, ssc cgl tier 1 previous year paper, ssc cgl tier 2 previous year paper, ssc cgl question paper 2024, ssc cgl question paper 2023, ssc cgl paper download free, ssc combined graduate level previous year paper"
+                title="SSC CGL Previous Year Question Paper PDF Download | Tier 1 & 2 | Study Volte"
+                description="Download SSC CGL previous year question paper for Tier 1 and Tier 2 free PDF. Solved papers from 2019-2025 in Hindi and English on Study Volte."
+                keywords="ssc cgl previous year question paper, ssc cgl previous year question paper pdf download, ssc cgl tier 1 previous year paper, ssc cgl tier 2 previous year paper, ssc cgl question paper 2024, ssc cgl question paper in hindi english, ssc cgl solved papers pdf, ssc pyq download, study volte ssc"
             />
             <script type="application/ld+json">
                 {JSON.stringify(webpageSchema)}

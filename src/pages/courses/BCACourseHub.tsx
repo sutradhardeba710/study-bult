@@ -13,8 +13,8 @@ const breadcrumbSchema = {
     itemListElement: [
         { '@type': 'ListItem', position: 1, name: 'Home', item: SITE },
         { '@type': 'ListItem', position: 2, name: 'Question Papers', item: `${SITE}/question-papers` },
-        { '@type': 'ListItem', position: 3, name: 'By Course', item: `${SITE}/question-papers/courses` },
-        { '@type': 'ListItem', position: 4, name: 'BCA Question Papers', item: `${SITE}/question-papers/courses/bca` },
+        { '@type': 'ListItem', position: 3, name: 'By Course', item: `${SITE}/courses` },
+        { '@type': 'ListItem', position: 4, name: 'BCA Question Papers', item: `${SITE}/courses/bca` },
     ],
 };
 
@@ -43,9 +43,9 @@ export default function BCACourseHub() {
     return (
         <>
             <SEOHead
-                title="BCA Previous Year Question Papers | All Semesters Free PDF | Study Volte"
+                title="BCA Previous Year Question Papers PDF Download | All Semesters | Study Volte"
                 description="Download BCA (Bachelor of Computer Applications) previous year question papers from MBBU. Programming, Data Structures, DBMS, Networking — all 6 semesters free PDF."
-                keywords="BCA question papers, BCA previous year question paper, Bachelor of Computer Applications question papers, BCA semester papers, MBBU BCA papers, programming question paper, data structures question paper, DBMS question paper"
+                keywords="BCA question papers, BCA previous year question paper pdf download, BCA 1st sem question paper, BCA 2nd sem question paper, Bachelor of Computer Applications question papers, MBBU BCA papers, c programming question paper, data structures question paper, DBMS question paper, computer networks paper pdf, study volte"
             />
             <script type="application/ld+json">{JSON.stringify(breadcrumbSchema)}</script>
             <script type="application/ld+json">{JSON.stringify(itemListSchema)}</script>
@@ -59,7 +59,7 @@ export default function BCACourseHub() {
                             <li><ChevronRight className="w-3.5 h-3.5 text-gray-300" /></li>
                             <li><Link to="/question-papers" className="hover:text-primary-600 transition-colors">Question Papers</Link></li>
                             <li><ChevronRight className="w-3.5 h-3.5 text-gray-300" /></li>
-                            <li><Link to="/question-papers/courses" className="hover:text-primary-600 transition-colors">By Course</Link></li>
+                            <li><Link to="/courses" className="hover:text-primary-600 transition-colors">By Course</Link></li>
                             <li><ChevronRight className="w-3.5 h-3.5 text-gray-300" /></li>
                             <li className="font-semibold text-gray-800">BCA</li>
                         </ol>

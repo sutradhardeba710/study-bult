@@ -77,16 +77,16 @@ export default defineConfig({
           { route: '/question-papers', priority: 0.9, changefreq: 'weekly' },
 
           // ── Cluster A: Universities ──────────────────────────────────────
-          { route: '/question-papers/universities/tripura', priority: 0.9, changefreq: 'weekly' },
+          { route: '/universities/tripura', priority: 0.9, changefreq: 'weekly' },
           { route: '/universities/tripura/mbbu-question-papers', priority: 0.9, changefreq: 'weekly' },
           { route: '/universities/tripura/bbmc-question-papers', priority: 0.9, changefreq: 'weekly' },
 
           // ── Cluster B: Courses ───────────────────────────────────────────
-          { route: '/question-papers/courses', priority: 0.8, changefreq: 'weekly' },
-          { route: '/question-papers/courses/ba', priority: 0.8, changefreq: 'weekly' },
-          { route: '/question-papers/courses/bsc', priority: 0.8, changefreq: 'weekly' },
-          { route: '/question-papers/courses/bcom', priority: 0.8, changefreq: 'weekly' },
-          { route: '/question-papers/courses/bca', priority: 0.75, changefreq: 'weekly' },
+          { route: '/courses', priority: 0.8, changefreq: 'weekly' },
+          { route: '/courses/ba', priority: 0.8, changefreq: 'weekly' },
+          { route: '/courses/bsc', priority: 0.8, changefreq: 'weekly' },
+          { route: '/courses/bcom', priority: 0.8, changefreq: 'weekly' },
+          { route: '/courses/bca', priority: 0.75, changefreq: 'weekly' },
 
           // ── Cluster C: Guides ────────────────────────────────────────────
           { route: '/guides', priority: 0.7, changefreq: 'monthly' },
@@ -112,6 +112,7 @@ export default defineConfig({
           { route: '/privacy', priority: 0.4, changefreq: 'yearly' },
           { route: '/terms', priority: 0.4, changefreq: 'yearly' },
           { route: '/copyright', priority: 0.4, changefreq: 'yearly' },
+          { route: '/sitemap', priority: 0.5, changefreq: 'weekly' },
           // Note: /test-meta deliberately excluded from sitemap
         ];
 
@@ -259,6 +260,31 @@ export default defineConfig({
   },
   ssr: {
     noExternal: ['react-helmet-async']
+  },
+  // @ts-expect-error - vite-react-ssg config extension
+  ssgOptions: {
+    script: 'async',
+    formatting: 'minify',
+    includedRoutes(paths: string[]) {
+      const publicPaths = paths.filter(p =>
+        !p.startsWith('/admin') &&
+        !p.startsWith('/dashboard') &&
+        !p.startsWith('/auth') &&
+        p !== '/diagnostics'
+      );
+      const dynamicRoutes: string[] = [];
+      const colleges = ['mbbu', 'bbmc'];
+      const courses = ['bsc', 'ba', 'bcom', 'bca'];
+      const semesters = ['1st-sem', '2nd-sem', '3rd-sem', '4th-sem', '5th-sem', '6th-sem'];
+      colleges.forEach(college => {
+        courses.forEach(course => {
+          semesters.forEach(sem => {
+            dynamicRoutes.push(`/${college}/${course}/${sem}-question-papers`);
+          });
+        });
+      });
+      return [...new Set([...publicPaths, ...dynamicRoutes])];
+    }
   },
   css: {
     devSourcemap: false

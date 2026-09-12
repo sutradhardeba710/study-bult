@@ -1,11 +1,46 @@
+# Study Volte robots.txt — https://study-volte.site
 User-agent: *
 Allow: /
 
-# Disallow admin and API routes
-Disallow: /admin/
-Disallow: /api/
-Disallow: /_next/
-Disallow: /dev/
+# High-value SEO content silos
+Allow: /question-papers
+Allow: /browse
+Allow: /courses/
+Allow: /exams/
+Allow: /guides/
+Allow: /universities/
+Allow: /mbbu/
+Allow: /bbmc/
+Allow: /sitemap
+Allow: /about
+Allow: /faq
+Allow: /help-center
 
-# Sitemap location
+# Disallow private/auth/admin areas
+Disallow: /admin/
+Disallow: /dashboard/
+Disallow: /login
+Disallow: /register
+Disallow: /reset-password
+Disallow: /auth/
+Disallow: /api/
+Disallow: /diagnostics
+
+# Googlebot — full access to crawl all resources
+User-agent: Googlebot
+Allow: /
+Allow: /question-papers
+Allow: /browse
+Allow: /courses/
+Allow: /exams/
+Allow: /guides/
+Allow: /universities/
+Allow: /mbbu/
+Allow: /bbmc/
+
+# Bingbot
+User-agent: Bingbot
+Allow: /
+
+# Sitemap
 Sitemap: https://study-volte.site/sitemap.xml

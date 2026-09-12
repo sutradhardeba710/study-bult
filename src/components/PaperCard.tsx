@@ -26,8 +26,10 @@ interface PaperCardProps {
 const PaperCard = ({ paper, index = 0 }: PaperCardProps) => {
     const [isShareMenuOpen, setIsShareMenuOpen] = useState(false);
 
-    // Create URL for browse page with filters
-    const browseUrl = `/browse?college=${encodeURIComponent(paper.college)}&semester=${encodeURIComponent(paper.semester)}`;
+    // Link directly to dedicated paper page if id is available, fallback to browse
+    const paperUrl = paper.id 
+        ? `/paper/${paper.id}` 
+        : `/browse?college=${encodeURIComponent(paper.college)}&semester=${encodeURIComponent(paper.semester)}`;
 
     // Determine if paper is popular (high downloads or likes)
     const isPopular = (paper.downloadCount || 0) > 50 || (paper.likeCount || 0) > 20;
@@ -56,7 +58,7 @@ const PaperCard = ({ paper, index = 0 }: PaperCardProps) => {
 
     return (
         <Link
-            to={browseUrl}
+            to={paperUrl}
             className="group relative block bg-white rounded-xl shadow-md hover:shadow-2xl transition-all duration-500 overflow-hidden border-2 border-gray-100 hover:border-primary-300 transform hover:-translate-y-2 hover:scale-[1.02]"
             style={{
                 animationDelay: `${index * 0.1}s`,

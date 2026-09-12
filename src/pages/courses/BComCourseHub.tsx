@@ -14,8 +14,8 @@ const breadcrumbSchema = {
     itemListElement: [
         { '@type': 'ListItem', position: 1, name: 'Home', item: SITE },
         { '@type': 'ListItem', position: 2, name: 'Question Papers', item: `${SITE}/question-papers` },
-        { '@type': 'ListItem', position: 3, name: 'By Course', item: `${SITE}/question-papers/courses` },
-        { '@type': 'ListItem', position: 4, name: 'BCom Question Papers', item: `${SITE}/question-papers/courses/bcom` },
+        { '@type': 'ListItem', position: 3, name: 'By Course', item: `${SITE}/courses` },
+        { '@type': 'ListItem', position: 4, name: 'BCom Question Papers', item: `${SITE}/courses/bcom` },
     ],
 };
 
@@ -44,9 +44,9 @@ export default function BComCourseHub() {
     return (
         <>
             <SEOHead
-                title="BCom Previous Year Question Papers | All Semesters Free PDF | Study Volte"
+                title="BCom Previous Year Question Papers PDF Download | All Semesters | Study Volte"
                 description="Download BCom (Bachelor of Commerce) previous year question papers from MBBU and BBMC. Accountancy, Business Studies, Economics, Financial Management — all 6 semesters free PDF."
-                keywords="BCom question papers, BCom previous year question paper, Bachelor of Commerce question papers, BCom semester papers, MBBU BCom papers, BBMC BCom papers, accountancy question paper, business studies question paper"
+                keywords="BCom question papers, BCom previous year question paper pdf download, BCom 1st sem question paper, BCom 2nd sem question paper, Bachelor of Commerce question papers, MBBU BCom papers, BBMC BCom papers, financial accountancy question paper, business studies question paper, corporate accounting question paper, income tax question paper pdf, study volte"
             />
             <script type="application/ld+json">{JSON.stringify(breadcrumbSchema)}</script>
             <script type="application/ld+json">{JSON.stringify(itemListSchema)}</script>
@@ -60,7 +60,7 @@ export default function BComCourseHub() {
                             <li><ChevronRight className="w-3.5 h-3.5 text-gray-300" /></li>
                             <li><Link to="/question-papers" className="hover:text-primary-600 transition-colors">Question Papers</Link></li>
                             <li><ChevronRight className="w-3.5 h-3.5 text-gray-300" /></li>
-                            <li><Link to="/question-papers/courses" className="hover:text-primary-600 transition-colors">By Course</Link></li>
+                            <li><Link to="/courses" className="hover:text-primary-600 transition-colors">By Course</Link></li>
                             <li><ChevronRight className="w-3.5 h-3.5 text-gray-300" /></li>
                             <li className="font-semibold text-gray-800">BCom</li>
                         </ol>

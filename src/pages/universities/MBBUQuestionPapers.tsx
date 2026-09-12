@@ -126,12 +126,26 @@ const MBBUQuestionPapers = () => {
         ]
     };
 
+    const mbbuOrgSchema = {
+        '@context': 'https://schema.org',
+        '@type': 'EducationalOrganization',
+        name: 'Maharaja Bir Bikram University',
+        alternateName: ['MBBU', 'MBB College', 'Maharaja Bir Bikram College', 'MBB University Agartala'],
+        url: 'https://study-volte.site/universities/tripura/mbbu-question-papers',
+        address: {
+            '@type': 'PostalAddress',
+            addressLocality: 'Agartala',
+            addressRegion: 'Tripura',
+            addressCountry: 'IN',
+        },
+    };
+
     return (
         <>
             <SEOHead
-                title="MBBU Previous Year Question Papers 2025 | All Semesters Free PDF | Study Volte"
-                description="Download Maharaja Bir Bikram University (MBBU) previous year question papers for all semesters. Free PDF downloads for BA, BSc, BCom, BCA, MA and all courses. All 6 semesters covered."
-                keywords="mbbu, mbbu paper, mbb college previous year question paper, MBBU question papers, MBBU previous year papers, Maharaja Bir Bikram University papers, MBBU exam papers PDF, Tripura university question papers, MBBU PYQ download"
+                title="MBBU Previous Year Question Papers PDF Download | Maharaja Bir Bikram College Papers | Study Volte"
+                description="Download Maharaja Bir Bikram University (MBBU) and MBB College previous year question papers for all semesters. Free PDF download for BA, BSc, BCom, BCA, MA. All 6 semesters covered."
+                keywords="mbbu, mbbu previous year question paper, maharaja bir bikram college papers, maharaja bir bikram university question paper, mbb college previous year question paper, mbbu question paper 2024 2025, mbbu 1st sem question paper, mbbu 2nd sem question paper, mbbu 3rd sem question paper, mbbu ba question paper, mbbu bsc question paper, mbbu bcom question paper, mbbu bca question paper, mbbu pyq download, tripura university question papers, study volte"
             />
 
             {/* FAQ Schema */}
@@ -141,6 +155,9 @@ const MBBUQuestionPapers = () => {
             {/* ItemList Schema for semester pages */}
             <script type="application/ld+json">
                 {JSON.stringify(itemListSchema)}
+            </script>
+            <script type="application/ld+json">
+                {JSON.stringify(mbbuOrgSchema)}
             </script>
 
             <div className="min-h-screen bg-gray-50">
@@ -153,16 +170,15 @@ const MBBUQuestionPapers = () => {
                                 <span>Tripura's #1 Question Paper Platform</span>
                             </div>
 
-                            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6">
-                                MBB College
-                                <span className="block mt-2 bg-gradient-to-r from-yellow-200 to-white bg-clip-text text-transparent">
-                                    Previous Year Question Paper
+                            <h1 className="text-3xl sm:text-5xl lg:text-6xl font-extrabold mb-6 leading-tight">
+                                Maharaja Bir Bikram College & University (MBBU), Agartala
+                                <span className="block mt-2 bg-gradient-to-r from-yellow-200 to-white bg-clip-text text-transparent text-2xl sm:text-4xl lg:text-5xl">
+                                    Previous Year Question Papers Free PDF Download
                                 </span>
                             </h1>
 
-                            <p className="text-xl md:text-2xl text-primary-100 mb-8 max-w-3xl mx-auto">
-                                Download every MBBU paper and MBB College previous year question paper for free.
-                                All courses, all semesters, all subjects - in PDF format.
+                            <p className="text-lg md:text-2xl text-primary-100 mb-8 max-w-3xl mx-auto">
+                                Download Maharaja Bir Bikram College & MBB University (MBBU) previous year question papers. All courses (BA, BSc, BCom, BCA, MA), all semesters, all subjects — in free PDF format.
                             </p>
 
                             {/* Quick Stats */}
