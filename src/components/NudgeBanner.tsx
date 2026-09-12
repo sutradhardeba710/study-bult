@@ -22,31 +22,31 @@ function getNudge(props: NudgeBannerProps): Nudge | null {
     if (hasPendingPaper) {
         return {
             key: 'pending',
-            message: '⏳ Your paper is under review — hang tight! We\'ll approve it soon.',
-            color: 'bg-blue-50 border-blue-200 text-blue-800',
+            message: 'Your uploaded paper is under review — our team will verify and approve it shortly!',
+            color: 'bg-blue-50/80 border-blue-200 text-blue-900',
         };
     }
     if (totalUploads === 0 && totalDownloads >= 1) {
         return {
             key: 'give_back',
-            message: `📥 You've downloaded ${totalDownloads} paper${totalDownloads > 1 ? 's' : ''}. Give back to the community!`,
-            cta: { label: 'Upload yours →', to: '/dashboard/upload' },
-            color: 'bg-amber-50 border-amber-200 text-amber-800',
+            message: `You've downloaded ${totalDownloads} paper${totalDownloads > 1 ? 's' : ''}. Support fellow students by sharing a paper!`,
+            cta: { label: 'Upload a paper', to: '/dashboard/upload' },
+            color: 'bg-indigo-50/80 border-indigo-200 text-indigo-950',
         };
     }
     if (totalUploads === 0) {
         return {
             key: 'first_upload',
-            message: '🚀 Be the first to upload a paper from your college!',
-            cta: { label: 'Upload now →', to: '/dashboard/upload' },
-            color: 'bg-violet-50 border-violet-200 text-violet-800',
+            message: 'Be the first to upload a question paper from your college and earn XP!',
+            cta: { label: 'Upload now', to: '/dashboard/upload' },
+            color: 'bg-violet-50/80 border-violet-200 text-violet-950',
         };
     }
     if (streak <= 1) {
         return {
             key: 'streak',
-            message: '🔥 Come back tomorrow to start a daily streak and earn bonus XP!',
-            color: 'bg-orange-50 border-orange-200 text-orange-800',
+            message: 'Study daily to build your streak and unlock exclusive contributor badges & bonus XP!',
+            color: 'bg-amber-50/80 border-amber-200 text-amber-950',
         };
     }
     return null;
@@ -77,22 +77,28 @@ export default function NudgeBanner(props: NudgeBannerProps) {
     };
 
     return (
-        <div className={`flex items-center justify-between gap-3 px-4 py-3 rounded-xl border text-sm font-medium ${nudge.color} mb-4`}>
-            <span className="flex-1">{nudge.message}</span>
-            <div className="flex items-center gap-2 shrink-0">
+        <div className={`flex items-center justify-between gap-3 px-4 py-3 sm:px-5 sm:py-3.5 rounded-2xl border text-sm font-medium ${nudge.color} shadow-xs backdrop-blur-sm transition-all`}>
+            <div className="flex items-center gap-2.5 min-w-0">
+                <span className="flex h-2 w-2 relative shrink-0">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary-400 opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-2 w-2 bg-primary-600"></span>
+                </span>
+                <span className="truncate">{nudge.message}</span>
+            </div>
+            <div className="flex items-center gap-3 shrink-0">
                 {nudge.cta && (
                     <Link
                         to={nudge.cta.to}
-                        className="inline-flex items-center gap-1 font-semibold underline underline-offset-2 hover:opacity-70 transition-opacity"
+                        className="inline-flex items-center gap-1.5 rounded-lg bg-white/90 hover:bg-white px-3 py-1 text-xs font-bold text-slate-800 shadow-2xs border border-slate-200/80 transition-all hover:shadow-xs"
                     >
                         {nudge.cta.label}
-                        <ArrowRight className="w-3.5 h-3.5" />
+                        <ArrowRight className="w-3 h-3 text-primary-600" />
                     </Link>
                 )}
                 <button
                     onClick={dismiss}
-                    aria-label="Dismiss"
-                    className="p-1 rounded-full hover:bg-black/10 transition-colors"
+                    aria-label="Dismiss notification"
+                    className="p-1 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-black/5 transition-colors"
                 >
                     <X className="w-4 h-4" />
                 </button>

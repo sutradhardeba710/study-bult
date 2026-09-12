@@ -55,8 +55,8 @@ function SectionIntro({ eyebrow, title, description, align = 'left' }: {
     return (
         <div className={`max-w-2xl ${align === 'center' ? 'sm:mx-auto sm:text-center' : ''}`}>
             <p className="mb-2 text-[11px] font-bold uppercase tracking-[0.18em] text-primary-700 sm:mb-3 sm:text-xs">{eyebrow}</p>
-            <h2 className="text-[2rem] font-extrabold leading-[1.08] tracking-[-0.035em] text-slate-950 sm:text-4xl lg:text-5xl">{title}</h2>
-            <p className="mt-3 text-base leading-7 text-slate-600 sm:mt-4 sm:text-lg">{description}</p>
+            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold leading-tight tracking-tight text-slate-950">{title}</h2>
+            <p className="mt-3 text-base sm:text-lg leading-relaxed text-slate-600">{description}</p>
         </div>
     );
 }
@@ -93,10 +93,10 @@ const Home = () => {
     };
 
     const quickSearches = [
-        { label: 'Political Science', tone: 'border-blue-200 bg-blue-50 text-blue-800 hover:bg-blue-100' },
-        { label: 'Education', tone: 'border-emerald-200 bg-emerald-50 text-emerald-800 hover:bg-emerald-100' },
-        { label: 'English', tone: 'border-amber-200 bg-amber-50 text-amber-800 hover:bg-amber-100' },
-        { label: 'Semester 1', tone: 'border-violet-200 bg-violet-50 text-violet-800 hover:bg-violet-100' },
+        { label: 'Political Science' },
+        { label: 'Education' },
+        { label: 'English' },
+        { label: 'Semester 1' },
     ];
     const workflow = [
         { icon: Search, label: 'Search', detail: 'Use university, course, semester, or subject.' },
@@ -165,81 +165,150 @@ const Home = () => {
             <script type="application/ld+json">{JSON.stringify(eduOrgSchema)}</script>
             <section className="hero-mesh relative isolate overflow-hidden text-[#0b1020]">
 
-                <div className="academic-dot-grid absolute inset-0 -z-10 opacity-40 [mask-image:linear-gradient(to_bottom,black,transparent_92%)]" aria-hidden="true" />
+                <div className="academic-dot-grid absolute inset-0 -z-10 opacity-30 [mask-image:linear-gradient(to_bottom,black,transparent_92%)]" aria-hidden="true" />
 
-                <div className="mx-auto grid max-w-7xl grid-cols-[minmax(0,1fr)] items-center gap-7 px-4 py-8 sm:gap-9 sm:px-6 sm:py-16 lg:min-h-[680px] lg:grid-cols-[1.05fr_0.95fr] lg:gap-16 lg:px-8 lg:py-24">
+                <div className="mx-auto grid max-w-7xl grid-cols-[minmax(0,1fr)] items-center gap-8 px-4 py-8 sm:gap-10 sm:px-6 sm:py-14 lg:min-h-[660px] lg:grid-cols-[1.1fr_0.9fr] lg:gap-14 lg:px-8 lg:py-20">
                     <div className="min-w-0 max-w-3xl">
-                        <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-primary-100 bg-white/80 px-3 py-1.5 text-xs font-bold text-primary-700 shadow-sm backdrop-blur sm:mb-6 sm:text-sm">
-                            <span className="h-2 w-2 animate-pulse rounded-full bg-emerald-500 ring-4 ring-emerald-100" aria-hidden="true" />
-                            Built for MBBU and BBMC students
+                        <div className="mb-4 sm:mb-6 inline-flex items-center gap-2 rounded-full border border-primary-100 bg-primary-50/70 px-3.5 py-1.5 text-xs font-semibold text-primary-800 shadow-2xs backdrop-blur-sm">
+                            <span className="flex h-2 w-2 relative">
+                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                                <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                            </span>
+                            Official Previous Year Papers for MBBU & BBMC
                         </div>
-                        <h1 className="text-[2.1rem] font-black leading-[1.02] tracking-[-0.04em] text-[#0b1020] min-[360px]:text-[2.4rem] min-[360px]:leading-[1.0] sm:text-5xl lg:text-6xl">
+
+                        <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-slate-900 leading-[1.15]">
                             Previous Year Question Papers
-                            <span className="hero-gradient-text block mt-1 text-[1.85rem] sm:text-3xl lg:text-4xl font-extrabold text-primary-600">Free PDF Download for MBBU, BBMC & University Exams</span>
+                            <span className="block mt-2 text-xl sm:text-2xl lg:text-3xl font-bold bg-gradient-to-r from-primary-600 via-indigo-600 to-violet-600 bg-clip-text text-transparent leading-snug">
+                                Free PDF Download for MBBU, BBMC & University Exams
+                            </span>
                         </h1>
-                        <p className="mt-5 max-w-xl text-base leading-7 text-[#4a5570] sm:mt-7 sm:max-w-2xl sm:text-xl sm:leading-8">
-                            Less searching. More studying. Find and download previous-year question papers (PYQ) by university, course, semester, and subject—then preview and save the right PDF in seconds.
+
+                        <p className="mt-4 text-base sm:text-lg text-slate-600 leading-relaxed max-w-xl">
+                            Find and download authentic university question papers by course, semester, and subject. Preview clean scans and save PDFs in seconds—100% free.
                         </p>
 
-                        <form onSubmit={submitSearch} className="mt-6 min-w-0 max-w-2xl sm:mt-9" role="search">
+                        <form onSubmit={submitSearch} className="mt-6 sm:mt-8 min-w-0 max-w-2xl" role="search">
                             <label htmlFor="home-paper-search" className="sr-only">Search question papers</label>
-                            <div className="hero-search-shell grid min-w-0 grid-cols-[minmax(0,1fr)_auto] gap-1.5 rounded-2xl bg-white p-2 min-[360px]:gap-2">
-                                <div className="flex min-h-11 min-w-0 items-center gap-2 px-1.5 min-[360px]:px-2 sm:min-h-12 sm:gap-3 sm:px-3">
+                            <div className="relative flex flex-col sm:flex-row items-stretch sm:items-center rounded-2xl bg-white p-1.5 sm:p-2 border border-slate-200/90 shadow-lg shadow-blue-900/5 focus-within:border-primary-500 focus-within:ring-4 focus-within:ring-primary-100 transition-all gap-2">
+                                <div className="flex min-h-11 min-w-0 flex-1 items-center gap-2 px-2.5">
                                     <Search className="h-5 w-5 shrink-0 text-slate-400" aria-hidden="true" />
-                                    <input id="home-paper-search" value={searchQuery} onChange={(event) => setSearchQuery(event.target.value)} placeholder="Subject or semester" className="min-w-0 flex-1 border-0 bg-transparent text-base text-slate-900 outline-none placeholder:text-slate-400" />
+                                    <input
+                                        id="home-paper-search"
+                                        value={searchQuery}
+                                        onChange={(event) => setSearchQuery(event.target.value)}
+                                        placeholder="Search by subject, semester, or course..."
+                                        className="min-w-0 flex-1 border-0 bg-transparent text-sm sm:text-base text-slate-900 outline-none placeholder:text-slate-400"
+                                    />
                                 </div>
-                                <button type="submit" className="btn-primary cta-shine min-h-11 min-w-11 shrink-0 px-3 text-sm min-[360px]:px-4 sm:min-h-12 sm:px-6 sm:text-base"><span className="min-[360px]:hidden">Go</span><span className="hidden min-[360px]:inline">Search papers</span></button>
+                                <button
+                                    type="submit"
+                                    className="btn-primary cta-shine min-h-11 shrink-0 rounded-xl px-5 sm:px-6 text-sm sm:text-base font-bold shadow-sm"
+                                >
+                                    Search papers
+                                </button>
                             </div>
                         </form>
 
-                        <div className="mt-4 -mx-4 flex min-w-0 max-w-full items-center gap-2 overflow-x-auto px-4 pb-2 text-sm text-[#8a93ad] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:mx-0 sm:mt-5 sm:flex-wrap sm:px-0">
-                            <span className="mr-1 shrink-0 text-[11px] font-bold uppercase tracking-[0.12em] text-primary-700">Popular</span>
+                        <div className="mt-4 flex min-w-0 items-center gap-2 flex-wrap text-xs sm:text-sm">
+                            <span className="text-xs font-bold uppercase tracking-wider text-slate-400">Popular:</span>
                             {quickSearches.map((term) => (
-                                <button key={term.label} type="button" onClick={() => navigate(`/browse?search=${encodeURIComponent(term.label)}`)} className={`min-h-11 shrink-0 rounded-full border px-3 py-2 text-sm font-bold shadow-sm transition duration-150 hover:-translate-y-0.5 ${term.tone}`}>{term.label}</button>
+                                <button
+                                    key={term.label}
+                                    type="button"
+                                    onClick={() => navigate(`/browse?search=${encodeURIComponent(term.label)}`)}
+                                    className="inline-flex items-center rounded-lg border border-slate-200/80 bg-white px-2.5 py-1 text-xs sm:text-sm font-medium text-slate-700 hover:text-primary-600 hover:border-primary-300 hover:bg-primary-50/40 shadow-2xs transition-all active:scale-95"
+                                >
+                                    {term.label}
+                                </button>
                             ))}
                         </div>
                     </div>
 
                     <div className="relative mx-auto min-w-0 w-full max-w-md sm:max-w-lg lg:mx-0" aria-label="Preview of a Study Volte question paper">
-                        <div className="absolute -left-5 top-10 hidden h-[82%] w-full rotate-[-4deg] rounded-[1.75rem] border border-primary-200 bg-primary-100/80 sm:block" aria-hidden="true" />
-                        <div className="absolute -right-4 top-6 hidden h-[88%] w-full rotate-[3deg] rounded-[1.75rem] border border-violet-200 bg-violet-100/80 sm:block" aria-hidden="true" />
-                        <div className="hero-paper-float relative overflow-hidden rounded-2xl border border-white bg-white text-slate-900 shadow-[0_30px_80px_-32px_rgba(59,110,246,.45)] ring-1 ring-[#e6eaf5] sm:rounded-[1.75rem]">
-                            <div className="flex items-center justify-between border-b border-slate-200 px-4 py-3 sm:px-6 sm:py-4">
+                        {/* Decorative layered backdrop cards */}
+                        <div className="absolute -left-4 top-8 hidden h-[84%] w-full rotate-[-3.5deg] rounded-3xl border border-primary-200/70 bg-gradient-to-br from-primary-100/70 to-blue-50/50 shadow-sm sm:block" aria-hidden="true" />
+                        <div className="absolute -right-3 top-5 hidden h-[88%] w-full rotate-[2.5deg] rounded-3xl border border-indigo-200/70 bg-gradient-to-br from-indigo-100/70 to-violet-50/50 shadow-sm sm:block" aria-hidden="true" />
+
+                        {/* Floating verified badge */}
+                        <div className="absolute -top-3.5 -left-2 sm:-left-4 z-20 hidden sm:flex items-center gap-1.5 rounded-full bg-white px-3 py-1.5 text-xs font-bold text-slate-800 shadow-md border border-slate-200/80">
+                            <span className="flex h-2 w-2 rounded-full bg-emerald-500" />
+                            Official 2024 Exam PDF
+                        </div>
+
+                        {/* Floating downloads badge */}
+                        <div className="absolute -bottom-3 -right-2 sm:-right-4 z-20 hidden sm:flex items-center gap-1.5 rounded-full bg-slate-900 px-3.5 py-1.5 text-xs font-bold text-white shadow-lg">
+                            <Download className="w-3.5 h-3.5 text-primary-400" />
+                            1,420+ Downloads
+                        </div>
+
+                        {/* Main Paper Card */}
+                        <div className="hero-paper-float relative overflow-hidden rounded-2xl sm:rounded-3xl border border-slate-200/80 bg-white text-slate-900 shadow-[0_25px_60px_-20px_rgba(30,58,138,0.22)]">
+                            {/* Paper Meta Header */}
+                            <div className="flex items-center justify-between border-b border-slate-100 bg-slate-50/80 px-4 py-3 sm:px-6 sm:py-3.5">
                                 <div className="flex min-w-0 items-center gap-3">
-                                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary-50 text-primary-700"><FileText className="h-5 w-5" /></div>
-                                    <div className="min-w-0"><p className="truncate text-sm font-bold">Political Science</p><p className="truncate text-xs text-slate-500">MBBU · BA · Semester 2</p></div>
-                                </div>
-                                <span className="hidden shrink-0 rounded-md bg-emerald-50 px-2 py-1 text-xs font-bold text-emerald-700 min-[360px]:inline-flex">Verified</span>
-                            </div>
-                            <div className="bg-slate-100 p-3 sm:p-7">
-                                <div className="grid grid-cols-[74px_minmax(0,1fr)] items-center gap-3 min-[360px]:grid-cols-[82px_minmax(0,1fr)] min-[360px]:gap-4 sm:hidden">
-                                    <div className="aspect-[3/4] rounded-lg border border-slate-300 bg-white p-2 shadow-md">
-                                        <p className="text-center text-[6px] font-bold uppercase tracking-wide text-slate-500">MBBU</p>
-                                        <div className="mx-auto my-2 h-px w-8 bg-slate-300" />
-                                        <p className="text-center text-[7px] font-black leading-tight text-slate-900">BA SEMESTER 2</p>
-                                        <div className="mt-3 space-y-1.5">{[86, 70, 92, 63, 78].map((width, index) => <div key={index} className="h-1 rounded-full bg-slate-200" style={{ width: `${width}%` }} />)}</div>
+                                    <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-primary-600 text-white shadow-xs">
+                                        <FileText className="h-4 w-4" />
                                     </div>
                                     <div className="min-w-0">
-                                        <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2 py-1 text-[10px] font-bold text-emerald-700"><CheckCircle className="h-3 w-3" />Verified scan</span>
-                                        <h3 className="mt-3 text-base font-black tracking-tight text-slate-950 min-[360px]:text-lg">BA Semester 2</h3>
-                                        <p className="mt-1 text-sm text-slate-500">Political Science · 2024</p>
-                                        <div className="mt-3 space-y-1.5 text-xs font-semibold text-slate-600"><p className="flex items-center gap-2"><CheckCircle className="h-3.5 w-3.5 text-emerald-600" />Clear scan</p><p className="flex items-center gap-2"><CheckCircle className="h-3.5 w-3.5 text-emerald-600" />Complete pages</p></div>
+                                        <p className="truncate text-sm font-bold text-slate-900">Political Science</p>
+                                        <p className="truncate text-xs text-slate-500">MBBU · BA · Semester 2 (2024)</p>
                                     </div>
                                 </div>
-                                <div className="mx-auto hidden aspect-[3/4] max-w-[290px] rounded-md border border-slate-300 bg-white p-6 shadow-lg sm:block">
-                                    <div className="text-center">
-                                        <p className="text-[10px] font-bold uppercase tracking-widest text-slate-500">Maharaja Bir Bikram University</p>
-                                        <div className="mx-auto my-4 h-px w-20 bg-slate-300" />
-                                        <p className="text-sm font-black text-slate-900">BA SECOND SEMESTER EXAMINATION</p>
-                                        <p className="mt-2 text-xs text-slate-600">Political Science · 2024</p>
+                                <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 border border-emerald-200 px-2.5 py-0.5 text-xs font-bold text-emerald-700">
+                                    <CheckCircle className="h-3 w-3" /> Verified Scan
+                                </span>
+                            </div>
+
+                            {/* Simulated Realistic University Paper Preview */}
+                            <div className="p-4 sm:p-6 bg-slate-50/50">
+                                <div className="rounded-xl border border-slate-200/90 bg-white p-4 sm:p-6 shadow-xs text-slate-800">
+                                    {/* University Header */}
+                                    <div className="text-center border-b border-slate-200 pb-3 sm:pb-4">
+                                        <p className="text-[10px] sm:text-xs font-black tracking-widest text-slate-500 uppercase">Maharaja Bir Bikram University</p>
+                                        <p className="text-[9px] sm:text-[10px] font-medium text-slate-400">Agartala, Tripura · Term End Exam 2024</p>
+                                        <div className="my-2 sm:my-2.5 mx-auto h-px w-16 bg-slate-300" />
+                                        <h4 className="text-xs sm:text-sm font-bold text-slate-900 tracking-tight">B.A. 2ND SEMESTER EXAMINATION</h4>
+                                        <p className="text-[11px] sm:text-xs text-slate-600 mt-0.5 font-medium">Subject: Political Science (Major / Minor)</p>
+                                        <div className="mt-2 flex items-center justify-between text-[10px] text-slate-500 font-semibold px-2">
+                                            <span>Time: 3 Hours</span>
+                                            <span>Full Marks: 80</span>
+                                        </div>
                                     </div>
-                                    <div className="mt-7 space-y-3">{[88, 72, 94, 63, 82, 74].map((width, index) => <div key={index} className="h-2 rounded-full bg-slate-200" style={{ width: `${width}%` }} />)}</div>
-                                    <div className="mt-7 rounded-lg border border-dashed border-primary-200 bg-primary-50 px-3 py-2 text-center text-[10px] font-semibold text-primary-700">Clear scan · Complete pages</div>
+
+                                    {/* Real Exam Content Preview */}
+                                    <div className="pt-3 sm:pt-4 space-y-2.5 text-[11px] sm:text-xs leading-relaxed">
+                                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Group — A</p>
+                                        <p className="text-slate-700">
+                                            <strong className="text-slate-900">1. Answer any four questions:</strong> (4 × 10 = 40)
+                                        </p>
+                                        <div className="space-y-1.5 pl-2 text-slate-600 italic">
+                                            <p>(a) Critically examine Plato&apos;s concept of the Ideal State.</p>
+                                            <p>(b) Discuss Aristotle&apos;s theory of citizenship and government.</p>
+                                            <p className="hidden sm:block">(c) Explain Machiavelli&apos;s advice to rulers in &apos;The Prince&apos;.</p>
+                                        </div>
+                                    </div>
+
+                                    {/* Quality Seal Banner */}
+                                    <div className="mt-4 rounded-lg border border-primary-100 bg-primary-50/70 px-3 py-1.5 text-center text-[10px] font-semibold text-primary-800 flex items-center justify-center gap-1.5">
+                                        <BadgeCheck className="h-3.5 w-3.5 text-primary-600 shrink-0" />
+                                        <span>Complete 4-Page PDF Scan · Crystal Clear Quality</span>
+                                    </div>
                                 </div>
                             </div>
-                            <div className="flex min-w-0 items-center justify-between gap-2 border-t border-slate-200 px-3 py-3 min-[360px]:gap-4 min-[360px]:px-4 sm:px-6 sm:py-4">
-                                <div className="flex min-w-0 items-center gap-1.5 whitespace-nowrap text-[11px] font-medium text-slate-500 min-[360px]:gap-2 min-[360px]:text-xs"><BadgeCheck className="h-4 w-4 text-emerald-600" />Quality checked</div>
-                                <Link to="/browse" className="inline-flex min-h-11 shrink-0 items-center gap-1.5 rounded-lg bg-slate-950 px-3 text-xs font-bold text-white hover:bg-slate-800 min-[360px]:gap-2 sm:px-4 sm:text-sm"><span className="min-[360px]:hidden">Browse</span><span className="hidden min-[360px]:inline">Browse library</span><ArrowRight className="link-arrow h-4 w-4" /></Link>
+
+                            {/* Card Footer */}
+                            <div className="flex items-center justify-between border-t border-slate-100 bg-white px-4 py-3 sm:px-6 sm:py-3.5">
+                                <div className="flex items-center gap-1.5 text-xs font-semibold text-slate-500">
+                                    <CheckCircle className="h-4 w-4 text-emerald-600" />
+                                    <span>Free Download</span>
+                                </div>
+                                <Link
+                                    to="/browse"
+                                    className="inline-flex items-center gap-2 rounded-xl bg-slate-900 hover:bg-slate-800 px-4 py-2 text-xs sm:text-sm font-bold text-white shadow-xs transition-all"
+                                >
+                                    Browse Library <ArrowRight className="h-3.5 w-3.5" />
+                                </Link>
                             </div>
                         </div>
                     </div>

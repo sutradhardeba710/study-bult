@@ -177,29 +177,27 @@ const LandingLoggedIn = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-[#f8faff]">
 
       {/* ── HERO GREETING BANNER ── */}
-      <section className="relative bg-gradient-to-br from-primary-700 via-primary-800 to-indigo-900 text-white overflow-hidden">
-        <div className="absolute inset-0 opacity-10"
-          style={{ backgroundImage: 'radial-gradient(circle, #ffffff 1px, transparent 1px)', backgroundSize: '28px 28px' }} />
-        <div className="absolute -bottom-1 left-0 right-0">
-          <svg viewBox="0 0 1440 60" preserveAspectRatio="none" className="w-full h-10 md:h-14">
-            <path d="M0,30 C360,70 1080,0 1440,40 L1440,60 L0,60 Z" fill="#f9fafb" />
-          </svg>
-        </div>
+      <section className="relative bg-gradient-to-br from-slate-900 via-[#101b38] to-[#0b1226] text-white border-b border-slate-800/80 overflow-hidden">
+        {/* Subtle background glow */}
+        <div className="absolute -right-24 -top-24 w-96 h-96 rounded-full bg-primary-600/15 blur-3xl pointer-events-none" aria-hidden="true" />
+        <div className="absolute -left-20 -bottom-20 w-80 h-80 rounded-full bg-indigo-500/10 blur-3xl pointer-events-none" aria-hidden="true" />
+        <div className="absolute inset-0 opacity-[0.04]"
+          style={{ backgroundImage: 'radial-gradient(circle, #ffffff 1px, transparent 1px)', backgroundSize: '24px 24px' }} />
 
-        <div className="relative max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10 md:py-14">
-          <div className="flex flex-col md:flex-row items-center md:items-start gap-6">
+        <div className="relative max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
+          <div className="flex flex-col sm:flex-row items-center sm:items-start gap-5 sm:gap-6">
             {/* Avatar: Google photo → custom upload → generated gradient initial */}
-            <div className="w-20 h-20 rounded-2xl overflow-hidden shrink-0 shadow-lg border-2 border-white/30">
+            <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl overflow-hidden shrink-0 shadow-xl ring-4 ring-white/10 border border-white/20">
               {avatarUrl
                 ? <img src={avatarUrl} alt={userProfile?.name || 'Avatar'} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
                 : (
-                  <div className="w-full h-full bg-gradient-to-br from-violet-500 via-primary-500 to-indigo-600 flex items-center justify-center">
+                  <div className="w-full h-full bg-gradient-to-tr from-indigo-600 via-primary-600 to-sky-400 flex items-center justify-center">
                     {firstName && firstName !== 'Student'
-                      ? <span className="text-4xl font-black text-white select-none drop-shadow">{firstName[0].toUpperCase()}</span>
-                      : <User className="w-9 h-9 text-white opacity-90" />
+                      ? <span className="text-2xl sm:text-3xl font-black text-white select-none drop-shadow-sm">{firstName[0].toUpperCase()}</span>
+                      : <User className="w-8 h-8 text-white/90" />
                     }
                   </div>
                 )
@@ -207,32 +205,32 @@ const LandingLoggedIn = () => {
             </div>
 
             {/* Greeting text */}
-            <div className="flex-1 text-center md:text-left">
-              <div className="flex items-center gap-2 justify-center md:justify-start mb-1">
-                <Sparkles className="w-5 h-5 text-yellow-300" />
-                <span className="text-primary-200 text-sm font-medium">{getGreeting()}!</span>
+            <div className="flex-1 text-center sm:text-left min-w-0">
+              <div className="inline-flex items-center gap-1.5 rounded-full bg-white/10 border border-white/15 px-3 py-1 text-xs font-semibold text-primary-200 backdrop-blur-md mb-2">
+                <Sparkles className="w-3.5 h-3.5 text-amber-300" />
+                <span>{getGreeting()}!</span>
               </div>
-              <h1 className="text-3xl md:text-4xl font-extrabold mb-2">{firstName} 👋</h1>
-              <p className="text-primary-200 text-sm">
-                {userProfile?.email}
-                {userProfile?.college && <> &nbsp;•&nbsp; {userProfile.college}</>}
-                {userProfile?.course && <> &nbsp;•&nbsp; {userProfile.course}</>}
-                {userProfile?.semester && <> &nbsp;•&nbsp; {userProfile.semester}</>}
+              <h1 className="text-2xl sm:text-3xl lg:text-4xl font-black text-white tracking-tight">{firstName} 👋</h1>
+              <p className="text-slate-300 text-xs sm:text-sm font-medium mt-1 flex flex-wrap items-center justify-center sm:justify-start gap-x-2 gap-y-0.5">
+                <span>{userProfile?.email}</span>
+                {userProfile?.college && <><span>•</span><span>{userProfile.college}</span></>}
+                {userProfile?.course && <><span>•</span><span>{userProfile.course}</span></>}
+                {userProfile?.semester && <><span>•</span><span>{userProfile.semester}</span></>}
               </p>
 
               {/* Streak & XP pills */}
-              <div className="flex items-center gap-2 mt-3 justify-center md:justify-start flex-wrap">
+              <div className="flex items-center gap-2 mt-3.5 justify-center sm:justify-start flex-wrap">
                 {streak > 0 && (
-                  <span className="inline-flex items-center gap-1.5 bg-orange-400/20 border border-orange-300/40 text-orange-100 text-xs font-bold px-3 py-1 rounded-full">
+                  <span className="inline-flex items-center gap-1.5 bg-gradient-to-r from-orange-500/20 to-amber-500/20 border border-orange-400/30 text-orange-200 text-xs font-bold px-3 py-1 rounded-full backdrop-blur-md shadow-2xs">
                     🔥 {streak}-day streak
                   </span>
                 )}
-                <span className="inline-flex items-center gap-1.5 bg-yellow-400/20 border border-yellow-300/40 text-yellow-100 text-xs font-bold px-3 py-1 rounded-full">
-                  <Zap className="w-3 h-3" /> {xp} XP
+                <span className="inline-flex items-center gap-1.5 bg-gradient-to-r from-amber-500/20 to-yellow-500/20 border border-amber-400/30 text-amber-200 text-xs font-bold px-3 py-1 rounded-full backdrop-blur-md shadow-2xs">
+                  <Zap className="w-3.5 h-3.5 text-amber-300" /> {xp} XP
                 </span>
                 {earnedBadges.slice(0, 2).map(b => (
-                  <span key={b.id} className="inline-flex items-center gap-1 bg-white/10 border border-white/20 text-white/90 text-xs font-semibold px-2.5 py-1 rounded-full">
-                    <Trophy className="w-3 h-3" /> {b.label}
+                  <span key={b.id} className="inline-flex items-center gap-1.5 bg-white/10 border border-white/15 text-slate-200 text-xs font-semibold px-3 py-1 rounded-full backdrop-blur-md">
+                    <Trophy className="w-3.5 h-3.5 text-yellow-400" /> {b.label}
                   </span>
                 ))}
               </div>
@@ -240,14 +238,14 @@ const LandingLoggedIn = () => {
 
             {/* Profile link */}
             <Link to="/dashboard/settings"
-              className="shrink-0 flex items-center gap-2 bg-white/10 hover:bg-white/20 border border-white/20 text-white px-4 py-2 rounded-xl text-sm font-semibold transition-all">
-              <User className="w-4 h-4" /> View Profile
+              className="shrink-0 inline-flex items-center gap-2 bg-white/10 hover:bg-white/20 border border-white/15 text-white px-4 py-2.5 rounded-xl text-xs sm:text-sm font-semibold backdrop-blur-md transition-all shadow-xs hover:shadow-sm">
+              <User className="w-4 h-4 text-primary-300" /> View Profile
             </Link>
           </div>
         </div>
       </section>
 
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-10">
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10 space-y-8 sm:space-y-10">
         {/* ── NUDGE BANNER ── */}
         <NudgeBanner
           totalUploads={stats.totalUploads}
@@ -258,18 +256,18 @@ const LandingLoggedIn = () => {
 
         {/* ── PAPER OF THE WEEK ── */}
         {paperOfWeek && (
-          <div className="bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 rounded-2xl p-5 flex items-center gap-5 shadow-sm">
-            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center shrink-0 shadow">
-              <Trophy className="w-6 h-6 text-white" />
+          <div className="bg-gradient-to-r from-amber-500/10 via-orange-500/5 to-transparent border border-amber-200/80 rounded-2xl p-4 sm:p-5 flex items-center gap-4 sm:gap-5 shadow-xs">
+            <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center shrink-0 shadow-sm text-white">
+              <Trophy className="w-5 h-5 sm:w-6 sm:h-6" />
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-xs font-bold text-amber-600 uppercase tracking-wide mb-0.5">📄 Paper of the Week</p>
-              <p className="text-gray-900 font-semibold truncate">{paperOfWeek.title}</p>
-              <p className="text-xs text-gray-500">{paperOfWeek.college} · {paperOfWeek.semester} · {paperOfWeek.downloadCount ?? 0} downloads</p>
+              <p className="text-[11px] font-bold text-amber-700 uppercase tracking-wider mb-0.5">📄 Paper of the Week</p>
+              <p className="text-slate-900 font-bold text-sm sm:text-base truncate">{paperOfWeek.title}</p>
+              <p className="text-xs text-slate-500 mt-0.5">{paperOfWeek.college} · {paperOfWeek.semester} · {paperOfWeek.downloadCount ?? 0} downloads</p>
             </div>
             <Link
               to={`/browse?college=${encodeURIComponent(paperOfWeek.college)}&semester=${encodeURIComponent(paperOfWeek.semester)}`}
-              className="shrink-0 flex items-center gap-1 bg-amber-500 hover:bg-amber-600 text-white text-xs font-bold px-4 py-2 rounded-xl transition-colors"
+              className="shrink-0 inline-flex items-center gap-1 bg-amber-500 hover:bg-amber-600 text-white text-xs font-bold px-3.5 py-2 rounded-xl transition-colors shadow-xs"
             >
               View <ChevronRight className="w-3.5 h-3.5" />
             </Link>
@@ -277,73 +275,105 @@ const LandingLoggedIn = () => {
         )}
 
         {/* ── STATS ── */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6">
           {statCards.map((s) => (
             <Link to={s.link} key={s.label}
-              className="group bg-white rounded-2xl shadow-sm border border-gray-100 p-6 flex items-center gap-5 hover:shadow-lg hover:-translate-y-1 transition-all duration-200">
-              <div className={`w-14 h-14 rounded-xl ${s.bg} flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform`}>
-                <s.icon className={`w-7 h-7 ${s.iconColor}`} />
+              className="group relative overflow-hidden bg-white rounded-2xl shadow-xs border border-slate-200/80 p-5 sm:p-6 hover:shadow-md hover:border-primary-300 hover:-translate-y-0.5 transition-all duration-200">
+              <div className="flex items-center justify-between mb-4">
+                <div className={`w-12 h-12 rounded-xl ${s.bg} flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform`}>
+                  <s.icon className={`w-6 h-6 ${s.iconColor}`} />
+                </div>
+                <ChevronRight className="w-4 h-4 text-slate-300 group-hover:text-primary-600 group-hover:translate-x-0.5 transition-all" />
               </div>
               <div>
-                <div className="text-3xl font-extrabold text-gray-900">{s.value}</div>
-                <div className="text-gray-500 text-sm font-medium">{s.label}</div>
+                <div className="text-3xl sm:text-4xl font-extrabold tracking-tight text-slate-900 tabular-nums">{s.value}</div>
+                <div className="text-slate-500 text-xs sm:text-sm font-medium mt-1">{s.label}</div>
               </div>
             </Link>
           ))}
         </div>
 
         {/* ── SUBJECT COVERAGE ── */}
-        <div className="bg-white rounded-2xl border border-gray-100 p-5 shadow-sm">
-          <div className="flex items-center gap-2 mb-3">
-            <BarChart2 className="w-4 h-4 text-primary-500" />
-            <p className="text-sm font-bold text-gray-700">
-              {userProfile?.college && userProfile?.semester
-                ? `${userProfile.semester} — Subject Coverage at ${userProfile.college}`
-                : 'Subject Coverage'}
-            </p>
+        <div className="bg-white rounded-2xl border border-slate-200/80 p-5 sm:p-6 shadow-xs">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-4 pb-4 border-b border-slate-100">
+            <div className="flex items-center gap-2.5">
+              <div className="w-8 h-8 rounded-lg bg-primary-50 text-primary-600 flex items-center justify-center">
+                <BarChart2 className="w-4 h-4" />
+              </div>
+              <div>
+                <h3 className="text-sm sm:text-base font-bold text-slate-900">
+                  {userProfile?.college && userProfile?.semester
+                    ? `${userProfile.semester} Subject Coverage`
+                    : 'Semester Subject Coverage'}
+                </h3>
+                <p className="text-xs text-slate-500">
+                  {userProfile?.college || 'Set your college in settings'}
+                </p>
+              </div>
+            </div>
+            {userProfile?.college && userProfile?.semester && (
+              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-slate-100 text-slate-700 text-xs font-semibold self-start sm:self-auto">
+                {userProfile.semester}
+              </span>
+            )}
           </div>
 
           {/* Case 1: Profile incomplete */}
           {(!userProfile?.college || !userProfile?.semester) && (
-            <div className="text-sm text-gray-400">
-              📝 Set your <strong>College</strong> and <strong>Semester</strong> in{' '}
-              <a href="/dashboard/settings" className="text-primary-600 underline font-medium">Settings</a>{' '}
-              to see subject coverage for your semester.
+            <div className="rounded-xl bg-slate-50 border border-dashed border-slate-200 p-4 text-sm text-slate-600 flex items-center justify-between gap-4">
+              <span>Select your <strong>College</strong> and <strong>Semester</strong> in profile settings to track syllabus coverage.</span>
+              <Link to="/dashboard/settings" className="shrink-0 text-xs font-bold text-primary-600 hover:text-primary-700 underline">Update →</Link>
             </div>
           )}
 
-          {/* Case 2: Profile set but no papers yet */}
+          {/* Case 2: Profile set but no papers yet (0%) */}
           {userProfile?.college && userProfile?.semester && coveredSubjects.length === 0 && (
-            <p className="text-sm text-gray-400">No approved papers yet for your semester. Be the first to upload! 🚀</p>
+            <div className="rounded-xl bg-gradient-to-r from-primary-50/60 to-indigo-50/60 border border-primary-100 p-4 sm:p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+              <div>
+                <p className="text-sm font-bold text-slate-900">Be the first contributor for {userProfile.semester}!</p>
+                <p className="text-xs text-slate-600 mt-1">No question papers uploaded yet for your semester subjects. Share your papers to earn 50 XP & help classmates.</p>
+              </div>
+              <Link
+                to="/dashboard/upload"
+                className="shrink-0 inline-flex items-center gap-1.5 rounded-xl bg-primary-600 hover:bg-primary-700 px-4 py-2 text-xs font-bold text-white shadow-xs transition-all"
+              >
+                <Upload className="w-3.5 h-3.5" /> Upload First Paper
+              </Link>
+            </div>
           )}
 
-          {/* Case 3: Papers exist — show exact X/Y count */}
+          {/* Case 3: Papers exist */}
           {userProfile?.college && userProfile?.semester && coveredSubjects.length > 0 && (() => {
             const total = subjects.length > 0 ? subjects.length : 12;
             const pct = Math.min(100, Math.round((coveredSubjects.length / total) * 100));
             const remaining = Math.max(0, total - coveredSubjects.length);
             return (
-              <>
-                <p className="text-sm text-gray-500 mb-3">
-                  <span className="font-bold text-primary-600">{coveredSubjects.length}/{total}</span>{' '}
-                  subjects covered
-                  {remaining > 0
-                    ? ` — upload yours to complete it! 🚀`
-                    : ' — 🎉 Full coverage achieved!'}
-                </p>
-                <div className="flex flex-wrap gap-2 mb-3">
-                  {coveredSubjects.map(s => (
-                    <span key={s} className="text-xs bg-primary-50 text-primary-700 border border-primary-100 px-2.5 py-1 rounded-full font-medium">{s}</span>
-                  ))}
+              <div className="space-y-4">
+                <div className="flex items-center justify-between text-sm">
+                  <span className="font-semibold text-slate-700">
+                    <span className="text-primary-600 font-bold">{coveredSubjects.length}</span> of {total} subjects covered
+                  </span>
+                  <span className="text-xs font-bold text-slate-600 bg-slate-100 px-2.5 py-0.5 rounded-md">{pct}% complete</span>
                 </div>
-                <div className="w-full bg-gray-100 rounded-full h-2 overflow-hidden">
+                <div className="w-full bg-slate-100 rounded-full h-2.5 overflow-hidden">
                   <div
-                    className="h-2 bg-gradient-to-r from-primary-500 to-indigo-500 rounded-full transition-all duration-700"
+                    className="h-2.5 bg-gradient-to-r from-primary-500 to-indigo-500 rounded-full transition-all duration-700"
                     style={{ width: `${pct}%` }}
                   />
                 </div>
-                <p className="text-xs text-gray-400 mt-1.5">{pct}% complete</p>
-              </>
+                <div className="flex flex-wrap gap-2 pt-1">
+                  {coveredSubjects.map(s => (
+                    <span key={s} className="inline-flex items-center gap-1 text-xs bg-primary-50 text-primary-700 border border-primary-200/60 px-2.5 py-1 rounded-lg font-medium">
+                      ✓ {s}
+                    </span>
+                  ))}
+                </div>
+                {remaining > 0 && (
+                  <p className="text-xs text-slate-500">
+                    Missing {remaining} subject{remaining > 1 ? 's' : ''} — <Link to="/dashboard/upload" className="text-primary-600 font-semibold hover:underline">upload to complete coverage!</Link>
+                  </p>
+                )}
+              </div>
             );
           })()}
         </div>
