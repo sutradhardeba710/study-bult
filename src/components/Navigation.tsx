@@ -4,9 +4,10 @@ import {
   X, User, Upload, Home, LogOut, Shield, Settings, HelpCircle,
   MessageCircle, FileQuestion, Search, FileText, Landmark,
   GraduationCap, FlaskConical, Briefcase, BookOpen, ChevronDown,
-  ArrowRight, Menu, Sparkles
+  ArrowRight, Menu, Sparkles, Bell, Megaphone
 } from 'lucide-react';
 import { useState, useEffect, useRef } from 'react';
+import SystemNoticeModal from './SystemNoticeModal';
 
 // Rich browse menu — hover, click, outside-click, and Escape support
 function BrowsePapersDropdown({ active = false }: { active?: boolean }) {
@@ -409,9 +410,36 @@ const Navigation = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [scrollProgress, setScrollProgress] = useState(0);
   const [navQuery, setNavQuery] = useState('');
+  const [isNoticeOpen, setIsNoticeOpen] = useState(false);
+  const [hasUnreadNotice, setHasUnreadNotice] = useState(false);
   const navSearchRef = useRef<HTMLInputElement>(null);
   const location = useLocation();
   const navigate = useNavigate();
+
+  // Check notice dismissal status
+  useEffect(() => {
+    try {
+      const dismissedDate = localStorage.getItem('sv_notice_dismissed_today');
+      const today = new Date().toDateString();
+      if (dismissedDate !== today) {
+        setHasUnreadNotice(true);
+      } else {
+        setHasUnreadNotice(false);
+      }
+    } catch {
+      // safe fallback
+    }
+  }, [isNoticeOpen]);
+
+  const handleCloseNoticeToday = () => {
+    try {
+      localStorage.setItem('sv_notice_dismissed_today', new Date().toDateString());
+    } catch {
+      // safe fallback
+    }
+    setHasUnreadNotice(false);
+    setIsNoticeOpen(false);
+  };
 
   useEffect(() => {
     let objectUrlToRevoke: string | null = null;
@@ -600,7 +628,7 @@ const Navigation = () => {
             </nav>
 
             {/* ── Right Action Controls ── */}
-            <div className="hidden items-center gap-3 lg:flex">
+            <div className="hidden items-center gap-2.5 lg:flex">
               {/* Quick Search Shell */}
               <form onSubmit={submitNavSearch} role="search" className="nav-search-shell relative flex h-9 w-[210px] items-center rounded-xl border border-slate-200/80 bg-slate-50/70 px-2.5 transition-all focus-within:w-[260px] focus-within:border-primary-400 focus-within:bg-white focus-within:ring-2 focus-within:ring-primary-500/15">
                 <Search className="h-4 w-4 shrink-0 text-slate-400" aria-hidden="true" />
@@ -617,6 +645,23 @@ const Navigation = () => {
                   Ctrl K
                 </kbd>
               </form>
+
+              {/* System Notices & Updates Bell */}
+              <button
+                type="button"
+                onClick={() => setIsNoticeOpen(true)}
+                className="relative flex h-9 w-9 items-center justify-center rounded-xl border border-slate-200/90 bg-white text-slate-600 transition-all hover:border-slate-300 hover:bg-slate-50 hover:text-slate-900 active:scale-95 shadow-2xs"
+                title="System Notices & Platform Updates"
+                aria-label="System Notices and Platform Updates"
+              >
+                <Bell className="h-4 w-4" />
+                {hasUnreadNotice && (
+                  <span className="absolute -top-0.5 -right-0.5 flex h-2.5 w-2.5">
+                    <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-rose-400 opacity-75" />
+                    <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-rose-500 border-2 border-white ring-1 ring-rose-500/20" />
+                  </span>
+                )}
+              </button>
 
               {/* Upload Paper CTA */}
               <Link
@@ -653,8 +698,22 @@ const Navigation = () => {
               )}
             </div>
 
-            {/* ── Mobile Hamburger & Quick Search ── */}
-            <div className="flex items-center gap-2 lg:hidden">
+            {/* ── Mobile Hamburger, Notice Bell & Quick Search ── */}
+            <div className="flex items-center gap-1.5 lg:hidden">
+              <button
+                type="button"
+                onClick={() => setIsNoticeOpen(true)}
+                className="relative flex h-9 w-9 items-center justify-center rounded-xl border border-slate-200/90 bg-white text-slate-600 transition-colors hover:bg-slate-50 hover:text-slate-900 active:scale-95"
+                aria-label="Platform Updates and Notices"
+              >
+                <Bell className="h-4 w-4" />
+                {hasUnreadNotice && (
+                  <span className="absolute -top-0.5 -right-0.5 flex h-2.5 w-2.5">
+                    <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-rose-400 opacity-75" />
+                    <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-rose-500 border-2 border-white" />
+                  </span>
+                )}
+              </button>
               <Link
                 to="/browse"
                 aria-label="Search question papers"
@@ -771,6 +830,33 @@ const Navigation = () => {
 
         {/* Drawer Scrollable Links */}
         <div className="flex-1 overflow-y-auto px-3 py-3 space-y-4">
+          {/* Quick Notice Trigger */}
+          <div>
+            <button
+              type="button"
+              onClick={() => {
+                setIsMobileMenuOpen(false);
+                setIsNoticeOpen(true);
+              }}
+              className="flex w-full items-center justify-between rounded-xl bg-gradient-to-r from-amber-500/10 via-primary-500/10 to-indigo-500/10 border border-amber-200/70 p-2.5 text-left text-xs font-bold text-slate-800 transition-all hover:bg-amber-100/40 active:scale-98"
+            >
+              <span className="flex items-center gap-2.5">
+                <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-amber-500 text-white shadow-xs">
+                  <Megaphone className="h-4 w-4" />
+                </span>
+                <span className="flex flex-col">
+                  <span className="font-bold text-slate-800">Platform Notices</span>
+                  <span className="text-[11px] font-normal text-slate-500">Updates, Earning &amp; Guidelines</span>
+                </span>
+              </span>
+              {hasUnreadNotice && (
+                <span className="rounded-full bg-rose-500 px-2 py-0.5 text-[10px] font-bold text-white shadow-xs animate-pulse">
+                  NEW
+                </span>
+              )}
+            </button>
+          </div>
+
           <div>
             <p className="px-3 pb-1 text-[10px] font-bold uppercase tracking-wider text-slate-400">Navigation</p>
             <div className="space-y-0.5">
@@ -878,6 +964,13 @@ const Navigation = () => {
           )}
         </div>
       </div>
+
+      {/* ── System Notice Modal ── */}
+      <SystemNoticeModal
+        isOpen={isNoticeOpen}
+        onClose={() => setIsNoticeOpen(false)}
+        onCloseToday={handleCloseNoticeToday}
+      />
     </>
   );
 };
