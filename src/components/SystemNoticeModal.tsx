@@ -193,24 +193,28 @@ export default function SystemNoticeModal({ isOpen, onClose, onCloseToday }: Sys
         {/* ── Top Header Bar: Clean & Minimal ── */}
         <div className="flex items-center justify-between px-5 sm:px-6 py-3.5 border-b border-slate-100 bg-white shrink-0">
           <div className="flex items-center gap-2">
-            <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-emerald-50 text-emerald-600 border border-emerald-200">
-              <IndianRupee className="w-3.5 h-3.5 stroke-[2.5]" />
+            <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-emerald-50 text-emerald-600 border border-emerald-200 shrink-0">
+              {activeTab === 'earning' ? (
+                <IndianRupee className="w-3.5 h-3.5 stroke-[2.5]" />
+              ) : (
+                <Bell className="w-3.5 h-3.5" />
+              )}
             </div>
-            <h2 id="system-notice-title" className="text-base font-black tracking-tight text-slate-900">
-              Student Rewards
+            <h2 id="system-notice-title" className="text-base font-black tracking-tight text-slate-900 min-w-[130px]">
+              {activeTab === 'earning' ? 'Student Rewards' : 'System Notices'}
             </h2>
           </div>
 
           <div className="flex items-center gap-2">
-            {/* Segmented Pill Tabs */}
-            <div className="flex items-center bg-slate-100 p-0.5 rounded-lg border border-slate-200">
+            {/* Symmetrical Segmented Pill Tabs - Zero Layout Shift */}
+            <div className="flex items-center bg-slate-100 p-1 rounded-xl border border-slate-200/80">
               <button
                 type="button"
                 onClick={() => setActiveTab('earning')}
-                className={`flex items-center gap-1.5 px-3 py-1 rounded-md text-xs font-bold transition-all ${
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
                   activeTab === 'earning'
                     ? 'bg-emerald-600 text-white shadow-xs'
-                    : 'text-slate-600 hover:text-slate-900'
+                    : 'text-slate-600 hover:text-slate-900 hover:bg-slate-200/50'
                 }`}
               >
                 <IndianRupee className="w-3 h-3 stroke-[2.5]" />
@@ -220,13 +224,13 @@ export default function SystemNoticeModal({ isOpen, onClose, onCloseToday }: Sys
               <button
                 type="button"
                 onClick={() => setActiveTab('notice')}
-                className={`flex items-center gap-1.5 px-3 py-1 rounded-md text-xs font-bold transition-all ${
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
                   activeTab === 'notice'
-                    ? 'bg-white text-slate-900 border border-slate-200 shadow-2xs'
-                    : 'text-slate-600 hover:text-slate-900'
+                    ? 'bg-emerald-600 text-white shadow-xs'
+                    : 'text-slate-600 hover:text-slate-900 hover:bg-slate-200/50'
                 }`}
               >
-                <Bell className="w-3 h-3 text-primary-600" />
+                <Bell className="w-3 h-3" />
                 <span>Notices</span>
               </button>
             </div>
@@ -235,15 +239,15 @@ export default function SystemNoticeModal({ isOpen, onClose, onCloseToday }: Sys
             <button
               onClick={onClose}
               aria-label="Close Notice"
-              className="p-1 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors ml-0.5"
+              className="p-1.5 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors ml-0.5"
             >
               <X className="w-4 h-4" />
             </button>
           </div>
         </div>
 
-        {/* ── Modal Scrollable Body: Visual First, No Long Paragraphs ── */}
-        <div className="flex-1 overflow-y-auto p-4 sm:p-5 space-y-3.5 font-sans bg-slate-50/40">
+        {/* ── Modal Scrollable Body: Stable min-height prevents jumping ── */}
+        <div className="flex-1 overflow-y-auto p-4 sm:p-5 space-y-3.5 font-sans bg-slate-50/40 min-h-[460px]">
 
           {/* ══════════════════════════════════════════════════════ */}
           {/* ── TAB: EARN REAL RUPEES (VISUAL & HIGH IMPACT) ── */}
