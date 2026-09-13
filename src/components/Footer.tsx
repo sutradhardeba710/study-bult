@@ -8,10 +8,10 @@ import { useEffect, useState, type FormEvent } from 'react';
 
 const universityLinks = [
   { to: '/universities/tripura/mbbu-question-papers', label: 'MBBU Question Papers' },
+  { to: '/universities/tripura/mbbu-ma-question-papers', label: 'MBBU MA Papers', badge: 'PG' },
   { to: '/universities/tripura/bbmc-question-papers', label: 'BBMC Question Papers' },
   { to: '/universities/tripura', label: 'Tripura University Hub' },
   { to: '/browse?search=Tripura', label: 'All Tripura Colleges' },
-  { to: '/browse', label: 'Browse All Universities' },
 ];
 
 const programLinks = [

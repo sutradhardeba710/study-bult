@@ -79,6 +79,9 @@ export default defineConfig({
           // ── Cluster A: Universities ──────────────────────────────────────
           { route: '/universities/tripura', priority: 0.9, changefreq: 'weekly' },
           { route: '/universities/tripura/mbbu-question-papers', priority: 0.9, changefreq: 'weekly' },
+          { route: '/universities/tripura/mbbu-ma-question-papers', priority: 0.9, changefreq: 'weekly' },
+          { route: '/mbbu-university-ma-papers', priority: 0.9, changefreq: 'weekly' },
+          { route: '/mbbu-papers', priority: 0.9, changefreq: 'weekly' },
           { route: '/universities/tripura/bbmc-question-papers', priority: 0.9, changefreq: 'weekly' },
 
           // ── Cluster B: Courses ───────────────────────────────────────────

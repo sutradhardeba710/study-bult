@@ -20,6 +20,8 @@ class ReactViteSitemapGenerator {
         '/universities/tripura',
         '/universities/tripura/bbmc-question-papers',
         '/universities/tripura/mbbu-question-papers',
+        '/universities/tripura/mbbu-ma-question-papers',
+        '/mbbu-university-ma-papers',
         '/courses',
         '/courses/ba',
         '/courses/bsc',

@@ -32,6 +32,7 @@ const DiagnosticsDashboard = lazy(() => import('./components/DiagnosticsDashboar
 const QuestionPapers = lazy(() => import('./pages/QuestionPapers'));
 const PaperDetails = lazy(() => import('./pages/PaperDetails'));
 const MBBUQuestionPapers = lazy(() => import('./pages/universities/MBBUQuestionPapers'));
+const MBBUMAPapers = lazy(() => import('./pages/universities/MBBUMAPapers'));
 const BBMCQuestionPapers = lazy(() => import('./pages/universities/BBMCQuestionPapers'));
 const CollegeCourseSemester = lazy(() => import('./pages/CollegeCourseSemester'));
 const HTMLSitemap = lazy(() => import('./pages/HTMLSitemap'));
@@ -97,7 +98,11 @@ const routes = [
             { path: 'universities/tripura', element: <TripuraHub /> },
             { path: 'universities/tripura/mbbu-question-papers', element: <MBBUQuestionPapers /> },
             { path: 'universities/tripura/bbmc-question-papers', element: <BBMCQuestionPapers /> },
-            { path: 'universities/tripura/mbbu-question-papers/ma', element: <Navigate to="/browse?university=MBBU&course=MA" replace /> },
+            { path: 'universities/tripura/mbbu-question-papers/ma', element: <MBBUMAPapers /> },
+            { path: 'universities/tripura/mbbu-ma-question-papers', element: <MBBUMAPapers /> },
+            { path: 'mbbu-university-ma-papers', element: <MBBUMAPapers /> },
+            { path: 'mbbu-university-ma-papers.html', element: <MBBUMAPapers /> },
+            { path: 'mbbu-papers', element: <MBBUMAPapers /> },
             { path: ':college/:course/:semester-question-papers', element: <CollegeCourseSemester /> },
 
             // ── Cluster C: Courses ───────────────────────────────────────────
