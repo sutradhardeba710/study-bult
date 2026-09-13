@@ -308,6 +308,7 @@ const Browse = () => {
         const requestedCollege = urlParams.get('college') || urlParams.get('university');
         const course = urlParams.get('course');
         const semester = urlParams.get('semester');
+        const subject = urlParams.get('subject');
         setFilters((current) => {
             const next = { ...current };
             if (requestedCollege) {
@@ -317,12 +318,18 @@ const Browse = () => {
                 if (match) next.college = [match];
             }
             if (course) {
-                const match = papers.find((paper) => paper.course?.toLowerCase() === course.toLowerCase())?.course;
-                if (match) next.course = [match];
+                const normCourse = course.toLowerCase().replace(/[\.\s]/g, '');
+                const match = papers.find((paper) => (paper.course || '').toLowerCase().replace(/[\.\s]/g, '') === normCourse)?.course;
+                // Preserve requested course filter so other courses (e.g. B.A) are not shown for MA queries
+                next.course = [match || course];
             }
             if (semester) {
                 const match = papers.find((paper) => paper.semester?.toLowerCase() === semester.toLowerCase())?.semester;
                 if (match) next.semester = [match];
+            }
+            if (subject) {
+                const match = papers.find((paper) => paper.subject?.toLowerCase() === subject.toLowerCase())?.subject;
+                if (match) next.subject = [match];
             }
             return next;
         });
@@ -356,14 +363,34 @@ const Browse = () => {
         const normalizedSearch = searchTerm.trim().toLowerCase();
         if (normalizedSearch) {
             const tokens = normalizedSearch.split(/[^a-z0-9]+/).filter((token) => token.length > 1 && !STOP_WORDS.has(token));
+            const isTokenMatch = (text: string, token: string) => {
+                if (token.length <= 2) {
+                    // For short 2-character tokens like 'ma', 'ba', 'ug', 'pg', enforce word boundaries
+                    // so 'ma' does NOT match 'maharaja' or 'mathematics'
+                    const escaped = token.split('').join('\\.?');
+                    return new RegExp(`\\b${escaped}\\b`, 'i').test(text);
+                }
+                return text.includes(token);
+            };
             const tokenMatches = papers.filter((paper) => {
                 const text = [paper.title, paper.subject, paper.course, paper.semester, paper.college, paper.examType].filter(Boolean).join(' ').toLowerCase();
-                return tokens.length > 0 && tokens.every((token) => text.includes(token));
+                return tokens.length > 0 && tokens.every((token) => isTokenMatch(text, token));
             });
             results = tokenMatches.length ? tokenMatches : fuse.search(normalizedSearch).map((result) => result.item);
         }
         (Object.keys(filters) as FilterKey[]).forEach((key) => {
-            if (filters[key].length) results = results.filter((paper) => filters[key].includes(paper[key]?.trim()));
+            if (filters[key].length) {
+                results = results.filter((paper) => {
+                    const paperVal = paper[key]?.trim();
+                    if (!paperVal) return false;
+                    if (key === 'course') {
+                        // Compare normalized course strings (e.g. 'm.a' == 'ma', 'b.a' == 'ba')
+                        const pNorm = paperVal.toLowerCase().replace(/[\.\s]/g, '');
+                        return filters[key].some((f) => f.toLowerCase().replace(/[\.\s]/g, '') === pNorm);
+                    }
+                    return filters[key].includes(paperVal);
+                });
+            }
         });
         if (sortMode === 'trending') results = [...results].sort((a, b) => (b.downloadCount || 0) - (a.downloadCount || 0));
         if (sortMode === 'newest') results = [...results].sort((a, b) => (asDate(b.createdAt)?.getTime() ?? 0) - (asDate(a.createdAt)?.getTime() ?? 0));

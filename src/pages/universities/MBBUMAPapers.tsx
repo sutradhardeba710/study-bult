@@ -53,23 +53,34 @@ const MBBUMAPapers = () => {
         ...doc.data()
       })) as PaperData[];
 
-      // Filter for MA or master's level papers if labeled, or show recent MBBU papers with MA tag
-      const maFiltered = allPapers.filter(p =>
-        (p.course && p.course.toLowerCase().includes('ma')) ||
-        (p.title && p.title.toLowerCase().includes('ma')) ||
-        (p.subject && p.subject.toLowerCase().includes('master'))
-      );
+      // Strict filter: ONLY Master of Arts (MA) papers, strictly exclude UG courses (B.A, B.Sc, B.Com, BCA)
+      const maFiltered = allPapers.filter((p) => {
+        const courseNorm = (p.course || '').toLowerCase().replace(/[\.\s]/g, '');
+        const titleNorm = (p.title || '').toLowerCase();
 
-      // If specific MA papers count is low, fallback to general MBBU papers so user never sees an empty screen
-      const displayPapers = maFiltered.length > 0 ? maFiltered : allPapers.slice(0, 8);
+        // Strictly exclude undergraduate degrees
+        const isUG = ['ba', 'bsc', 'bcom', 'bca', 'bba', 'bed', 'btech'].includes(courseNorm) ||
+          titleNorm.includes('b.a') || titleNorm.includes('b.sc') || titleNorm.includes('bcom') || titleNorm.includes('bca') ||
+          /\bb\.?a\b/i.test(p.course || '');
+        if (isUG) return false;
 
-      displayPapers.sort((a, b) => {
+        // Must explicitly designate Master of Arts / M.A
+        return (
+          courseNorm === 'ma' ||
+          courseNorm === 'masterofarts' ||
+          /\bm\.?a\b/i.test(p.course || '') ||
+          /\bm\.?a\b/i.test(p.title || '') ||
+          (p.subject && /\bmaster\b/i.test(p.subject))
+        );
+      });
+
+      maFiltered.sort((a, b) => {
         const dateA = (a as any).createdAt?.seconds || 0;
         const dateB = (b as any).createdAt?.seconds || 0;
         return dateB - dateA;
       });
 
-      setPapers(displayPapers);
+      setPapers(maFiltered);
     } catch (error) {
       console.error('Error loading MBBU MA papers:', error);
     } finally {
@@ -305,7 +316,7 @@ const MBBUMAPapers = () => {
                 </p>
                 <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between">
                   <Link
-                    to={`/browse?university=MBBU&search=${encodeURIComponent(sub.name)}`}
+                    to={`/browse?university=MBBU&course=MA&subject=${encodeURIComponent(sub.name.replace('MA ', ''))}`}
                     className="inline-flex items-center gap-1 text-xs font-bold text-primary-600 hover:text-primary-700"
                   >
                     <span>View {sub.code} Papers</span>
@@ -327,7 +338,7 @@ const MBBUMAPapers = () => {
                   Recent MBBU MA Question Papers
                 </h2>
                 <p className="text-xs sm:text-sm text-slate-500 mt-1">
-                  Verified papers uploaded by students &amp; faculty of Maharaja Bir Bikram University.
+                  Verified Master of Arts papers uploaded by students &amp; faculty of Maharaja Bir Bikram University.
                 </p>
               </div>
 
@@ -362,7 +373,7 @@ const MBBUMAPapers = () => {
             {loading ? (
               <div className="flex flex-col items-center justify-center py-16">
                 <div className="animate-spin rounded-full h-8 w-8 border-3 border-primary-200 border-t-primary-600 mb-3"></div>
-                <p className="text-xs text-slate-500">Loading MBBU papers repository...</p>
+                <p className="text-xs text-slate-500">Loading MBBU MA papers repository...</p>
               </div>
             ) : filteredPapers.length > 0 ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
@@ -371,24 +382,31 @@ const MBBUMAPapers = () => {
                 ))}
               </div>
             ) : (
-              <div className="rounded-2xl border border-slate-200 bg-slate-50/50 p-8 text-center max-w-md mx-auto">
-                <BookOpen className="w-8 h-8 text-slate-400 mx-auto mb-2" />
-                <p className="text-sm font-bold text-slate-700">No exact match found in preview</p>
-                <p className="text-xs text-slate-500 mt-1">
-                  Browse the comprehensive catalog or contribute your MBBU MA papers to the community.
+              <div className="rounded-2xl border border-slate-200 bg-gradient-to-br from-slate-50 to-primary-50/20 p-8 sm:p-10 text-center max-w-xl mx-auto shadow-2xs">
+                <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-primary-100 text-primary-600 mx-auto mb-3">
+                  <GraduationCap className="w-6 h-6" />
+                </div>
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-amber-100 text-amber-800 px-3 py-0.5 text-xs font-bold uppercase tracking-wider mb-2">
+                  <Sparkles className="w-3.5 h-3.5" /> Archiving In Progress
+                </span>
+                <h3 className="text-lg font-bold text-slate-900">MBBU MA Papers are Currently Being Collected</h3>
+                <p className="text-xs sm:text-sm text-slate-600 mt-2 leading-relaxed">
+                  We are actively collecting and verifying Master of Arts question papers for MBBU across English, Political Science, History, Bengali, Education, and Economics. Have an MA paper? Upload it and earn reward coins!
                 </p>
-                <div className="mt-4 flex justify-center gap-2">
-                  <Link
-                    to="/browse?university=MBBU"
-                    className="rounded-xl bg-primary-600 px-4 py-2 text-xs font-bold text-white hover:bg-primary-700"
-                  >
-                    Browse All MBBU Papers
-                  </Link>
+                <div className="mt-5 flex flex-col sm:flex-row items-center justify-center gap-3">
                   <Link
                     to="/upload"
-                    className="rounded-xl border border-slate-200 bg-white px-4 py-2 text-xs font-bold text-slate-700 hover:bg-slate-50"
+                    className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-xl bg-primary-600 px-5 py-2.5 text-xs font-bold text-white shadow-sm hover:bg-primary-700 transition-all"
                   >
-                    Upload Paper
+                    <Download className="w-3.5 h-3.5" />
+                    <span>Upload MBBU MA Paper (+50 Coins)</span>
+                  </Link>
+                  <Link
+                    to="/universities/tripura/mbbu-question-papers"
+                    className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-xl border border-slate-300 bg-white px-5 py-2.5 text-xs font-bold text-slate-700 hover:bg-slate-50 transition-all"
+                  >
+                    <span>Browse MBBU Undergraduate (B.A/B.Sc) Papers</span>
+                    <ChevronRight className="w-3.5 h-3.5" />
                   </Link>
                 </div>
               </div>
@@ -425,7 +443,7 @@ const MBBUMAPapers = () => {
                 </div>
 
                 <Link
-                  to={`/browse?university=MBBU&search=${encodeURIComponent(s.title)}`}
+                  to={`/browse?university=MBBU&course=MA&semester=${encodeURIComponent(s.title)}`}
                   className="inline-flex items-center gap-2 rounded-xl bg-slate-900 px-4 py-2 text-xs font-bold text-white hover:bg-slate-800 transition-colors shrink-0"
                 >
                   <Download className="w-3.5 h-3.5" />
@@ -437,7 +455,7 @@ const MBBUMAPapers = () => {
                 {maSubjects.map((sub) => (
                   <Link
                     key={sub.code}
-                    to={`/browse?university=MBBU&search=${encodeURIComponent(`${sub.name} ${s.title}`)}`}
+                    to={`/browse?university=MBBU&course=MA&semester=${encodeURIComponent(s.title)}&subject=${encodeURIComponent(sub.name.replace('MA ', ''))}`}
                     className="flex flex-col items-center justify-center p-3 rounded-xl border border-slate-200/80 bg-slate-50/50 hover:bg-primary-50 hover:border-primary-300 transition-all text-center group"
                   >
                     <span className="text-xs font-bold text-slate-800 group-hover:text-primary-700">
