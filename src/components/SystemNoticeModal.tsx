@@ -178,9 +178,14 @@ export default function SystemNoticeModal({ isOpen, onClose, onCloseToday }: Sys
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-950/65 backdrop-blur-xs animate-in fade-in duration-200">
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-950/65 backdrop-blur-xs sv-notice-backdrop"
+      onClick={(e) => {
+        if (e.target === e.currentTarget) onClose();
+      }}
+    >
       <div
-        className="relative w-full max-w-[620px] bg-white text-slate-800 rounded-3xl border border-slate-200/90 shadow-2xl shadow-slate-950/25 overflow-hidden flex flex-col max-h-[92vh]"
+        className="relative w-full max-w-[620px] bg-white text-slate-800 rounded-3xl border border-slate-200/90 shadow-2xl shadow-slate-950/25 overflow-hidden flex flex-col max-h-[92vh] sv-notice-modal"
         role="dialog"
         aria-modal="true"
         aria-labelledby="system-notice-title"

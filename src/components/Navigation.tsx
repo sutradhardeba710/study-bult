@@ -416,24 +416,59 @@ const Navigation = () => {
   const location = useLocation();
   const navigate = useNavigate();
 
-  // Check notice dismissal status
+  // Auto-show notice on landing unless dismissed today or closed in this session
+  useEffect(() => {
+    let timer: ReturnType<typeof setTimeout> | null = null;
+    try {
+      const dismissedDate = localStorage.getItem('sv_notice_dismissed_today');
+      const today = new Date().toDateString();
+      const closedInSession = sessionStorage.getItem('sv_notice_closed_session');
+
+      if (dismissedDate === today) {
+        setHasUnreadNotice(false);
+      } else {
+        setHasUnreadNotice(true);
+        // Show automatically with smooth entrance animation if not closed in this session
+        if (closedInSession !== 'true') {
+          timer = setTimeout(() => {
+            setIsNoticeOpen(true);
+          }, 700);
+        }
+      }
+    } catch {
+      // safe fallback
+    }
+    return () => {
+      if (timer) clearTimeout(timer);
+    };
+  }, []);
+
+  // Synchronize unread badge with today's dismissal status
   useEffect(() => {
     try {
       const dismissedDate = localStorage.getItem('sv_notice_dismissed_today');
       const today = new Date().toDateString();
-      if (dismissedDate !== today) {
-        setHasUnreadNotice(true);
-      } else {
-        setHasUnreadNotice(false);
-      }
+      setHasUnreadNotice(dismissedDate !== today);
     } catch {
       // safe fallback
     }
   }, [isNoticeOpen]);
 
+  // "Close Notice" closes for this browser session
+  const handleCloseNoticeSession = () => {
+    try {
+      sessionStorage.setItem('sv_notice_closed_session', 'true');
+    } catch {
+      // safe fallback
+    }
+    setIsNoticeOpen(false);
+  };
+
+  // "Close Today" dismisses for the entire calendar day
   const handleCloseNoticeToday = () => {
     try {
       localStorage.setItem('sv_notice_dismissed_today', new Date().toDateString());
+      sessionStorage.setItem('sv_notice_closed_session', 'true');
     } catch {
       // safe fallback
     }
@@ -968,7 +1003,7 @@ const Navigation = () => {
       {/* ── System Notice Modal ── */}
       <SystemNoticeModal
         isOpen={isNoticeOpen}
-        onClose={() => setIsNoticeOpen(false)}
+        onClose={handleCloseNoticeSession}
         onCloseToday={handleCloseNoticeToday}
       />
     </>
