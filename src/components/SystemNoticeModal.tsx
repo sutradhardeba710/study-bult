@@ -3,7 +3,8 @@ import { Link } from 'react-router-dom';
 import {
   Bell, Upload, X, ShieldAlert, Sparkles,
   ArrowRight, CheckCircle2, Trash2, Plus,
-  Wallet, Coins, HelpCircle, ChevronRight, Zap
+  Wallet, Coins, Camera, Tag, Banknote,
+  Flame, GraduationCap, FileText, ExternalLink
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { collection, query, orderBy, onSnapshot, addDoc, deleteDoc, doc, serverTimestamp } from 'firebase/firestore';
@@ -61,7 +62,7 @@ export default function SystemNoticeModal({ isOpen, onClose, onCloseToday }: Sys
   const { userProfile } = useAuth();
   const isAdmin = userProfile?.role === 'admin';
 
-  // Earning & Upload is placed at the top and set as the default view
+  // Default tab is Earning & Upload so students immediately see how to earn cash
   const [activeTab, setActiveTab] = useState<'earning' | 'notice'>('earning');
   const [notices, setNotices] = useState<SystemNoticeItem[]>(DEFAULT_NOTICES);
   const [showAdminAddForm, setShowAdminAddForm] = useState(false);
@@ -160,33 +161,50 @@ export default function SystemNoticeModal({ isOpen, onClose, onCloseToday }: Sys
     }
   };
 
+  const getTagBadgeClass = (tag: string) => {
+    switch (tag) {
+      case 'Important':
+        return 'bg-rose-50 text-rose-700 border-rose-200';
+      case 'Rewards':
+        return 'bg-amber-50 text-amber-800 border-amber-200';
+      case 'Update':
+        return 'bg-blue-50 text-blue-700 border-blue-200';
+      case 'Feature':
+        return 'bg-emerald-50 text-emerald-700 border-emerald-200';
+      default:
+        return 'bg-slate-100 text-slate-700 border-slate-200';
+    }
+  };
+
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-200">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-950/60 backdrop-blur-xs animate-in fade-in duration-200">
       <div
-        className="relative w-full max-w-[640px] bg-[#161922] text-slate-200 rounded-2xl border border-slate-700/70 shadow-2xl shadow-black/90 overflow-hidden flex flex-col max-h-[92vh]"
+        className="relative w-full max-w-[650px] bg-white text-slate-800 rounded-2xl sm:rounded-3xl border border-slate-200/90 shadow-2xl shadow-slate-950/20 overflow-hidden flex flex-col max-h-[92vh]"
         role="dialog"
         aria-modal="true"
         aria-labelledby="system-notice-title"
       >
-        {/* ── Top Header Bar: Clean Sans Title & Segmented Pills (Reference Matching) ── */}
-        <div className="flex items-center justify-between px-5 pt-4 pb-3 border-b border-slate-800 shrink-0 bg-[#161922]">
-          <div className="flex items-center gap-2">
-            <span className="text-base select-none">📢</span>
-            <h2 id="system-notice-title" className="text-base font-bold tracking-normal text-white">
+        {/* ── Top Header Bar: Clean Sans Title & Segmented Tab Switcher (Fresh Light Design) ── */}
+        <div className="flex items-center justify-between px-5 sm:px-6 pt-4 pb-3.5 border-b border-slate-100 bg-white shrink-0">
+          <div className="flex items-center gap-2.5">
+            <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-amber-50 border border-amber-200/80 text-amber-600 shadow-2xs">
+              <Sparkles className="w-4 h-4" />
+            </div>
+            <h2 id="system-notice-title" className="text-base sm:text-lg font-black tracking-tight text-slate-900">
               System Notice
             </h2>
           </div>
 
           <div className="flex items-center gap-2">
-            {/* Segmented Pill Tabs: Earning on the top/first */}
-            <div className="flex items-center bg-[#0e1118] p-0.5 rounded-lg border border-slate-800/90">
+            {/* Segmented Pill Tabs: Light Mode */}
+            <div className="flex items-center bg-slate-100/90 p-1 rounded-xl border border-slate-200/70">
               <button
                 type="button"
                 onClick={() => setActiveTab('earning')}
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-semibold transition-all ${
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
                   activeTab === 'earning'
-                    ? 'bg-gradient-to-r from-amber-500/25 to-yellow-500/25 text-amber-300 border border-amber-500/40 shadow-xs'
-                    : 'text-slate-400 hover:text-slate-200'
+                    ? 'bg-gradient-to-r from-amber-500 to-orange-500 text-white shadow-sm'
+                    : 'text-slate-600 hover:text-slate-900'
                 }`}
               >
                 <span>💰</span>
@@ -196,22 +214,22 @@ export default function SystemNoticeModal({ isOpen, onClose, onCloseToday }: Sys
               <button
                 type="button"
                 onClick={() => setActiveTab('notice')}
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-semibold transition-all ${
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
                   activeTab === 'notice'
-                    ? 'bg-[#2b3345] text-white border border-slate-600/50 shadow-xs'
-                    : 'text-slate-400 hover:text-slate-200'
+                    ? 'bg-white text-slate-900 border border-slate-200/90 shadow-2xs'
+                    : 'text-slate-600 hover:text-slate-900'
                 }`}
               >
-                <Bell className="w-3.5 h-3.5" />
+                <Bell className="w-3.5 h-3.5 text-primary-600" />
                 <span>Notice</span>
               </button>
             </div>
 
-            {/* Close Icon Button */}
+            {/* Close Button */}
             <button
               onClick={onClose}
               aria-label="Close Notice"
-              className="p-1 rounded-md text-slate-400 hover:text-white hover:bg-slate-800 transition-colors ml-0.5"
+              className="p-1.5 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors ml-0.5"
             >
               <X className="w-4 h-4" />
             </button>
@@ -219,45 +237,45 @@ export default function SystemNoticeModal({ isOpen, onClose, onCloseToday }: Sys
         </div>
 
         {/* ── Modal Scrollable Body ── */}
-        <div className="flex-1 overflow-y-auto px-5 py-4 space-y-4 text-xs sm:text-sm text-slate-300 leading-relaxed font-sans">
+        <div className="flex-1 overflow-y-auto px-5 sm:px-6 py-4 space-y-4 text-xs sm:text-sm text-slate-600 leading-relaxed font-sans bg-slate-50/40">
 
           {/* ══════════════════════════════════════════════════════ */}
           {/* ── TAB: EARN BY UPLOADING PAPERS (PRIMARY MOTIVE) ── */}
           {/* ══════════════════════════════════════════════════════ */}
           {activeTab === 'earning' && (
             <div className="space-y-4">
-              {/* High Impact Hero Banner with Glowing Emojis */}
-              <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-amber-500/15 via-primary-600/15 to-emerald-500/10 border border-amber-500/40 p-4 sm:p-5 text-slate-100 shadow-lg shadow-amber-500/5">
+              {/* Vibrant Gold/Amber Hero Banner in Light Mode */}
+              <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-amber-50 via-orange-50/50 to-amber-100/40 border border-amber-200/90 p-4 sm:p-5 text-slate-800 shadow-sm">
                 <div className="flex items-start justify-between gap-3">
                   <div className="space-y-1.5">
-                    <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-amber-400/20 border border-amber-400/30 text-amber-300 text-[11px] font-black uppercase tracking-wider">
-                      <span>🔥</span> Contributor Rewards Live
+                    <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-amber-500/15 border border-amber-500/30 text-amber-900 text-[11px] font-black uppercase tracking-wider">
+                      <span>🔥</span> Contributor Rewards Program
                     </div>
-                    <h3 className="text-base sm:text-lg font-black text-white leading-tight">
-                      💰 Earn ₹ Cash by Uploading Question Papers! 🚀
+                    <h3 className="text-base sm:text-lg font-black text-slate-900 leading-snug">
+                      💰 Earn Real Cash by Uploading Question Papers! 🚀
                     </h3>
-                    <p className="text-xs text-slate-300 leading-relaxed max-w-lg">
-                      Have exam papers from college or university? Snap photos with your phone, upload in 30 seconds, and get rewarded directly to your UPI (GPay, PhonePe, Paytm)!
+                    <p className="text-xs text-slate-600 leading-relaxed max-w-lg">
+                      Have exam question papers from your college or university? Snap photos with your phone, upload in 30 seconds, and get rewarded directly to your UPI (Google Pay, PhonePe, Paytm)!
                     </p>
                   </div>
-                  <div className="hidden sm:flex h-14 w-14 rounded-2xl bg-amber-500/20 border border-amber-500/40 items-center justify-center text-3xl shadow-inner shrink-0">
+                  <div className="hidden sm:flex h-14 w-14 rounded-2xl bg-amber-500/15 border border-amber-300/60 items-center justify-center text-3xl shadow-xs shrink-0">
                     💸
                   </div>
                 </div>
 
-                {/* Big Direct Action Button Right in Hero Banner */}
-                <div className="mt-3.5 pt-3 border-t border-amber-500/20 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
-                  <div className="flex items-center gap-2 text-xs font-semibold text-amber-200">
-                    <span>⚡ Instant Approval</span>
-                    <span className="text-slate-600">•</span>
-                    <span>🪙 +50 to +100 Coins/Paper</span>
-                    <span className="text-slate-600">•</span>
-                    <span>📲 UPI Cashout</span>
+                {/* Hero Quick Highlights & Fast CTA */}
+                <div className="mt-3.5 pt-3 border-t border-amber-200/70 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
+                  <div className="flex flex-wrap items-center gap-2 text-xs font-bold text-amber-900">
+                    <span className="flex items-center gap-1">⚡ Instant 24h Approval</span>
+                    <span className="text-amber-300">•</span>
+                    <span className="flex items-center gap-1">🪙 +50 to +100 Coins/Paper</span>
+                    <span className="text-amber-300">•</span>
+                    <span className="flex items-center gap-1">📲 Direct UPI Cashout</span>
                   </div>
                   <Link
                     to="/upload"
                     onClick={onClose}
-                    className="inline-flex items-center justify-center gap-2 px-4 py-2 bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-400 hover:to-yellow-400 text-slate-950 font-black text-xs rounded-xl shadow-md shadow-amber-500/20 transition-transform active:scale-95 shrink-0"
+                    className="inline-flex items-center justify-center gap-2 px-4 py-2 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white font-extrabold text-xs rounded-xl shadow-sm hover:shadow-md shadow-amber-500/20 transition-all active:scale-95 shrink-0"
                   >
                     <span>📤 Upload Paper Now</span>
                     <ArrowRight className="w-3.5 h-3.5 stroke-[3]" />
@@ -265,123 +283,146 @@ export default function SystemNoticeModal({ isOpen, onClose, onCloseToday }: Sys
                 </div>
               </div>
 
-              {/* 3 Step Visual Earning Guide */}
+              {/* 3 Step Visual Earning Guide in Light Mode */}
               <div>
-                <p className="text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-2.5 flex items-center gap-1.5">
+                <p className="text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-2.5 flex items-center gap-1.5">
                   <span>🎯</span> How to Upload &amp; Earn in 3 Easy Steps
                 </p>
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
                   {/* Step 1 */}
-                  <div className="p-3 bg-[#11141c] border border-slate-800 hover:border-slate-700 rounded-xl space-y-1.5 transition-colors">
+                  <div className="p-3.5 bg-white border border-slate-200/90 rounded-2xl space-y-2 shadow-2xs hover:border-blue-300 transition-colors">
                     <div className="flex items-center justify-between">
-                      <span className="text-xl">📸</span>
-                      <span className="text-[10px] font-extrabold px-1.5 py-0.5 rounded bg-blue-500/20 text-blue-400">STEP 1</span>
+                      <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-blue-50 text-blue-600 border border-blue-100">
+                        <Camera className="w-4 h-4" />
+                      </div>
+                      <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 border border-blue-200/60">
+                        STEP 1
+                      </span>
                     </div>
-                    <h4 className="text-xs font-bold text-white">Snap or Pick PDF</h4>
-                    <p className="text-[11px] text-slate-400 leading-relaxed">
-                      Take clear photos of your exam paper or select a PDF from your phone or PC.
-                    </p>
+                    <div>
+                      <h4 className="text-xs font-bold text-slate-900">Snap or Pick PDF</h4>
+                      <p className="text-[11px] text-slate-500 mt-0.5 leading-relaxed">
+                        Take clear photos of your exam paper or select a PDF from your phone or PC.
+                      </p>
+                    </div>
                   </div>
 
                   {/* Step 2 */}
-                  <div className="p-3 bg-[#11141c] border border-slate-800 hover:border-slate-700 rounded-xl space-y-1.5 transition-colors">
+                  <div className="p-3.5 bg-white border border-slate-200/90 rounded-2xl space-y-2 shadow-2xs hover:border-amber-300 transition-colors">
                     <div className="flex items-center justify-between">
-                      <span className="text-xl">🏷️</span>
-                      <span className="text-[10px] font-extrabold px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-400">STEP 2</span>
+                      <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-amber-50 text-amber-600 border border-amber-100">
+                        <Tag className="w-4 h-4" />
+                      </div>
+                      <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-amber-50 text-amber-700 border border-amber-200/60">
+                        STEP 2
+                      </span>
                     </div>
-                    <h4 className="text-xs font-bold text-white">Select Course &amp; Sem</h4>
-                    <p className="text-[11px] text-slate-400 leading-relaxed">
-                      Pick University (MBBU/TU), Subject, Semester &amp; Year. Takes only 30 seconds!
-                    </p>
+                    <div>
+                      <h4 className="text-xs font-bold text-slate-900">Choose Course &amp; Sem</h4>
+                      <p className="text-[11px] text-slate-500 mt-0.5 leading-relaxed">
+                        Select University (MBBU/TU), Subject, Semester &amp; Year in 30 seconds!
+                      </p>
+                    </div>
                   </div>
 
                   {/* Step 3 */}
-                  <div className="p-3 bg-[#11141c] border border-slate-800 hover:border-slate-700 rounded-xl space-y-1.5 transition-colors">
+                  <div className="p-3.5 bg-white border border-slate-200/90 rounded-2xl space-y-2 shadow-2xs hover:border-emerald-300 transition-colors">
                     <div className="flex items-center justify-between">
-                      <span className="text-xl">💵</span>
-                      <span className="text-[10px] font-extrabold px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-400">STEP 3</span>
+                      <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600 border border-emerald-100">
+                        <Banknote className="w-4 h-4" />
+                      </div>
+                      <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200/60">
+                        STEP 3
+                      </span>
                     </div>
-                    <h4 className="text-xs font-bold text-white">Get Paid to UPI</h4>
-                    <p className="text-[11px] text-slate-400 leading-relaxed">
-                      Earn coins automatically on approval. Cash out to GPay, PhonePe or Amazon!
-                    </p>
+                    <div>
+                      <h4 className="text-xs font-bold text-slate-900">Get Paid to UPI</h4>
+                      <p className="text-[11px] text-slate-500 mt-0.5 leading-relaxed">
+                        Earn coins automatically on approval. Cash out to GPay, PhonePe or Amazon!
+                      </p>
+                    </div>
                   </div>
                 </div>
               </div>
 
-              {/* Coin Value & Earning Table with Rich Emojis */}
-              <div className="p-3.5 bg-[#11141c] border border-slate-800 rounded-xl space-y-2.5">
+              {/* Reward Coin Valuation Grid */}
+              <div className="p-4 bg-white border border-slate-200/90 rounded-2xl space-y-2.5 shadow-2xs">
                 <div className="flex items-center justify-between">
-                  <p className="text-xs font-bold text-white flex items-center gap-1.5">
-                    <span>🪙</span> Reward Coin Valuation Chart
+                  <p className="text-xs font-bold text-slate-900 flex items-center gap-1.5">
+                    <Coins className="w-4 h-4 text-amber-500" />
+                    <span>Reward Coin Valuation Breakdown</span>
                   </p>
-                  <span className="text-[11px] text-amber-400 font-semibold">100 Coins = Real Cash Transfer</span>
+                  <span className="text-[11px] font-semibold text-amber-700 bg-amber-50 px-2 py-0.5 rounded-md border border-amber-200/60">
+                    100 Coins = Real Cash
+                  </span>
                 </div>
+
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
-                  <div className="p-2.5 bg-[#181c26] border border-slate-800/80 rounded-lg text-center space-y-0.5">
-                    <div className="text-base">📄</div>
-                    <span className="block text-[11px] text-slate-400">UG Semester</span>
-                    <span className="block font-black text-amber-400 text-xs">+50 Coins</span>
+                  <div className="p-2.5 bg-slate-50/90 border border-slate-200/70 rounded-xl text-center space-y-0.5">
+                    <FileText className="w-4 h-4 text-primary-600 mx-auto" />
+                    <span className="block text-[11px] font-medium text-slate-500">UG Semester</span>
+                    <span className="block font-black text-amber-600 text-xs">+50 Coins</span>
                   </div>
 
-                  <div className="p-2.5 bg-[#181c26] border border-slate-800/80 rounded-lg text-center space-y-0.5">
-                    <div className="text-base">🎓</div>
-                    <span className="block text-[11px] text-slate-400">PG / MA / MSc</span>
-                    <span className="block font-black text-amber-400 text-xs">+100 Coins</span>
+                  <div className="p-2.5 bg-slate-50/90 border border-slate-200/70 rounded-xl text-center space-y-0.5">
+                    <GraduationCap className="w-4 h-4 text-indigo-600 mx-auto" />
+                    <span className="block text-[11px] font-medium text-slate-500">PG / MA / MSc</span>
+                    <span className="block font-black text-amber-600 text-xs">+100 Coins</span>
                   </div>
 
-                  <div className="p-2.5 bg-[#181c26] border border-slate-800/80 rounded-lg text-center space-y-0.5">
-                    <div className="text-base">🔥</div>
-                    <span className="block text-[11px] text-slate-400">Daily Streak</span>
-                    <span className="block font-black text-primary-400 text-xs">+10 Coins</span>
+                  <div className="p-2.5 bg-slate-50/90 border border-slate-200/70 rounded-xl text-center space-y-0.5">
+                    <Flame className="w-4 h-4 text-orange-500 mx-auto" />
+                    <span className="block text-[11px] font-medium text-slate-500">Daily Streak</span>
+                    <span className="block font-black text-primary-600 text-xs">+10 Coins</span>
                   </div>
 
-                  <div className="p-2.5 bg-[#181c26] border border-slate-800/80 rounded-lg text-center space-y-0.5">
-                    <div className="text-base">🏦</div>
-                    <span className="block text-[11px] text-slate-400">Payout Mode</span>
-                    <span className="block font-black text-emerald-400 text-xs">UPI / GPay</span>
+                  <div className="p-2.5 bg-slate-50/90 border border-slate-200/70 rounded-xl text-center space-y-0.5">
+                    <Wallet className="w-4 h-4 text-emerald-600 mx-auto" />
+                    <span className="block text-[11px] font-medium text-slate-500">Payout Mode</span>
+                    <span className="block font-black text-emerald-600 text-xs">UPI / GPay</span>
                   </div>
                 </div>
               </div>
 
-              {/* What Papers Can You Upload? */}
-              <div className="p-3 bg-[#11141c] border border-slate-800 rounded-xl space-y-2">
-                <p className="text-[11px] font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
-                  <span>📥</span> Accepted Question Papers
+              {/* What Papers Can You Upload? Checklist */}
+              <div className="p-3.5 bg-white border border-slate-200/90 rounded-2xl space-y-2 shadow-2xs">
+                <p className="text-[11px] font-bold uppercase tracking-wider text-slate-500 flex items-center gap-1.5">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                  <span>Accepted Question Papers</span>
                 </p>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5 text-xs text-slate-300">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs text-slate-700">
                   <div className="flex items-center gap-2">
-                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                    <span className="flex h-4 w-4 items-center justify-center rounded-full bg-emerald-100 text-emerald-700 text-[10px] font-bold">✓</span>
                     <span>MBBU Semester Exams (BA, BSc, BCom, BCA)</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                    <span className="flex h-4 w-4 items-center justify-center rounded-full bg-emerald-100 text-emerald-700 text-[10px] font-bold">✓</span>
                     <span>Tripura University (General &amp; Honors)</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                    <span className="flex h-4 w-4 items-center justify-center rounded-full bg-emerald-100 text-emerald-700 text-[10px] font-bold">✓</span>
                     <span>Master's Degrees (MA, MSc, MCom)</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
-                    <span>Mid-term / Internal / Practical Question Papers</span>
+                    <span className="flex h-4 w-4 items-center justify-center rounded-full bg-emerald-100 text-emerald-700 text-[10px] font-bold">✓</span>
+                    <span>Mid-term / Internal / Practical Exam Papers</span>
                   </div>
                 </div>
               </div>
 
-              {/* High-Converting Main Upload CTA Banner */}
+              {/* HIGH-CONVERTING MAIN UPLOAD CTA BUTTON */}
               <div className="pt-1">
                 <Link
                   to="/upload"
                   onClick={onClose}
-                  className="w-full group flex items-center justify-center gap-3 py-3 px-5 bg-gradient-to-r from-primary-600 via-indigo-600 to-primary-600 hover:from-primary-500 hover:to-indigo-500 text-white font-extrabold text-sm rounded-xl shadow-xl shadow-primary-600/30 transition-all active:scale-98"
+                  className="w-full group flex items-center justify-center gap-3 py-3.5 px-5 bg-gradient-to-r from-primary-600 via-indigo-600 to-primary-600 hover:from-primary-700 hover:to-indigo-700 text-white font-extrabold text-sm rounded-2xl shadow-lg shadow-primary-500/25 transition-all active:scale-98"
                 >
-                  <span className="text-base group-hover:scale-110 transition-transform">📤</span>
+                  <Upload className="w-4 h-4 transition-transform group-hover:-translate-y-0.5" />
                   <span>Click Here to Load &amp; Upload Question Paper</span>
                   <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
                 </Link>
-                <p className="text-center text-[10px] text-slate-500 mt-1.5">
-                  Supported formats: PDF, JPEG, PNG (up to 25MB) • No complicated sign-up needed
+                <p className="text-center text-[11px] text-slate-500 mt-2 font-medium">
+                  ⚡ Takes under 1 minute • Mobile photos accepted • Earn coins immediately on approval
                 </p>
               </div>
             </div>
@@ -393,18 +434,18 @@ export default function SystemNoticeModal({ isOpen, onClose, onCloseToday }: Sys
           {activeTab === 'notice' && (
             <div className="space-y-4">
               {/* Pinned Earning Reminder Banner at Top of Notice Tab */}
-              <div className="p-3 bg-gradient-to-r from-amber-500/15 to-yellow-500/10 border border-amber-500/30 rounded-xl flex items-center justify-between gap-3">
+              <div className="p-3.5 bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200/90 rounded-2xl flex items-center justify-between gap-3 shadow-2xs">
                 <div className="flex items-center gap-2.5">
                   <span className="text-xl select-none">💰</span>
                   <div>
-                    <h4 className="text-xs font-bold text-white">Have Question Papers? Earn Cash via UPI!</h4>
-                    <p className="text-[11px] text-slate-300">Earn +50 to +100 Coins for every paper you upload.</p>
+                    <h4 className="text-xs font-bold text-slate-900">Have Question Papers? Earn Cash via UPI!</h4>
+                    <p className="text-[11px] text-slate-600">Earn +50 to +100 Coins for every paper you upload.</p>
                   </div>
                 </div>
                 <button
                   type="button"
                   onClick={() => setActiveTab('earning')}
-                  className="px-3 py-1 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs rounded-lg shrink-0 transition-colors shadow-xs"
+                  className="px-3 py-1.5 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white font-bold text-xs rounded-xl shrink-0 transition-all shadow-xs"
                 >
                   See How 🚀
                 </button>
@@ -412,14 +453,14 @@ export default function SystemNoticeModal({ isOpen, onClose, onCloseToday }: Sys
 
               {/* Admin Notice Manager Toggle */}
               {isAdmin && (
-                <div className="p-3 bg-[#202534] border border-amber-500/40 rounded-xl text-xs">
+                <div className="p-3.5 bg-amber-50/70 border border-amber-200/90 rounded-2xl text-xs">
                   <div className="flex items-center justify-between">
-                    <span className="text-amber-300 font-bold flex items-center gap-1.5">
-                      <ShieldAlert className="w-3.5 h-3.5" /> Admin Notice Publisher
+                    <span className="text-amber-900 font-bold flex items-center gap-1.5">
+                      <ShieldAlert className="w-4 h-4 text-amber-700" /> Admin Notice Publisher
                     </span>
                     <button
                       onClick={() => setShowAdminAddForm(!showAdminAddForm)}
-                      className="px-2.5 py-1 text-[11px] font-bold bg-amber-600 hover:bg-amber-500 text-white rounded-md transition-colors"
+                      className="px-2.5 py-1 text-[11px] font-bold bg-amber-600 hover:bg-amber-700 text-white rounded-lg transition-colors shadow-2xs"
                     >
                       <Plus className="w-3 h-3 inline mr-1" />
                       {showAdminAddForm ? 'Cancel' : 'Post New Notice'}
@@ -427,33 +468,33 @@ export default function SystemNoticeModal({ isOpen, onClose, onCloseToday }: Sys
                   </div>
 
                   {showAdminAddForm && (
-                    <form onSubmit={handleCreateNotice} className="mt-3 pt-3 border-t border-slate-700/70 space-y-2.5 text-slate-200">
+                    <form onSubmit={handleCreateNotice} className="mt-3 pt-3 border-t border-amber-200/60 space-y-2.5 text-slate-700">
                       <div>
-                        <label className="block text-[11px] font-semibold text-slate-300 mb-1">Title</label>
+                        <label className="block text-[11px] font-bold text-slate-800 mb-1">Title</label>
                         <input
                           value={newTitle}
                           onChange={(e) => setNewTitle(e.target.value)}
                           placeholder="e.g. 2025 MBBU Semester Papers Added"
-                          className="w-full px-3 py-1.5 bg-[#0f121a] border border-slate-700 rounded-lg text-xs text-white placeholder:text-slate-500 outline-none focus:border-primary-500"
+                          className="w-full px-3 py-1.5 bg-white border border-slate-200 rounded-xl text-xs text-slate-900 placeholder:text-slate-400 outline-none focus:border-primary-500 focus:ring-1 focus:ring-primary-500"
                         />
                       </div>
                       <div>
-                        <label className="block text-[11px] font-semibold text-slate-300 mb-1">Content</label>
+                        <label className="block text-[11px] font-bold text-slate-800 mb-1">Content</label>
                         <textarea
                           value={newContent}
                           onChange={(e) => setNewContent(e.target.value)}
                           rows={3}
                           placeholder="Write announcement details..."
-                          className="w-full px-3 py-1.5 bg-[#0f121a] border border-slate-700 rounded-lg text-xs text-white placeholder:text-slate-500 outline-none focus:border-primary-500 resize-none"
+                          className="w-full px-3 py-1.5 bg-white border border-slate-200 rounded-xl text-xs text-slate-900 placeholder:text-slate-400 outline-none focus:border-primary-500 focus:ring-1 focus:ring-primary-500 resize-none"
                         />
                       </div>
                       <div className="grid grid-cols-2 gap-2">
                         <div>
-                          <label className="block text-[11px] font-semibold text-slate-300 mb-1">Category Tag</label>
+                          <label className="block text-[11px] font-bold text-slate-800 mb-1">Category Tag</label>
                           <select
                             value={newTag}
                             onChange={(e) => setNewTag(e.target.value as any)}
-                            className="w-full px-2.5 py-1.5 bg-[#0f121a] border border-slate-700 rounded-lg text-xs text-white outline-none"
+                            className="w-full px-2.5 py-1.5 bg-white border border-slate-200 rounded-xl text-xs text-slate-900 outline-none"
                           >
                             <option value="Notice">Notice</option>
                             <option value="Update">Update</option>
@@ -463,19 +504,19 @@ export default function SystemNoticeModal({ isOpen, onClose, onCloseToday }: Sys
                           </select>
                         </div>
                         <div>
-                          <label className="block text-[11px] font-semibold text-slate-300 mb-1">Action Link (Optional)</label>
+                          <label className="block text-[11px] font-bold text-slate-800 mb-1">Action Link (Optional)</label>
                           <input
                             value={newLink}
                             onChange={(e) => setNewLink(e.target.value)}
                             placeholder="/upload or /browse"
-                            className="w-full px-3 py-1.5 bg-[#0f121a] border border-slate-700 rounded-lg text-xs text-white placeholder:text-slate-500 outline-none"
+                            className="w-full px-3 py-1.5 bg-white border border-slate-200 rounded-xl text-xs text-slate-900 placeholder:text-slate-400 outline-none"
                           />
                         </div>
                       </div>
                       <button
                         type="submit"
                         disabled={submitting}
-                        className="w-full py-1.5 bg-primary-600 hover:bg-primary-500 text-white rounded-lg text-xs font-bold disabled:opacity-50 transition-colors"
+                        className="w-full py-2 bg-primary-600 hover:bg-primary-700 text-white rounded-xl text-xs font-bold disabled:opacity-50 transition-colors shadow-xs"
                       >
                         {submitting ? 'Publishing...' : 'Publish Notice to All Users'}
                       </button>
@@ -484,29 +525,34 @@ export default function SystemNoticeModal({ isOpen, onClose, onCloseToday }: Sys
                 </div>
               )}
 
-              {/* List of Notices matching the reference format */}
-              <div className="space-y-4">
+              {/* List of Notices */}
+              <div className="space-y-3">
                 {notices.map((item, index) => (
-                  <div key={item.id || index} className="space-y-1.5">
+                  <div key={item.id || index} className="p-4 bg-white border border-slate-200/90 rounded-2xl space-y-1.5 shadow-2xs">
                     <div className="flex items-start justify-between gap-2">
                       <div className="flex items-center gap-2">
                         <span className="text-base select-none">📢</span>
-                        <h3 className="text-sm font-bold text-white tracking-wide">
-                          {index + 1}. {item.title}
+                        <h3 className="text-sm font-bold text-slate-900 tracking-tight">
+                          {item.title}
                         </h3>
                       </div>
-                      {isAdmin && (
-                        <button
-                          onClick={() => handleDeleteNotice(item.id)}
-                          className="p-1 text-slate-500 hover:text-rose-400 rounded-md transition-colors shrink-0"
-                          title="Delete notice"
-                        >
-                          <Trash2 className="w-3.5 h-3.5" />
-                        </button>
-                      )}
+                      <div className="flex items-center gap-1.5 shrink-0">
+                        <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold border ${getTagBadgeClass(item.tag)}`}>
+                          {item.tag}
+                        </span>
+                        {isAdmin && (
+                          <button
+                            onClick={() => handleDeleteNotice(item.id)}
+                            className="p-1 text-slate-400 hover:text-rose-600 rounded-md transition-colors"
+                            title="Delete notice"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        )}
+                      </div>
                     </div>
 
-                    <p className="text-xs text-slate-300 pl-6 leading-relaxed">
+                    <p className="text-xs text-slate-600 pl-6 leading-relaxed">
                       {item.content}
                     </p>
 
@@ -515,16 +561,12 @@ export default function SystemNoticeModal({ isOpen, onClose, onCloseToday }: Sys
                         <Link
                           to={item.link}
                           onClick={onClose}
-                          className="inline-flex items-center gap-1.5 text-xs font-semibold text-primary-400 hover:text-primary-300 hover:underline transition-colors"
+                          className="inline-flex items-center gap-1.5 text-xs font-bold text-primary-600 hover:text-primary-700 hover:underline transition-colors"
                         >
                           <span>{item.linkText || 'Learn more'}</span>
                           <ArrowRight className="w-3 h-3" />
                         </Link>
                       </div>
-                    )}
-
-                    {index < notices.length - 1 && (
-                      <hr className="border-slate-800 my-3" />
                     )}
                   </div>
                 ))}
@@ -533,12 +575,12 @@ export default function SystemNoticeModal({ isOpen, onClose, onCloseToday }: Sys
           )}
         </div>
 
-        {/* ── Modal Bottom Bar: Two Dark Pill Buttons on Right (Exact Match to Screenshot) ── */}
-        <div className="flex items-center justify-end gap-2.5 px-5 py-3 border-t border-slate-800 bg-[#12151d] shrink-0">
+        {/* ── Modal Bottom Bar: Light Mode Pill Buttons ── */}
+        <div className="flex items-center justify-end gap-2.5 px-5 sm:px-6 py-3.5 border-t border-slate-100 bg-white shrink-0">
           <button
             type="button"
             onClick={handleCloseToday}
-            className="px-4 py-1.5 bg-[#2b3345] hover:bg-[#374156] text-slate-300 hover:text-white rounded-lg text-xs font-semibold transition-colors shadow-2xs"
+            className="px-4 py-2 bg-slate-100 hover:bg-slate-200/80 text-slate-700 rounded-xl text-xs font-bold transition-colors"
           >
             Close Today
           </button>
@@ -546,7 +588,7 @@ export default function SystemNoticeModal({ isOpen, onClose, onCloseToday }: Sys
           <button
             type="button"
             onClick={onClose}
-            className="px-4 py-1.5 bg-[#2b3345] hover:bg-[#374156] text-slate-300 hover:text-white rounded-lg text-xs font-semibold transition-colors shadow-2xs"
+            className="px-5 py-2 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-xs font-bold transition-colors shadow-xs active:scale-98"
           >
             Close Notice
           </button>
