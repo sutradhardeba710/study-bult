@@ -1053,23 +1053,21 @@ body {
 @keyframes svNoticeModalSlideDown {
   0% {
     opacity: 0;
-    transform: translateY(-70px) scale(0.96);
-  }
-  65% {
-    opacity: 1;
-    transform: translateY(6px) scale(1.008);
+    transform: translateY(-40px);
   }
   100% {
     opacity: 1;
-    transform: translateY(0) scale(1);
+    transform: none;
   }
 }
 
 .sv-notice-backdrop {
-  animation: svNoticeBackdropFade 0.28s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation: svNoticeBackdropFade 0.25s ease-out forwards;
 }
 
 .sv-notice-modal {
-  animation: svNoticeModalSlideDown 0.42s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-  will-change: transform, opacity;
+  animation: svNoticeModalSlideDown 0.32s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
 }

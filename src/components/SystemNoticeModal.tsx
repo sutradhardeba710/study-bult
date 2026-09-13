@@ -179,7 +179,7 @@ export default function SystemNoticeModal({ isOpen, onClose, onCloseToday }: Sys
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-950/65 backdrop-blur-xs sv-notice-backdrop"
+      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-950/70 sv-notice-backdrop"
       onClick={(e) => {
         if (e.target === e.currentTarget) onClose();
       }}
