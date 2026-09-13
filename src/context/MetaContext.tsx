@@ -100,6 +100,7 @@ export const MetaProvider = ({ children }: { children: ReactNode }) => {
         colleges: filteredColleges,
         examTypes: filteredExamTypes
       }));
+      localStorage.setItem('metaValues_timestamp', Date.now().toString());
     } catch (error) {
       console.error("Error fetching meta:", error);
     } finally {
@@ -108,8 +109,28 @@ export const MetaProvider = ({ children }: { children: ReactNode }) => {
   }, [filterItems]);
 
   useEffect(() => {
-    fetchMeta();
-  }, [fetchMeta]); // Re-fetch when user changes via fetchMeta dependency
+    const cached = localStorage.getItem('metaValues');
+    const cachedTime = localStorage.getItem('metaValues_timestamp');
+    const now = Date.now();
+    const isFresh = cached && cachedTime && (now - Number(cachedTime) < 1000 * 60 * 60); // 1 hour
+
+    // If cached and fresh, avoid firing 5 Firestore network requests on page mount
+    if (isFresh) {
+      return;
+    }
+
+    // Defer fetch to browser idle time so it never competes with initial paint (LCP/FCP)
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    if (typeof requestIdleCallback !== 'undefined') {
+      const idleId = requestIdleCallback(() => fetchMeta(), { timeout: 4000 });
+      return () => cancelIdleCallback(idleId);
+    } else {
+      timer = setTimeout(() => fetchMeta(), 2000);
+      return () => {
+        if (timer) clearTimeout(timer);
+      };
+    }
+  }, [fetchMeta]);
 
   return (
     <MetaContext.Provider value={{ subjects, courses, semesters, colleges, examTypes, loading, refreshMeta: fetchMeta }}>

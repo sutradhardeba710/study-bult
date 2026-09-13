@@ -62,9 +62,16 @@
   <!-- Google AdSense site verification -->
   <meta name="google-adsense-account" content="ca-pub-7371660234749132" />
 
-  <!-- Google AdSense loader -->
-  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7371660234749132"
-    crossorigin="anonymous"></script>
+  <!-- Google AdSense loader (deferred to window load to eliminate render and main-thread blocking) -->
+  <script>
+    window.addEventListener('load', function() {
+      var s = document.createElement('script');
+      s.src = "https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7371660234749132";
+      s.async = true;
+      s.crossOrigin = "anonymous";
+      document.head.appendChild(s);
+    });
+  </script>
 
   <!-- Google tag (gtag.js) -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=AW-17991393501"></script>

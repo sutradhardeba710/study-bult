@@ -76,8 +76,9 @@ export default function SystemNoticeModal({ isOpen, onClose, onCloseToday }: Sys
   const [newLinkText, setNewLinkText] = useState('');
   const [submitting, setSubmitting] = useState(false);
 
-  // Real-time listener for notices from Firestore
+  // Real-time listener for notices from Firestore — only active while modal is open
   useEffect(() => {
+    if (!isOpen) return;
     try {
       const q = query(collection(db, 'system_notices'), orderBy('createdAt', 'desc'));
       const unsub = onSnapshot(
@@ -102,7 +103,7 @@ export default function SystemNoticeModal({ isOpen, onClose, onCloseToday }: Sys
     } catch (e) {
       console.warn('Notice listener initialization failed:', e);
     }
-  }, []);
+  }, [isOpen]);
 
   if (!isOpen) return null;
 
