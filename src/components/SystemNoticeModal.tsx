@@ -2,8 +2,8 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import {
   Bell, Upload, X, ShieldAlert, Sparkles,
-  ArrowRight, CheckCircle2, Trash2, Plus, ExternalLink,
-  Wallet, Coins, HelpCircle
+  ArrowRight, CheckCircle2, Trash2, Plus,
+  Wallet, Coins, HelpCircle, ChevronRight, Zap
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { collection, query, orderBy, onSnapshot, addDoc, deleteDoc, doc, serverTimestamp } from 'firebase/firestore';
@@ -61,7 +61,8 @@ export default function SystemNoticeModal({ isOpen, onClose, onCloseToday }: Sys
   const { userProfile } = useAuth();
   const isAdmin = userProfile?.role === 'admin';
 
-  const [activeTab, setActiveTab] = useState<'notice' | 'earning'>('notice');
+  // Earning & Upload is placed at the top and set as the default view
+  const [activeTab, setActiveTab] = useState<'earning' | 'notice'>('earning');
   const [notices, setNotices] = useState<SystemNoticeItem[]>(DEFAULT_NOTICES);
   const [showAdminAddForm, setShowAdminAddForm] = useState(false);
 
@@ -160,54 +161,57 @@ export default function SystemNoticeModal({ isOpen, onClose, onCloseToday }: Sys
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/75 backdrop-blur-sm animate-in fade-in duration-200">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-200">
       <div
-        className="relative w-full max-w-[620px] bg-[#1a1d26] text-slate-200 rounded-2xl border border-slate-700/70 shadow-2xl shadow-black/80 overflow-hidden flex flex-col max-h-[90vh]"
+        className="relative w-full max-w-[640px] bg-[#161922] text-slate-200 rounded-2xl border border-slate-700/70 shadow-2xl shadow-black/90 overflow-hidden flex flex-col max-h-[92vh]"
         role="dialog"
         aria-modal="true"
         aria-labelledby="system-notice-title"
       >
-        {/* ── Modal Header: Title on left, segmented pill tabs & close on right (Matching Reference Image) ── */}
-        <div className="flex items-center justify-between px-5 pt-4 pb-3 border-b border-slate-800/80 shrink-0">
-          <h2 id="system-notice-title" className="text-base font-bold tracking-normal text-white">
-            System Notice
-          </h2>
+        {/* ── Top Header Bar: Clean Sans Title & Segmented Pills (Reference Matching) ── */}
+        <div className="flex items-center justify-between px-5 pt-4 pb-3 border-b border-slate-800 shrink-0 bg-[#161922]">
+          <div className="flex items-center gap-2">
+            <span className="text-base select-none">📢</span>
+            <h2 id="system-notice-title" className="text-base font-bold tracking-normal text-white">
+              System Notice
+            </h2>
+          </div>
 
           <div className="flex items-center gap-2">
-            {/* Segmented Pill Tabs */}
-            <div className="flex items-center bg-[#13161f] p-0.5 rounded-lg border border-slate-800">
+            {/* Segmented Pill Tabs: Earning on the top/first */}
+            <div className="flex items-center bg-[#0e1118] p-0.5 rounded-lg border border-slate-800/90">
+              <button
+                type="button"
+                onClick={() => setActiveTab('earning')}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-semibold transition-all ${
+                  activeTab === 'earning'
+                    ? 'bg-gradient-to-r from-amber-500/25 to-yellow-500/25 text-amber-300 border border-amber-500/40 shadow-xs'
+                    : 'text-slate-400 hover:text-slate-200'
+                }`}
+              >
+                <span>💰</span>
+                <span>Earn &amp; Upload</span>
+              </button>
+
               <button
                 type="button"
                 onClick={() => setActiveTab('notice')}
-                className={`flex items-center gap-1.5 px-3 py-1 rounded-md text-xs font-medium transition-all ${
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-semibold transition-all ${
                   activeTab === 'notice'
-                    ? 'bg-[#2b3345] text-white shadow-xs font-semibold'
+                    ? 'bg-[#2b3345] text-white border border-slate-600/50 shadow-xs'
                     : 'text-slate-400 hover:text-slate-200'
                 }`}
               >
                 <Bell className="w-3.5 h-3.5" />
                 <span>Notice</span>
               </button>
-
-              <button
-                type="button"
-                onClick={() => setActiveTab('earning')}
-                className={`flex items-center gap-1.5 px-3 py-1 rounded-md text-xs font-medium transition-all ${
-                  activeTab === 'earning'
-                    ? 'bg-[#2b3345] text-white shadow-xs font-semibold'
-                    : 'text-slate-400 hover:text-slate-200'
-                }`}
-              >
-                <Coins className="w-3.5 h-3.5 text-amber-400" />
-                <span>Earn &amp; Upload</span>
-              </button>
             </div>
 
-            {/* Close Cross Button */}
+            {/* Close Icon Button */}
             <button
               onClick={onClose}
               aria-label="Close Notice"
-              className="p-1 rounded-md text-slate-400 hover:text-white hover:bg-slate-800/80 transition-colors ml-1"
+              className="p-1 rounded-md text-slate-400 hover:text-white hover:bg-slate-800 transition-colors ml-0.5"
             >
               <X className="w-4 h-4" />
             </button>
@@ -216,12 +220,199 @@ export default function SystemNoticeModal({ isOpen, onClose, onCloseToday }: Sys
 
         {/* ── Modal Scrollable Body ── */}
         <div className="flex-1 overflow-y-auto px-5 py-4 space-y-4 text-xs sm:text-sm text-slate-300 leading-relaxed font-sans">
-          {/* TAB 1: SYSTEM NOTICES & ANNOUNCEMENTS */}
+
+          {/* ══════════════════════════════════════════════════════ */}
+          {/* ── TAB: EARN BY UPLOADING PAPERS (PRIMARY MOTIVE) ── */}
+          {/* ══════════════════════════════════════════════════════ */}
+          {activeTab === 'earning' && (
+            <div className="space-y-4">
+              {/* High Impact Hero Banner with Glowing Emojis */}
+              <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-amber-500/15 via-primary-600/15 to-emerald-500/10 border border-amber-500/40 p-4 sm:p-5 text-slate-100 shadow-lg shadow-amber-500/5">
+                <div className="flex items-start justify-between gap-3">
+                  <div className="space-y-1.5">
+                    <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-amber-400/20 border border-amber-400/30 text-amber-300 text-[11px] font-black uppercase tracking-wider">
+                      <span>🔥</span> Contributor Rewards Live
+                    </div>
+                    <h3 className="text-base sm:text-lg font-black text-white leading-tight">
+                      💰 Earn ₹ Cash by Uploading Question Papers! 🚀
+                    </h3>
+                    <p className="text-xs text-slate-300 leading-relaxed max-w-lg">
+                      Have exam papers from college or university? Snap photos with your phone, upload in 30 seconds, and get rewarded directly to your UPI (GPay, PhonePe, Paytm)!
+                    </p>
+                  </div>
+                  <div className="hidden sm:flex h-14 w-14 rounded-2xl bg-amber-500/20 border border-amber-500/40 items-center justify-center text-3xl shadow-inner shrink-0">
+                    💸
+                  </div>
+                </div>
+
+                {/* Big Direct Action Button Right in Hero Banner */}
+                <div className="mt-3.5 pt-3 border-t border-amber-500/20 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
+                  <div className="flex items-center gap-2 text-xs font-semibold text-amber-200">
+                    <span>⚡ Instant Approval</span>
+                    <span className="text-slate-600">•</span>
+                    <span>🪙 +50 to +100 Coins/Paper</span>
+                    <span className="text-slate-600">•</span>
+                    <span>📲 UPI Cashout</span>
+                  </div>
+                  <Link
+                    to="/upload"
+                    onClick={onClose}
+                    className="inline-flex items-center justify-center gap-2 px-4 py-2 bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-400 hover:to-yellow-400 text-slate-950 font-black text-xs rounded-xl shadow-md shadow-amber-500/20 transition-transform active:scale-95 shrink-0"
+                  >
+                    <span>📤 Upload Paper Now</span>
+                    <ArrowRight className="w-3.5 h-3.5 stroke-[3]" />
+                  </Link>
+                </div>
+              </div>
+
+              {/* 3 Step Visual Earning Guide */}
+              <div>
+                <p className="text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-2.5 flex items-center gap-1.5">
+                  <span>🎯</span> How to Upload &amp; Earn in 3 Easy Steps
+                </p>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+                  {/* Step 1 */}
+                  <div className="p-3 bg-[#11141c] border border-slate-800 hover:border-slate-700 rounded-xl space-y-1.5 transition-colors">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xl">📸</span>
+                      <span className="text-[10px] font-extrabold px-1.5 py-0.5 rounded bg-blue-500/20 text-blue-400">STEP 1</span>
+                    </div>
+                    <h4 className="text-xs font-bold text-white">Snap or Pick PDF</h4>
+                    <p className="text-[11px] text-slate-400 leading-relaxed">
+                      Take clear photos of your exam paper or select a PDF from your phone or PC.
+                    </p>
+                  </div>
+
+                  {/* Step 2 */}
+                  <div className="p-3 bg-[#11141c] border border-slate-800 hover:border-slate-700 rounded-xl space-y-1.5 transition-colors">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xl">🏷️</span>
+                      <span className="text-[10px] font-extrabold px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-400">STEP 2</span>
+                    </div>
+                    <h4 className="text-xs font-bold text-white">Select Course &amp; Sem</h4>
+                    <p className="text-[11px] text-slate-400 leading-relaxed">
+                      Pick University (MBBU/TU), Subject, Semester &amp; Year. Takes only 30 seconds!
+                    </p>
+                  </div>
+
+                  {/* Step 3 */}
+                  <div className="p-3 bg-[#11141c] border border-slate-800 hover:border-slate-700 rounded-xl space-y-1.5 transition-colors">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xl">💵</span>
+                      <span className="text-[10px] font-extrabold px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-400">STEP 3</span>
+                    </div>
+                    <h4 className="text-xs font-bold text-white">Get Paid to UPI</h4>
+                    <p className="text-[11px] text-slate-400 leading-relaxed">
+                      Earn coins automatically on approval. Cash out to GPay, PhonePe or Amazon!
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Coin Value & Earning Table with Rich Emojis */}
+              <div className="p-3.5 bg-[#11141c] border border-slate-800 rounded-xl space-y-2.5">
+                <div className="flex items-center justify-between">
+                  <p className="text-xs font-bold text-white flex items-center gap-1.5">
+                    <span>🪙</span> Reward Coin Valuation Chart
+                  </p>
+                  <span className="text-[11px] text-amber-400 font-semibold">100 Coins = Real Cash Transfer</span>
+                </div>
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
+                  <div className="p-2.5 bg-[#181c26] border border-slate-800/80 rounded-lg text-center space-y-0.5">
+                    <div className="text-base">📄</div>
+                    <span className="block text-[11px] text-slate-400">UG Semester</span>
+                    <span className="block font-black text-amber-400 text-xs">+50 Coins</span>
+                  </div>
+
+                  <div className="p-2.5 bg-[#181c26] border border-slate-800/80 rounded-lg text-center space-y-0.5">
+                    <div className="text-base">🎓</div>
+                    <span className="block text-[11px] text-slate-400">PG / MA / MSc</span>
+                    <span className="block font-black text-amber-400 text-xs">+100 Coins</span>
+                  </div>
+
+                  <div className="p-2.5 bg-[#181c26] border border-slate-800/80 rounded-lg text-center space-y-0.5">
+                    <div className="text-base">🔥</div>
+                    <span className="block text-[11px] text-slate-400">Daily Streak</span>
+                    <span className="block font-black text-primary-400 text-xs">+10 Coins</span>
+                  </div>
+
+                  <div className="p-2.5 bg-[#181c26] border border-slate-800/80 rounded-lg text-center space-y-0.5">
+                    <div className="text-base">🏦</div>
+                    <span className="block text-[11px] text-slate-400">Payout Mode</span>
+                    <span className="block font-black text-emerald-400 text-xs">UPI / GPay</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* What Papers Can You Upload? */}
+              <div className="p-3 bg-[#11141c] border border-slate-800 rounded-xl space-y-2">
+                <p className="text-[11px] font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
+                  <span>📥</span> Accepted Question Papers
+                </p>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5 text-xs text-slate-300">
+                  <div className="flex items-center gap-2">
+                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                    <span>MBBU Semester Exams (BA, BSc, BCom, BCA)</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                    <span>Tripura University (General &amp; Honors)</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                    <span>Master's Degrees (MA, MSc, MCom)</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                    <span>Mid-term / Internal / Practical Question Papers</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* High-Converting Main Upload CTA Banner */}
+              <div className="pt-1">
+                <Link
+                  to="/upload"
+                  onClick={onClose}
+                  className="w-full group flex items-center justify-center gap-3 py-3 px-5 bg-gradient-to-r from-primary-600 via-indigo-600 to-primary-600 hover:from-primary-500 hover:to-indigo-500 text-white font-extrabold text-sm rounded-xl shadow-xl shadow-primary-600/30 transition-all active:scale-98"
+                >
+                  <span className="text-base group-hover:scale-110 transition-transform">📤</span>
+                  <span>Click Here to Load &amp; Upload Question Paper</span>
+                  <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
+                </Link>
+                <p className="text-center text-[10px] text-slate-500 mt-1.5">
+                  Supported formats: PDF, JPEG, PNG (up to 25MB) • No complicated sign-up needed
+                </p>
+              </div>
+            </div>
+          )}
+
+          {/* ══════════════════════════════════════════════════════ */}
+          {/* ── TAB: SYSTEM NOTICES & ANNOUNCEMENTS ── */}
+          {/* ══════════════════════════════════════════════════════ */}
           {activeTab === 'notice' && (
             <div className="space-y-4">
+              {/* Pinned Earning Reminder Banner at Top of Notice Tab */}
+              <div className="p-3 bg-gradient-to-r from-amber-500/15 to-yellow-500/10 border border-amber-500/30 rounded-xl flex items-center justify-between gap-3">
+                <div className="flex items-center gap-2.5">
+                  <span className="text-xl select-none">💰</span>
+                  <div>
+                    <h4 className="text-xs font-bold text-white">Have Question Papers? Earn Cash via UPI!</h4>
+                    <p className="text-[11px] text-slate-300">Earn +50 to +100 Coins for every paper you upload.</p>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setActiveTab('earning')}
+                  className="px-3 py-1 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs rounded-lg shrink-0 transition-colors shadow-xs"
+                >
+                  See How 🚀
+                </button>
+              </div>
+
               {/* Admin Notice Manager Toggle */}
               {isAdmin && (
-                <div className="p-3 bg-[#222838] border border-amber-500/40 rounded-xl text-xs">
+                <div className="p-3 bg-[#202534] border border-amber-500/40 rounded-xl text-xs">
                   <div className="flex items-center justify-between">
                     <span className="text-amber-300 font-bold flex items-center gap-1.5">
                       <ShieldAlert className="w-3.5 h-3.5" /> Admin Notice Publisher
@@ -243,7 +434,7 @@ export default function SystemNoticeModal({ isOpen, onClose, onCloseToday }: Sys
                           value={newTitle}
                           onChange={(e) => setNewTitle(e.target.value)}
                           placeholder="e.g. 2025 MBBU Semester Papers Added"
-                          className="w-full px-3 py-1.5 bg-[#13161f] border border-slate-700 rounded-lg text-xs text-white placeholder:text-slate-500 outline-none focus:border-primary-500"
+                          className="w-full px-3 py-1.5 bg-[#0f121a] border border-slate-700 rounded-lg text-xs text-white placeholder:text-slate-500 outline-none focus:border-primary-500"
                         />
                       </div>
                       <div>
@@ -253,7 +444,7 @@ export default function SystemNoticeModal({ isOpen, onClose, onCloseToday }: Sys
                           onChange={(e) => setNewContent(e.target.value)}
                           rows={3}
                           placeholder="Write announcement details..."
-                          className="w-full px-3 py-1.5 bg-[#13161f] border border-slate-700 rounded-lg text-xs text-white placeholder:text-slate-500 outline-none focus:border-primary-500 resize-none"
+                          className="w-full px-3 py-1.5 bg-[#0f121a] border border-slate-700 rounded-lg text-xs text-white placeholder:text-slate-500 outline-none focus:border-primary-500 resize-none"
                         />
                       </div>
                       <div className="grid grid-cols-2 gap-2">
@@ -262,7 +453,7 @@ export default function SystemNoticeModal({ isOpen, onClose, onCloseToday }: Sys
                           <select
                             value={newTag}
                             onChange={(e) => setNewTag(e.target.value as any)}
-                            className="w-full px-2.5 py-1.5 bg-[#13161f] border border-slate-700 rounded-lg text-xs text-white outline-none"
+                            className="w-full px-2.5 py-1.5 bg-[#0f121a] border border-slate-700 rounded-lg text-xs text-white outline-none"
                           >
                             <option value="Notice">Notice</option>
                             <option value="Update">Update</option>
@@ -277,7 +468,7 @@ export default function SystemNoticeModal({ isOpen, onClose, onCloseToday }: Sys
                             value={newLink}
                             onChange={(e) => setNewLink(e.target.value)}
                             placeholder="/upload or /browse"
-                            className="w-full px-3 py-1.5 bg-[#13161f] border border-slate-700 rounded-lg text-xs text-white placeholder:text-slate-500 outline-none"
+                            className="w-full px-3 py-1.5 bg-[#0f121a] border border-slate-700 rounded-lg text-xs text-white placeholder:text-slate-500 outline-none"
                           />
                         </div>
                       </div>
@@ -293,7 +484,7 @@ export default function SystemNoticeModal({ isOpen, onClose, onCloseToday }: Sys
                 </div>
               )}
 
-              {/* List of Notices */}
+              {/* List of Notices matching the reference format */}
               <div className="space-y-4">
                 {notices.map((item, index) => (
                   <div key={item.id || index} className="space-y-1.5">
@@ -338,149 +529,12 @@ export default function SystemNoticeModal({ isOpen, onClose, onCloseToday }: Sys
                   </div>
                 ))}
               </div>
-
-              {/* Quick Earning Teaser Banner inside Notice tab */}
-              <div className="mt-4 p-3.5 bg-gradient-to-r from-amber-500/10 via-primary-500/10 to-indigo-500/10 border border-amber-500/30 rounded-xl flex items-center justify-between gap-3">
-                <div className="flex items-center gap-3">
-                  <div className="h-8 w-8 rounded-lg bg-amber-500/20 text-amber-400 flex items-center justify-center shrink-0 border border-amber-500/30">
-                    <Coins className="w-4 h-4" />
-                  </div>
-                  <div>
-                    <h4 className="text-xs font-bold text-white">Have Question Papers from Previous Exams?</h4>
-                    <p className="text-[11px] text-slate-400">Earn +50 to +100 Coins per paper. Redeem cash via UPI.</p>
-                  </div>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => setActiveTab('earning')}
-                  className="px-3 py-1.5 bg-[#2b3345] hover:bg-[#384257] text-white text-xs font-semibold rounded-lg shrink-0 transition-colors"
-                >
-                  View Details
-                </button>
-              </div>
-            </div>
-          )}
-
-          {/* TAB 2: EARNING & PAPER UPLOAD PROGRAM */}
-          {activeTab === 'earning' && (
-            <div className="space-y-4">
-              {/* Header intro */}
-              <div className="p-3.5 bg-[#141822] border border-slate-700/60 rounded-xl space-y-1.5">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <Sparkles className="w-4 h-4 text-amber-400" />
-                    <h3 className="text-sm font-bold text-white">Student Contributor &amp; Earning Program</h3>
-                  </div>
-                  <span className="px-2 py-0.5 bg-emerald-500/20 border border-emerald-500/40 text-emerald-400 rounded text-[10px] font-bold uppercase tracking-wider">
-                    Instant Rewards
-                  </span>
-                </div>
-                <p className="text-xs text-slate-300 leading-relaxed">
-                  Study Volte rewards students for building the largest open academic archive in Tripura. Help classmates succeed and get compensated for your verified question papers.
-                </p>
-              </div>
-
-              {/* 3 Steps to Earn */}
-              <div>
-                <p className="text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-2">How It Works</p>
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
-                  <div className="p-3 bg-[#13161f] border border-slate-800 rounded-xl space-y-1">
-                    <div className="flex items-center gap-2">
-                      <span className="flex h-5 w-5 items-center justify-center rounded-full bg-primary-500/20 text-primary-400 text-xs font-bold">1</span>
-                      <h4 className="text-xs font-bold text-white">Scan or Snap</h4>
-                    </div>
-                    <p className="text-[11px] text-slate-400 leading-relaxed">
-                      Take clear photos or create a PDF of your semester exam paper.
-                    </p>
-                  </div>
-
-                  <div className="p-3 bg-[#13161f] border border-slate-800 rounded-xl space-y-1">
-                    <div className="flex items-center gap-2">
-                      <span className="flex h-5 w-5 items-center justify-center rounded-full bg-amber-500/20 text-amber-400 text-xs font-bold">2</span>
-                      <h4 className="text-xs font-bold text-white">Upload &amp; Tag</h4>
-                    </div>
-                    <p className="text-[11px] text-slate-400 leading-relaxed">
-                      Select University, Course, Semester &amp; Year. Takes only 30 seconds.
-                    </p>
-                  </div>
-
-                  <div className="p-3 bg-[#13161f] border border-slate-800 rounded-xl space-y-1">
-                    <div className="flex items-center gap-2">
-                      <span className="flex h-5 w-5 items-center justify-center rounded-full bg-emerald-500/20 text-emerald-400 text-xs font-bold">3</span>
-                      <h4 className="text-xs font-bold text-white">Get Paid</h4>
-                    </div>
-                    <p className="text-[11px] text-slate-400 leading-relaxed">
-                      Receive coins on approval. Cash out to GPay, PhonePe or Amazon.
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-              {/* Coin Value Chart */}
-              <div className="p-3 bg-[#13161f] border border-slate-800 rounded-xl space-y-2">
-                <div className="flex items-center justify-between">
-                  <p className="text-xs font-bold text-white flex items-center gap-1.5">
-                    <Coins className="w-3.5 h-3.5 text-amber-400" /> Reward Coin Breakdown
-                  </p>
-                  <span className="text-[11px] text-slate-400">100 Coins = Cash Payout</span>
-                </div>
-                <div className="grid grid-cols-2 gap-2 text-xs">
-                  <div className="p-2 bg-[#1a1e2a] rounded-lg flex items-center justify-between">
-                    <span className="text-slate-300">Verified UG Paper</span>
-                    <span className="font-bold text-amber-400">+50 Coins</span>
-                  </div>
-                  <div className="p-2 bg-[#1a1e2a] rounded-lg flex items-center justify-between">
-                    <span className="text-slate-300">Rare / PG Paper</span>
-                    <span className="font-bold text-amber-400">+100 Coins</span>
-                  </div>
-                  <div className="p-2 bg-[#1a1e2a] rounded-lg flex items-center justify-between">
-                    <span className="text-slate-300">Daily Streak Bonus</span>
-                    <span className="font-bold text-primary-400">+10 Coins</span>
-                  </div>
-                  <div className="p-2 bg-[#1a1e2a] rounded-lg flex items-center justify-between">
-                    <span className="text-slate-300">Payout Channels</span>
-                    <span className="font-bold text-emerald-400">UPI / Amazon</span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Quality Checklist */}
-              <div className="space-y-1.5 text-xs text-slate-300">
-                <p className="text-[11px] font-bold uppercase tracking-wider text-slate-400">Upload Checklist for Fast Approval</p>
-                <div className="space-y-1">
-                  <div className="flex items-center gap-2">
-                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
-                    <span>Good lighting, all question numbers and text readable.</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
-                    <span>Include all pages of the question paper in order.</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
-                    <span>PDF or JPEG/PNG files are supported up to 25MB.</span>
-                  </div>
-                </div>
-              </div>
-
-              {/* DIRECT CALL TO ACTION BUTTON: LOAD PAPER */}
-              <div className="pt-2">
-                <Link
-                  to="/upload"
-                  onClick={onClose}
-                  className="w-full flex items-center justify-center gap-2.5 py-2.5 px-4 bg-gradient-to-r from-primary-600 via-indigo-600 to-primary-600 hover:from-primary-500 hover:to-indigo-500 text-white text-xs sm:text-sm font-bold rounded-xl shadow-lg shadow-primary-600/20 transition-all active:scale-98"
-                >
-                  <Upload className="w-4 h-4" />
-                  <span>Load &amp; Upload Question Paper Now</span>
-                  <ArrowRight className="w-4 h-4" />
-                </Link>
-              </div>
             </div>
           )}
         </div>
 
         {/* ── Modal Bottom Bar: Two Dark Pill Buttons on Right (Exact Match to Screenshot) ── */}
-        <div className="flex items-center justify-end gap-2.5 px-5 py-3 border-t border-slate-800/80 bg-[#161922] shrink-0">
+        <div className="flex items-center justify-end gap-2.5 px-5 py-3 border-t border-slate-800 bg-[#12151d] shrink-0">
           <button
             type="button"
             onClick={handleCloseToday}
