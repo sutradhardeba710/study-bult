@@ -277,15 +277,20 @@ export default function SystemNoticeModal({ isOpen, onClose, onCloseToday }: Sys
                     </div>
                   </div>
 
-                  {/* Real Money & Phone Graphic */}
+                  {/* Real Money & Indian Rupee Graphic */}
                   <div className="relative shrink-0">
                     <div className="w-28 h-28 sm:w-32 sm:h-32 rounded-2xl overflow-hidden border-2 border-emerald-300 shadow-md bg-white p-1 ring-2 ring-emerald-400/20">
-                      <img
-                        src="/images/indian-rupee-cash-earning.jpg?v=2"
-                        alt="Earn Indian Rupee Cash via UPI"
-                        className="w-full h-full object-cover rounded-xl"
-                        loading="eager"
-                      />
+                      <picture>
+                        <source srcSet="/images/indian-rupee-cash-earning.webp?v=3" type="image/webp" />
+                        <img
+                          src="/images/indian-rupee-cash-earning.jpg?v=3"
+                          alt="Earn Real Indian Rupees via UPI"
+                          className="w-full h-full object-cover rounded-xl"
+                          width={128}
+                          height={128}
+                          loading="eager"
+                        />
+                      </picture>
                     </div>
                     <div className="absolute -bottom-1.5 -right-1 bg-emerald-600 text-white text-[9px] font-black px-2 py-0.5 rounded-full shadow-md flex items-center gap-1 border border-emerald-400">
                       <ShieldCheck className="w-2.5 h-2.5" /> UPI Verified
