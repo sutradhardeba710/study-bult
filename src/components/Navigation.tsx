@@ -650,7 +650,7 @@ const Navigation = () => {
               <button
                 type="button"
                 onClick={() => setIsNoticeOpen(true)}
-                className="relative flex h-9 w-9 items-center justify-center rounded-xl border border-slate-200/90 bg-white text-slate-600 transition-all hover:border-slate-300 hover:bg-slate-50 hover:text-slate-900 active:scale-95 shadow-2xs"
+                className="relative flex h-9 w-9 items-center justify-center rounded-full border border-slate-200/90 bg-slate-50/80 text-slate-700 transition-all hover:bg-slate-100 hover:text-slate-900 hover:border-slate-300 active:scale-95 shadow-2xs"
                 title="System Notices & Platform Updates"
                 aria-label="System Notices and Platform Updates"
               >
@@ -703,7 +703,7 @@ const Navigation = () => {
               <button
                 type="button"
                 onClick={() => setIsNoticeOpen(true)}
-                className="relative flex h-9 w-9 items-center justify-center rounded-xl border border-slate-200/90 bg-white text-slate-600 transition-colors hover:bg-slate-50 hover:text-slate-900 active:scale-95"
+                className="relative flex h-9 w-9 items-center justify-center rounded-full border border-slate-200/90 bg-slate-50/80 text-slate-700 transition-colors hover:bg-slate-100 hover:text-slate-900 active:scale-95"
                 aria-label="Platform Updates and Notices"
               >
                 <Bell className="h-4 w-4" />
