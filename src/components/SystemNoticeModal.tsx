@@ -185,23 +185,19 @@ export default function SystemNoticeModal({ isOpen, onClose, onCloseToday }: Sys
       }}
     >
       <div
-        className="relative w-full max-w-[620px] bg-white text-slate-800 rounded-3xl border border-slate-200/90 shadow-2xl shadow-slate-950/25 overflow-hidden flex flex-col max-h-[92vh] sv-notice-modal"
+        className="relative w-full max-w-[620px] h-[610px] max-h-[90vh] bg-white text-slate-800 rounded-3xl border border-slate-200/90 shadow-2xl shadow-slate-950/25 overflow-hidden flex flex-col sv-notice-modal"
         role="dialog"
         aria-modal="true"
         aria-labelledby="system-notice-title"
       >
-        {/* ── Top Header Bar: Clean & Minimal ── */}
+        {/* ── Top Header Bar: Clean, Minimal & Stable ── */}
         <div className="flex items-center justify-between px-5 sm:px-6 py-3.5 border-b border-slate-100 bg-white shrink-0">
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 shrink-0">
             <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-emerald-50 text-emerald-600 border border-emerald-200 shrink-0">
-              {activeTab === 'earning' ? (
-                <IndianRupee className="w-3.5 h-3.5 stroke-[2.5]" />
-              ) : (
-                <Bell className="w-3.5 h-3.5" />
-              )}
+              <Sparkles className="w-3.5 h-3.5" />
             </div>
-            <h2 id="system-notice-title" className="text-base font-black tracking-tight text-slate-900 min-w-[130px]">
-              {activeTab === 'earning' ? 'Student Rewards' : 'System Notices'}
+            <h2 id="system-notice-title" className="text-base font-black tracking-tight text-slate-900">
+              System Notice
             </h2>
           </div>
 
@@ -246,8 +242,8 @@ export default function SystemNoticeModal({ isOpen, onClose, onCloseToday }: Sys
           </div>
         </div>
 
-        {/* ── Modal Scrollable Body: Stable min-height prevents jumping ── */}
-        <div className="flex-1 overflow-y-auto p-4 sm:p-5 space-y-3.5 font-sans bg-slate-50/40 min-h-[460px]">
+        {/* ── Modal Scrollable Body: Stable fixed container prevents jumping ── */}
+        <div className="flex-1 overflow-y-auto custom-scrollbar p-4 sm:p-5 space-y-3.5 font-sans bg-slate-50/40">
 
           {/* ══════════════════════════════════════════════════════ */}
           {/* ── TAB: EARN REAL RUPEES (VISUAL & HIGH IMPACT) ── */}
