@@ -1040,7 +1040,7 @@ body {
   .auth-password-toggle { transition-duration: .01ms !important; }
 }
 
-/* System Notice Modal Entrance Animations */
+/* System Notice Modal Entrance Animations: Slide from up to down */
 @keyframes svNoticeBackdropFade {
   from {
     opacity: 0;
@@ -1050,26 +1050,26 @@ body {
   }
 }
 
-@keyframes svNoticeModalPop {
+@keyframes svNoticeModalSlideDown {
   0% {
     opacity: 0;
-    transform: scale(0.92) translateY(24px);
+    transform: translateY(-70px) scale(0.96);
   }
-  60% {
+  65% {
     opacity: 1;
-    transform: scale(1.02) translateY(-2px);
+    transform: translateY(6px) scale(1.008);
   }
   100% {
     opacity: 1;
-    transform: scale(1) translateY(0);
+    transform: translateY(0) scale(1);
   }
 }
 
 .sv-notice-backdrop {
-  animation: svNoticeBackdropFade 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation: svNoticeBackdropFade 0.28s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
 .sv-notice-modal {
-  animation: svNoticeModalPop 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation: svNoticeModalSlideDown 0.42s cubic-bezier(0.16, 1, 0.3, 1) forwards;
   will-change: transform, opacity;
 }
