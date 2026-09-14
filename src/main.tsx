@@ -19,6 +19,22 @@ const loadConfigDebug = async () => {
 if (typeof window !== 'undefined') {
   // Load config debug after initial render
   loadConfigDebug();
+
+  // Register service worker non-blockingly during idle time
+  if ('serviceWorker' in navigator && !import.meta.env.DEV) {
+    window.addEventListener('load', () => {
+      const register = () => {
+        import('virtual:pwa-register').then(({ registerSW }) => {
+          registerSW({ immediate: true });
+        }).catch(() => {});
+      };
+      if ('requestIdleCallback' in window) {
+        window.requestIdleCallback(register, { timeout: 3000 });
+      } else {
+        setTimeout(register, 1500);
+      }
+    });
+  }
 }
 
 export const createRoot = ViteReactSSG({ routes });

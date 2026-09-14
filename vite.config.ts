@@ -7,6 +7,7 @@ import Sitemap from 'vite-plugin-sitemap';
 
 const pwaPlugin = VitePWA({
   registerType: 'autoUpdate',
+  injectRegister: null, // Don't inject render-blocking <script src="/registerSW.js"> into <head>
   includeAssets: ['favicon.png', 'logo.png', 'robots.txt'],
   manifest: {
     name: 'Study Volte',
@@ -156,8 +157,14 @@ export default defineConfig({
   },
   build: {
     cssCodeSplit: true,     // Each lazy chunk gets its own CSS — only load what's needed
-    // Auto-inject <link rel="modulepreload"> for entry chunks → fetched in parallel with CSS
-    modulePreload: { polyfill: false },
+    // Auto-inject <link rel="modulepreload"> only for necessary entry chunks
+    modulePreload: {
+      polyfill: false,
+      resolveDependencies(filename, deps) {
+        // Prevent lazy admin/heavy packages from being preloaded on public routes
+        return deps.filter(dep => !dep.includes('vendor-charts') && !dep.includes('vendor-dnd') && !dep.includes('vendor-confetti') && !dep.includes('vendor-crop'));
+      }
+    },
     rollupOptions: {
       external: ['nodemailer'],
       treeshake: 'recommended',
@@ -166,6 +173,10 @@ export default defineConfig({
           // Core React runtime — loaded first, tiny
           if (id.includes('node_modules/react/') || id.includes('node_modules/react-dom/') || id.includes('node_modules/scheduler/')) {
             return 'vendor-react';
+          }
+          // Common UI utility helpers — must be separate so heavy chart libraries don't swallow them
+          if (id.includes('node_modules/clsx') || id.includes('node_modules/prop-types')) {
+            return 'vendor-utils';
           }
           // Router
           if (id.includes('node_modules/react-router') || id.includes('node_modules/@remix-run')) {

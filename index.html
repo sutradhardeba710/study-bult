@@ -62,15 +62,35 @@
   <!-- Google AdSense site verification -->
   <meta name="google-adsense-account" content="ca-pub-7371660234749132" />
 
-  <!-- Google AdSense loader (deferred to window load to eliminate render and main-thread blocking) -->
+  <!-- Google AdSense loader: Deferred to first interaction or idle callback to prevent blocking initial render & main thread -->
   <script>
-    window.addEventListener('load', function() {
-      var s = document.createElement('script');
-      s.src = "https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7371660234749132";
-      s.async = true;
-      s.crossOrigin = "anonymous";
-      document.head.appendChild(s);
-    });
+    (function() {
+      var loaded = false;
+      function loadAdSense() {
+        if (loaded) return;
+        loaded = true;
+        ['scroll', 'touchstart', 'mousemove', 'keydown'].forEach(function(evt) {
+          window.removeEventListener(evt, loadAdSense, { passive: true });
+        });
+        var s = document.createElement('script');
+        s.src = "https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7371660234749132";
+        s.async = true;
+        s.crossOrigin = "anonymous";
+        document.head.appendChild(s);
+      }
+      ['scroll', 'touchstart', 'mousemove', 'keydown'].forEach(function(evt) {
+        window.addEventListener(evt, loadAdSense, { passive: true, once: true });
+      });
+      window.addEventListener('load', function() {
+        if ('requestIdleCallback' in window) {
+          setTimeout(function() {
+            window.requestIdleCallback(loadAdSense, { timeout: 2000 });
+          }, 3500);
+        } else {
+          setTimeout(loadAdSense, 4000);
+        }
+      });
+    })();
   </script>
 
   <!-- Google tag (gtag.js) -->
