@@ -93,14 +93,40 @@
     })();
   </script>
 
-  <!-- Google tag (gtag.js) -->
-  <script async src="https://www.googletagmanager.com/gtag/js?id=AW-17991393501"></script>
+  <!-- Google tag (gtag.js) - Deferred to user interaction / idle to prevent 550ms+ main-thread blockage -->
   <script>
     window.dataLayer = window.dataLayer || [];
     function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
-
-    gtag('config', 'AW-17991393501');
+    (function() {
+      var loaded = false;
+      function loadGtag() {
+        if (loaded) return;
+        loaded = true;
+        ['scroll', 'touchstart', 'mousemove', 'keydown'].forEach(function(e) {
+          window.removeEventListener(e, loadGtag, { passive: true });
+        });
+        var s = document.createElement('script');
+        s.src = "https://www.googletagmanager.com/gtag/js?id=AW-17991393501";
+        s.async = true;
+        s.onload = function() {
+          gtag('js', new Date());
+          gtag('config', 'AW-17991393501');
+        };
+        document.head.appendChild(s);
+      }
+      ['scroll', 'touchstart', 'mousemove', 'keydown'].forEach(function(e) {
+        window.addEventListener(e, loadGtag, { passive: true, once: true });
+      });
+      window.addEventListener('load', function() {
+        if ('requestIdleCallback' in window) {
+          setTimeout(function() {
+            window.requestIdleCallback(loadGtag, { timeout: 2000 });
+          }, 3500);
+        } else {
+          setTimeout(loadGtag, 4500);
+        }
+      });
+    })();
   </script>
 
   <!-- Mobile Web App -->

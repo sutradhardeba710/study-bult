@@ -14,7 +14,7 @@ const AnalyticsTracker = lazy(() => import('./components/AnalyticsTracker'));
 const ErrorBoundary = lazy(() => import('./components/ErrorBoundary'));
 const NetworkStatusBanner = lazy(() => import('./components/NetworkStatusBanner'));
 
-const GOOGLE_ANALYTICS_ID = import.meta.env.VITE_GOOGLE_ANALYTICS_ID || 'G-XXXXXXXXXX';
+const GOOGLE_ANALYTICS_ID = import.meta.env.VITE_GOOGLE_ANALYTICS_ID;
 
 const LoadingFallback = () => (
   <div className="flex flex-col items-center justify-center min-h-[70vh] bg-gray-50" aria-hidden="true">
@@ -59,7 +59,9 @@ function LayoutRouter() {
       <Suspense fallback={<LoadingFallback />}>
         <NetworkStatusBanner />
         <Navigation />
-        <AnalyticsTracker measurementId={GOOGLE_ANALYTICS_ID} />
+        {GOOGLE_ANALYTICS_ID && GOOGLE_ANALYTICS_ID !== 'G-XXXXXXXXXX' && (
+          <AnalyticsTracker measurementId={GOOGLE_ANALYTICS_ID} />
+        )}
         <ErrorBoundary>
           <Suspense fallback={<LoadingFallback />}>
             <Outlet />
