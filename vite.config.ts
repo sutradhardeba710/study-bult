@@ -159,26 +159,8 @@ export default defineConfig({
   },
   build: {
     cssCodeSplit: true,     // Each lazy chunk gets its own CSS — only load what's needed
-    // Auto-inject <link rel="modulepreload"> only for necessary entry chunks
-    modulePreload: {
-      polyfill: false,
-      resolveDependencies(filename, deps) {
-        // Prevent lazy admin/heavy packages & secondary SDKs from being preloaded on public routes
-        return deps.filter(dep =>
-          !dep.includes('vendor-charts') &&
-          !dep.includes('vendor-dnd') &&
-          !dep.includes('vendor-confetti') &&
-          !dep.includes('vendor-crop') &&
-          !dep.includes('firebase-') &&
-          !dep.includes('UploadEncouragementModal') &&
-          !dep.includes('page-landing-loggedin') &&
-          !dep.includes('LandingLoggedIn') &&
-          !dep.includes('featuredPapers') &&
-          !dep.includes('papers-') &&
-          !dep.includes('service-papers')
-        );
-      }
-    },
+    // Disable modulepreload in <head> to prevent bandwidth starvation of render-blocking CSS on mobile
+    modulePreload: false,
     rollupOptions: {
       external: ['nodemailer'],
       treeshake: 'recommended',
@@ -306,7 +288,7 @@ export default defineConfig({
   },
   // @ts-expect-error - vite-react-ssg config extension
   ssgOptions: {
-    script: 'async',
+    script: 'sync',
     formatting: 'minify',
     includedRoutes(paths: string[]) {
       const publicPaths = paths.filter(p =>
