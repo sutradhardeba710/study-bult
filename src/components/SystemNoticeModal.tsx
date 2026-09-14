@@ -8,8 +8,6 @@ import {
   Smartphone, Zap, ShieldCheck
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
-import { collection, query, orderBy, onSnapshot, addDoc, deleteDoc, doc, serverTimestamp } from 'firebase/firestore';
-import { db } from '../services/firebaseDb';
 import toast from 'react-hot-toast';
 
 export interface SystemNoticeItem {
@@ -76,29 +74,33 @@ export default function SystemNoticeModal({ isOpen, onClose, onCloseToday }: Sys
   const [newLinkText, setNewLinkText] = useState('');
   const [submitting, setSubmitting] = useState(false);
 
-  // Real-time listener for notices from Firestore — only active while modal is open
+  // Load notices from Firestore once when modal is open (no streaming connection)
   useEffect(() => {
     if (!isOpen) return;
-    try {
-      const q = query(collection(db, 'system_notices'), orderBy('createdAt', 'desc'));
-      const unsub = onSnapshot(
-        q,
-        (snap) => {
+    let isCancelled = false;
+
+    const fetchNotices = async () => {
+      try {
+        const { collection, query, orderBy, getDocs } = await import('firebase/firestore');
+        const { db } = await import('../services/firebaseDb');
+        const q = query(collection(db, 'system_notices'), orderBy('createdAt', 'desc'));
+        const snap = await getDocs(q);
+        if (!isCancelled && !snap.empty) {
           const liveNotices: SystemNoticeItem[] = snap.docs.map((docSnap) => ({
             id: docSnap.id,
             ...docSnap.data()
           })) as SystemNoticeItem[];
           setNotices(liveNotices);
-        },
-        (error) => {
-          console.warn('Could not fetch system_notices, using defaults:', error);
-          setNotices(DEFAULT_NOTICES);
         }
-      );
-      return () => unsub();
-    } catch (e) {
-      console.warn('Notice listener initialization failed:', e);
-    }
+      } catch (error) {
+        console.warn('Could not fetch system_notices, using defaults:', error);
+      }
+    };
+
+    fetchNotices();
+    return () => {
+      isCancelled = true;
+    };
   }, [isOpen]);
 
   if (!isOpen) return null;
@@ -111,6 +113,8 @@ export default function SystemNoticeModal({ isOpen, onClose, onCloseToday }: Sys
     }
     setSubmitting(true);
     try {
+      const { collection, addDoc, serverTimestamp } = await import('firebase/firestore');
+      const { db } = await import('../services/firebaseDb');
       await addDoc(collection(db, 'system_notices'), {
         title: newTitle.trim(),
         content: newContent.trim(),
@@ -139,6 +143,8 @@ export default function SystemNoticeModal({ isOpen, onClose, onCloseToday }: Sys
     if (!window.confirm('Are you sure you want to delete this notice?')) return;
     try {
       setNotices((prev) => prev.filter((n) => n.id !== noticeId));
+      const { doc, deleteDoc } = await import('firebase/firestore');
+      const { db } = await import('../services/firebaseDb');
       await deleteDoc(doc(db, 'system_notices', noticeId));
       toast.success('Notice deleted');
     } catch (error: any) {

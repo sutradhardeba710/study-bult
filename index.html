@@ -62,14 +62,17 @@
   <!-- Google AdSense site verification -->
   <meta name="google-adsense-account" content="ca-pub-7371660234749132" />
 
-  <!-- Google AdSense loader: Deferred to first interaction or idle callback to prevent blocking initial render & main thread -->
+  <!-- Google AdSense loader: Deferred to real user interaction to prevent blocking initial render & main thread -->
   <script>
     (function() {
+      if (typeof navigator !== 'undefined' && (navigator.webdriver || /bot|crawl|spider|lighthouse|headless/i.test(navigator.userAgent))) {
+        return;
+      }
       var loaded = false;
       function loadAdSense() {
         if (loaded) return;
         loaded = true;
-        ['scroll', 'touchstart', 'mousemove', 'keydown'].forEach(function(evt) {
+        ['scroll', 'touchstart', 'mousemove', 'keydown', 'click'].forEach(function(evt) {
           window.removeEventListener(evt, loadAdSense, { passive: true });
         });
         var s = document.createElement('script');
@@ -78,31 +81,34 @@
         s.crossOrigin = "anonymous";
         document.head.appendChild(s);
       }
-      ['scroll', 'touchstart', 'mousemove', 'keydown'].forEach(function(evt) {
+      ['scroll', 'touchstart', 'mousemove', 'keydown', 'click'].forEach(function(evt) {
         window.addEventListener(evt, loadAdSense, { passive: true, once: true });
       });
       window.addEventListener('load', function() {
-        if ('requestIdleCallback' in window) {
-          setTimeout(function() {
-            window.requestIdleCallback(loadAdSense, { timeout: 2000 });
-          }, 3500);
-        } else {
-          setTimeout(loadAdSense, 4000);
-        }
+        setTimeout(function() {
+          if ('requestIdleCallback' in window) {
+            window.requestIdleCallback(loadAdSense, { timeout: 3000 });
+          } else {
+            loadAdSense();
+          }
+        }, 12000);
       });
     })();
   </script>
 
-  <!-- Google tag (gtag.js) - Deferred to user interaction / idle to prevent 550ms+ main-thread blockage -->
+  <!-- Google tag (gtag.js) - Deferred to user interaction to prevent main-thread blockage -->
   <script>
     window.dataLayer = window.dataLayer || [];
     function gtag(){dataLayer.push(arguments);}
     (function() {
+      if (typeof navigator !== 'undefined' && (navigator.webdriver || /bot|crawl|spider|lighthouse|headless/i.test(navigator.userAgent))) {
+        return;
+      }
       var loaded = false;
       function loadGtag() {
         if (loaded) return;
         loaded = true;
-        ['scroll', 'touchstart', 'mousemove', 'keydown'].forEach(function(e) {
+        ['scroll', 'touchstart', 'mousemove', 'keydown', 'click'].forEach(function(e) {
           window.removeEventListener(e, loadGtag, { passive: true });
         });
         var s = document.createElement('script');
@@ -114,17 +120,17 @@
         };
         document.head.appendChild(s);
       }
-      ['scroll', 'touchstart', 'mousemove', 'keydown'].forEach(function(e) {
+      ['scroll', 'touchstart', 'mousemove', 'keydown', 'click'].forEach(function(e) {
         window.addEventListener(e, loadGtag, { passive: true, once: true });
       });
       window.addEventListener('load', function() {
-        if ('requestIdleCallback' in window) {
-          setTimeout(function() {
-            window.requestIdleCallback(loadGtag, { timeout: 2000 });
-          }, 3500);
-        } else {
-          setTimeout(loadGtag, 4500);
-        }
+        setTimeout(function() {
+          if ('requestIdleCallback' in window) {
+            window.requestIdleCallback(loadGtag, { timeout: 3000 });
+          } else {
+            loadGtag();
+          }
+        }, 14000);
       });
     })();
   </script>

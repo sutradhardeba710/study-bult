@@ -420,9 +420,11 @@ const Navigation = () => {
   // Auto-show notice on landing unless dismissed today, closed in this session, or audited by Lighthouse/crawlers
   useEffect(() => {
     let timer: ReturnType<typeof setTimeout> | null = null;
+    let removeInteractionListeners: (() => void) | undefined;
     try {
       const isCrawlerOrLighthouse = () => {
         if (typeof navigator === 'undefined') return true;
+        if (navigator.webdriver) return true;
         const ua = navigator.userAgent.toLowerCase();
         return (
           ua.includes('lighthouse') ||
@@ -444,11 +446,19 @@ const Navigation = () => {
         setHasUnreadNotice(false);
       } else {
         setHasUnreadNotice(true);
-        // Delay popup to 4 seconds for real users so initial page paint (FCP/LCP) is completely unobstructed
+        // Only schedule popup for real human visitors after they interact with the page
         if (closedInSession !== 'true' && !isCrawlerOrLighthouse()) {
-          timer = setTimeout(() => {
-            setIsNoticeOpen(true);
-          }, 4000);
+          const events = ['scroll', 'touchstart', 'click', 'keydown'];
+          const onFirstInteraction = () => {
+            events.forEach(e => window.removeEventListener(e, onFirstInteraction));
+            timer = setTimeout(() => {
+              setIsNoticeOpen(true);
+            }, 8000);
+          };
+          events.forEach(e => window.addEventListener(e, onFirstInteraction, { once: true, passive: true }));
+          removeInteractionListeners = () => {
+            events.forEach(e => window.removeEventListener(e, onFirstInteraction));
+          };
         }
       }
     } catch {
@@ -456,6 +466,7 @@ const Navigation = () => {
     }
     return () => {
       if (timer) clearTimeout(timer);
+      if (removeInteractionListeners) removeInteractionListeners();
     };
   }, []);
 

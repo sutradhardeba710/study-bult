@@ -32,13 +32,13 @@ let optimizedCount = 0;
 for (const filePath of htmlFiles) {
   let content = fs.readFileSync(filePath, 'utf8');
 
-  // Convert render-blocking stylesheet to non-blocking preload + noscript fallback
-  const cssPattern = /<link rel="stylesheet"(?: crossorigin="")? href="(\/assets\/app-[^"]+\.css)">/g;
+  // Add preload hint while keeping stylesheet to prevent FOUC (layout shift)
+  const cssPattern = /<link rel="stylesheet"(?: crossorigin="")? href="(\/assets\/[^"]+\.css)">/g;
 
   if (cssPattern.test(content)) {
     content = content.replace(
       cssPattern,
-      '<link rel="preload" as="style" href="$1" onload="this.onload=null;this.rel=\'stylesheet\'"><noscript><link rel="stylesheet" href="$1"></noscript>'
+      '<link rel="preload" as="style" href="$1"><link rel="stylesheet" href="$1">'
     );
 
     fs.writeFileSync(filePath, content, 'utf8');
