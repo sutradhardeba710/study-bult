@@ -548,7 +548,10 @@ const Navigation = () => {
       if (frame) return;
       frame = window.requestAnimationFrame(updateNavigation);
     };
-    updateNavigation();
+    // Only query if already scrolled down on restore; avoid synchronous forced reflow on initial top-of-page load
+    if (window.scrollY > 16) {
+      window.requestAnimationFrame(updateNavigation);
+    }
     window.addEventListener('scroll', onScroll, { passive: true });
     return () => {
       window.removeEventListener('scroll', onScroll);

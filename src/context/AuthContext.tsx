@@ -437,7 +437,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             // Guest visitor: mark not loading immediately so guest UI is instant
             setLoading(false);
 
-            // Defer auth iframe until user interaction or 4s idle timeout
+            // Only initialize auth when the guest explicitly interacts (click, touch, etc.)
             let started = false;
             const triggerAuth = () => {
                 if (started) return;
@@ -446,13 +446,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 startAuth();
             };
 
-            const events = ['click', 'keydown', 'scroll', 'touchstart'];
+            const events = ['click', 'keydown', 'touchstart'];
             events.forEach(e => window.addEventListener(e, triggerAuth, { once: true, passive: true }));
             removeInteractionListeners = () => {
                 events.forEach(e => window.removeEventListener(e, triggerAuth));
             };
-
-            timerId = setTimeout(triggerAuth, 4500);
         }
 
         return () => {

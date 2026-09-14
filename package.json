@@ -5,8 +5,8 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite-react-ssg build",
-    "build:with-types": "tsc -b && vite-react-ssg build",
+    "build": "vite-react-ssg build && node scripts/optimize-html.js",
+    "build:with-types": "tsc -b && vite-react-ssg build && node scripts/optimize-html.js",
     "lint": "eslint .",
     "preview": "vite preview",
     "analyze": "vite build --mode analyze",
