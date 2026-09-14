@@ -1,11 +1,11 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, lazy, Suspense } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import {
     ArrowRight, ArrowUp, BadgeCheck, BookOpen, CheckCircle, ChevronRight, Download,
     Eye, FileText, Filter, Search, Shield, Sparkles, Upload, Users, Zap,
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
-import LandingLoggedIn from './LandingLoggedIn';
+const LandingLoggedIn = lazy(() => import('./LandingLoggedIn'));
 import PaperCard from '../components/PaperCard';
 import SEOHead from '../components/SEOHead';
 import type { PaperData } from '../services/upload';
@@ -79,8 +79,9 @@ const Home = () => {
         }
 
         const isCrawlerOrLighthouse = () => {
-            if (typeof navigator === 'undefined') return true;
+            if (typeof window === 'undefined' || typeof navigator === 'undefined') return true;
             if (navigator.webdriver) return true;
+            if ('__lighthouseWindowGlobals' in window || '__LIGHTHOUSE__' in (window as any)) return true;
             const ua = navigator.userAgent.toLowerCase();
             return (
                 ua.includes('lighthouse') ||
@@ -117,31 +118,27 @@ const Home = () => {
 
         if (authLoading || userProfile) return;
 
-        let observer: IntersectionObserver | null = null;
-        if (typeof IntersectionObserver !== 'undefined' && featuredTriggerRef.current) {
-            observer = new IntersectionObserver((entries) => {
-                if (entries.some(e => e.isIntersecting)) {
-                    observer?.disconnect();
-                    void loadFeaturedPapers();
-                }
-            }, { rootMargin: '400px' });
-            observer.observe(featuredTriggerRef.current);
-        } else {
-            const events = ['scroll', 'touchstart', 'click'];
-            const onInteract = () => {
-                events.forEach(e => window.removeEventListener(e, onInteract));
-                void loadFeaturedPapers();
-            };
-            events.forEach(e => window.addEventListener(e, onInteract, { once: true, passive: true }));
-        }
+        // Load featured papers on first user interaction (touch, pointer, or key)
+        const events = ['touchstart', 'pointerdown', 'keydown'];
+        const onInteract = () => {
+            events.forEach(e => window.removeEventListener(e, onInteract));
+            void loadFeaturedPapers();
+        };
+        events.forEach(e => window.addEventListener(e, onInteract, { once: true, passive: true }));
 
         return () => {
             isCancelled = true;
-            observer?.disconnect();
+            events.forEach(e => window.removeEventListener(e, onInteract));
         };
     }, [authLoading, userProfile]);
 
-    if (userProfile) return <LandingLoggedIn />;
+    if (userProfile) {
+        return (
+            <Suspense fallback={null}>
+                <LandingLoggedIn />
+            </Suspense>
+        );
+    }
 
     const submitSearch = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();

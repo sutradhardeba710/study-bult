@@ -21,6 +21,8 @@ const pwaPlugin = VitePWA({
     ]
   },
   workbox: {
+    globPatterns: ['favicon*.png', 'logo*.webp', 'pwa-*.png'],
+    globIgnores: ['**/logo-backup*'],
     runtimeCaching: [
       {
         urlPattern: /^https:\/\/fonts\.(googleapis|gstatic)\.com\/.*/i,
@@ -161,8 +163,20 @@ export default defineConfig({
     modulePreload: {
       polyfill: false,
       resolveDependencies(filename, deps) {
-        // Prevent lazy admin/heavy packages from being preloaded on public routes
-        return deps.filter(dep => !dep.includes('vendor-charts') && !dep.includes('vendor-dnd') && !dep.includes('vendor-confetti') && !dep.includes('vendor-crop'));
+        // Prevent lazy admin/heavy packages & secondary SDKs from being preloaded on public routes
+        return deps.filter(dep =>
+          !dep.includes('vendor-charts') &&
+          !dep.includes('vendor-dnd') &&
+          !dep.includes('vendor-confetti') &&
+          !dep.includes('vendor-crop') &&
+          !dep.includes('firebase-') &&
+          !dep.includes('UploadEncouragementModal') &&
+          !dep.includes('page-landing-loggedin') &&
+          !dep.includes('LandingLoggedIn') &&
+          !dep.includes('featuredPapers') &&
+          !dep.includes('papers-') &&
+          !dep.includes('service-papers')
+        );
       }
     },
     rollupOptions: {
@@ -243,8 +257,23 @@ export default defineConfig({
           if (id.includes('node_modules/react-pdf') || id.includes('node_modules/pdfjs-dist')) {
             return 'vendor-pdf';
           }
+          // Shared application components & context (prevent route-chunk contamination)
+          if (id.includes('src/context/') || id.includes('src/services/firebaseConfig')) {
+            return 'app-context';
+          }
+          if (id.includes('src/components/SEOHead')) {
+            return 'app-seo';
+          }
+          if (id.includes('src/components/PaperCard')) {
+            return 'app-papercard';
+          }
+          if (id.includes('src/services/papers')) {
+            return 'service-papers';
+          }
+          if (id.includes('src/pages/LandingLoggedIn')) {
+            return 'page-landing-loggedin';
+          }
         },
-        experimentalMinChunkSize: 10_000,  // merge chunks < 10KB → fewer HTTP round-trips
       }
     },
     minify: 'terser',

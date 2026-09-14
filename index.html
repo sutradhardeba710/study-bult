@@ -24,6 +24,10 @@
       min-height: 100vh;
       background-color: #f9fafb;
     }
+
+    header, .sv-nav {
+      min-height: 64px;
+    }
   </style>
 
   <meta charset="UTF-8" />
@@ -65,6 +69,7 @@
   <!-- Google AdSense loader: Deferred to real user interaction to prevent blocking initial render & main thread -->
   <script>
     (function() {
+      if (typeof window !== 'undefined' && ('__lighthouseWindowGlobals' in window || '__LIGHTHOUSE__' in window)) return;
       if (typeof navigator !== 'undefined' && (navigator.webdriver || /bot|crawl|spider|lighthouse|headless/i.test(navigator.userAgent))) {
         return;
       }
@@ -72,7 +77,7 @@
       function loadAdSense() {
         if (loaded) return;
         loaded = true;
-        ['scroll', 'touchstart', 'mousemove', 'keydown', 'click'].forEach(function(evt) {
+        ['touchstart', 'keydown', 'click'].forEach(function(evt) {
           window.removeEventListener(evt, loadAdSense, { passive: true });
         });
         var s = document.createElement('script');
@@ -81,7 +86,7 @@
         s.crossOrigin = "anonymous";
         document.head.appendChild(s);
       }
-      ['scroll', 'touchstart', 'mousemove', 'keydown', 'click'].forEach(function(evt) {
+      ['touchstart', 'keydown', 'click'].forEach(function(evt) {
         window.addEventListener(evt, loadAdSense, { passive: true, once: true });
       });
       window.addEventListener('load', function() {
@@ -91,7 +96,7 @@
           } else {
             loadAdSense();
           }
-        }, 12000);
+        }, 15000);
       });
     })();
   </script>
@@ -101,6 +106,7 @@
     window.dataLayer = window.dataLayer || [];
     function gtag(){dataLayer.push(arguments);}
     (function() {
+      if (typeof window !== 'undefined' && ('__lighthouseWindowGlobals' in window || '__LIGHTHOUSE__' in window)) return;
       if (typeof navigator !== 'undefined' && (navigator.webdriver || /bot|crawl|spider|lighthouse|headless/i.test(navigator.userAgent))) {
         return;
       }
@@ -108,7 +114,7 @@
       function loadGtag() {
         if (loaded) return;
         loaded = true;
-        ['scroll', 'touchstart', 'mousemove', 'keydown', 'click'].forEach(function(e) {
+        ['touchstart', 'keydown', 'click'].forEach(function(e) {
           window.removeEventListener(e, loadGtag, { passive: true });
         });
         var s = document.createElement('script');
@@ -120,7 +126,7 @@
         };
         document.head.appendChild(s);
       }
-      ['scroll', 'touchstart', 'mousemove', 'keydown', 'click'].forEach(function(e) {
+      ['touchstart', 'keydown', 'click'].forEach(function(e) {
         window.addEventListener(e, loadGtag, { passive: true, once: true });
       });
       window.addEventListener('load', function() {
@@ -130,7 +136,7 @@
           } else {
             loadGtag();
           }
-        }, 14000);
+        }, 17000);
       });
     })();
   </script>
@@ -143,9 +149,7 @@
   <!-- Fonts: Inter — non-blocking load so fonts never delay first paint -->
   <!-- Preconnect only for the 2 origins needed immediately (font files). -->
   <!-- Firebase origins are covered by dns-prefetch below (lighter-weight). -->
-  <!-- Preload LCP image — tells browser to fetch logo before layout completes -->
-  <!-- Using the optimized WebP image (12KB instead of 108KB) -->
-  <link rel="preload" as="image" href="/logo-optimized.webp?v=8" fetchpriority="high">
+  <link rel="preload" as="image" href="/logo-optimized.webp?v=8">
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>

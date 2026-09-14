@@ -32,7 +32,7 @@ let optimizedCount = 0;
 for (const filePath of htmlFiles) {
   let content = fs.readFileSync(filePath, 'utf8');
 
-  // Add preload hint while keeping stylesheet to prevent FOUC (layout shift)
+  // Add preload hint while keeping stylesheet to prevent layout thrashing
   const cssPattern = /<link rel="stylesheet"(?: crossorigin="")? href="(\/assets\/[^"]+\.css)">/g;
 
   if (cssPattern.test(content)) {

@@ -1,14 +1,8 @@
 /* eslint-disable react-refresh/only-export-components */
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import type { User } from 'firebase/auth';
-// engagement is imported lazily inside onAuthStateChanged — never parsed for guests
-import { isFirebaseConfigured, initFirebaseAuth } from '../services/firebase';
-import { signInWithGoogle, signInWithGoogleRedirect, getGoogleRedirectResult } from '../services/google';
-import {
-    sendWelcomeEmail,
-    sendLoginNotificationEmail,
-    sendAccountDeletionEmail
-} from '../services/email';
+// engagement, google, and email are imported lazily inside user actions — never parsed for guests
+import { isFirebaseConfigured } from '../services/firebaseConfig';
 
 export interface UserProfile {
     uid: string;
@@ -108,6 +102,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
         try {
             const { createUserWithEmailAndPassword, updateProfile } = await import('firebase/auth');
+            const { initFirebaseAuth } = await import('../services/firebase');
             const auth = await initFirebaseAuth();
 
             const userCredential = await createUserWithEmailAndPassword(auth, email, password);
@@ -131,6 +126,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             setUserProfile(userProfileData);
 
             // Send welcome email
+            const { sendWelcomeEmail } = await import('../services/email');
             await sendWelcomeEmail(userProfileData);
         } catch (error: any) {
             console.error('Registration error:', error);
@@ -145,6 +141,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
         try {
             const { signInWithEmailAndPassword } = await import('firebase/auth');
+            const { initFirebaseAuth } = await import('../services/firebase');
             const auth = await initFirebaseAuth();
 
             const userCredential = await signInWithEmailAndPassword(auth, email, password);
@@ -161,7 +158,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 setUserProfile(profile);
 
                 // Send login notification email (fire-and-forget)
-                sendLoginNotificationEmail(profile, { time: new Date() }).catch(() => { });
+                import('../services/email')
+                    .then(({ sendLoginNotificationEmail }) => sendLoginNotificationEmail(profile, { time: new Date() }))
+                    .catch(() => { });
             }
         } catch (error: any) {
             throw new Error(error?.message || 'An unexpected error occurred.');
@@ -174,6 +173,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         }
 
         try {
+            const { signInWithGoogle } = await import('../services/google');
             const result = await signInWithGoogle();
 
             // Check if this is a new user or if profile is incomplete
@@ -182,6 +182,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 return result;
             } else {
                 // Existing user with complete profile - send login notification
+                const { sendLoginNotificationEmail } = await import('../services/email');
                 await sendLoginNotificationEmail(result.profile, {
                     time: new Date(),
                 });
@@ -198,6 +199,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             throw new Error('Firebase is not properly configured. Please check your environment variables.');
         }
 
+        const { signInWithGoogleRedirect } = await import('../services/google');
         await signInWithGoogleRedirect();
     };
 
@@ -207,6 +209,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         }
 
         try {
+            const { getGoogleRedirectResult } = await import('../services/google');
             return await getGoogleRedirectResult();
         } catch (error: any) {
             console.error('Google redirect result error:', error);
@@ -221,6 +224,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
         try {
             const { signOut } = await import('firebase/auth');
+            const { initFirebaseAuth } = await import('../services/firebase');
             const auth = await initFirebaseAuth();
 
             await signOut(auth);
@@ -284,6 +288,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             await deleteUser(currentUser);
 
             // Send account deletion confirmation email
+            const { sendAccountDeletionEmail } = await import('../services/email');
             await sendAccountDeletionEmail(email, name);
 
             // Clear local state
@@ -302,6 +307,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
         try {
             const { sendPasswordResetEmail: firebaseSendPasswordResetEmail } = await import('firebase/auth');
+            const { initFirebaseAuth } = await import('../services/firebase');
             const auth = await initFirebaseAuth();
 
             // Firebase will send an email with a password reset link
@@ -328,6 +334,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
             // Send welcome email only after profile is completed
             if (profile.email) {
+                const { sendWelcomeEmail } = await import('../services/email');
                 await sendWelcomeEmail(updatedProfile);
             }
 
@@ -352,6 +359,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         // Waiting 500ms gives the UI plenty of time to render the 'loading/guest' skeleton.
         const startAuth = async () => {
             const { onAuthStateChanged } = await import('firebase/auth');
+            const { initFirebaseAuth } = await import('../services/firebase');
             const auth = await initFirebaseAuth();
 
             unsubscribe = onAuthStateChanged(auth, async (user) => {

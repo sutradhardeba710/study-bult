@@ -1,5 +1,5 @@
 import { Outlet, useLocation, ScrollRestoration } from 'react-router-dom';
-import { AuthProvider } from './context/AuthContext';
+import { AuthProvider, useAuth } from './context/AuthContext';
 import { MetaProvider } from './context/MetaContext';
 import { Toaster } from 'react-hot-toast';
 import { lazy, Suspense } from 'react';
@@ -32,15 +32,23 @@ export default function App() {
         <div className="App flex flex-col min-h-screen">
           <ScrollRestoration getKey={(location) => location.pathname} />
           <Toaster position="top-right" toastOptions={{ duration: 3000 }} />
-          <Suspense fallback={null}>
-            <UploadEncouragementModal />
-          </Suspense>
+          <UploadEncouragementGate />
           <Suspense fallback={<LoadingFallback />}>
             <LayoutRouter />
           </Suspense>
         </div>
       </MetaProvider>
     </AuthProvider>
+  );
+}
+
+function UploadEncouragementGate() {
+  const { currentUser } = useAuth();
+  if (!currentUser?.emailVerified) return null;
+  return (
+    <Suspense fallback={null}>
+      <UploadEncouragementModal />
+    </Suspense>
   );
 }
 
