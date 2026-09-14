@@ -84,15 +84,11 @@ export default function SystemNoticeModal({ isOpen, onClose, onCloseToday }: Sys
       const unsub = onSnapshot(
         q,
         (snap) => {
-          if (!snap.empty) {
-            const liveNotices: SystemNoticeItem[] = snap.docs.map((docSnap) => ({
-              id: docSnap.id,
-              ...docSnap.data()
-            })) as SystemNoticeItem[];
-            setNotices(liveNotices);
-          } else {
-            setNotices(DEFAULT_NOTICES);
-          }
+          const liveNotices: SystemNoticeItem[] = snap.docs.map((docSnap) => ({
+            id: docSnap.id,
+            ...docSnap.data()
+          })) as SystemNoticeItem[];
+          setNotices(liveNotices);
         },
         (error) => {
           console.warn('Could not fetch system_notices, using defaults:', error);
@@ -133,7 +129,7 @@ export default function SystemNoticeModal({ isOpen, onClose, onCloseToday }: Sys
       setShowAdminAddForm(false);
     } catch (error: any) {
       console.error('Error adding notice:', error);
-      toast.error(error.message || 'Failed to post notice');
+      toast.error(error?.message || 'Failed to post notice');
     } finally {
       setSubmitting(false);
     }
@@ -142,11 +138,12 @@ export default function SystemNoticeModal({ isOpen, onClose, onCloseToday }: Sys
   const handleDeleteNotice = async (noticeId: string) => {
     if (!window.confirm('Are you sure you want to delete this notice?')) return;
     try {
+      setNotices((prev) => prev.filter((n) => n.id !== noticeId));
       await deleteDoc(doc(db, 'system_notices', noticeId));
       toast.success('Notice deleted');
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error deleting notice:', error);
-      toast.error('Failed to delete notice');
+      toast.error(error?.message || 'Failed to delete notice');
     }
   };
 
@@ -422,13 +419,24 @@ export default function SystemNoticeModal({ isOpen, onClose, onCloseToday }: Sys
 
                   {showAdminAddForm && (
                     <form onSubmit={handleCreateNotice} className="mt-2.5 pt-2.5 border-t border-amber-200/60 space-y-2 text-slate-700">
-                      <div>
+                      <div className="flex items-center gap-2">
                         <input
                           value={newTitle}
                           onChange={(e) => setNewTitle(e.target.value)}
                           placeholder="Notice Title"
-                          className="w-full px-3 py-1.5 bg-white border border-slate-200 rounded-lg text-xs text-slate-900 placeholder:text-slate-400 outline-none"
+                          className="flex-1 px-3 py-1.5 bg-white border border-slate-200 rounded-lg text-xs text-slate-900 placeholder:text-slate-400 outline-none focus:border-amber-500"
                         />
+                        <select
+                          value={newTag}
+                          onChange={(e) => setNewTag(e.target.value as any)}
+                          className="px-2.5 py-1.5 bg-white border border-slate-200 rounded-lg text-xs text-slate-900 font-semibold outline-none focus:border-amber-500"
+                        >
+                          <option value="Notice">Notice</option>
+                          <option value="Update">Update</option>
+                          <option value="Important">Important</option>
+                          <option value="Rewards">Rewards</option>
+                          <option value="Feature">Feature</option>
+                        </select>
                       </div>
                       <div>
                         <textarea
@@ -436,13 +444,27 @@ export default function SystemNoticeModal({ isOpen, onClose, onCloseToday }: Sys
                           onChange={(e) => setNewContent(e.target.value)}
                           rows={2}
                           placeholder="Notice Content..."
-                          className="w-full px-3 py-1.5 bg-white border border-slate-200 rounded-lg text-xs text-slate-900 placeholder:text-slate-400 outline-none resize-none"
+                          className="w-full px-3 py-1.5 bg-white border border-slate-200 rounded-lg text-xs text-slate-900 placeholder:text-slate-400 outline-none resize-none focus:border-amber-500"
+                        />
+                      </div>
+                      <div className="grid grid-cols-2 gap-2">
+                        <input
+                          value={newLink}
+                          onChange={(e) => setNewLink(e.target.value)}
+                          placeholder="Optional Link (e.g., /browse)"
+                          className="px-3 py-1.5 bg-white border border-slate-200 rounded-lg text-xs text-slate-900 placeholder:text-slate-400 outline-none focus:border-amber-500"
+                        />
+                        <input
+                          value={newLinkText}
+                          onChange={(e) => setNewLinkText(e.target.value)}
+                          placeholder="Button Text (e.g., Explore)"
+                          className="px-3 py-1.5 bg-white border border-slate-200 rounded-lg text-xs text-slate-900 placeholder:text-slate-400 outline-none focus:border-amber-500"
                         />
                       </div>
                       <button
                         type="submit"
                         disabled={submitting}
-                        className="w-full py-1.5 bg-primary-600 hover:bg-primary-700 text-white rounded-lg text-xs font-bold transition-colors"
+                        className="w-full py-1.5 bg-primary-600 hover:bg-primary-700 text-white rounded-lg text-xs font-bold transition-colors disabled:opacity-50"
                       >
                         {submitting ? 'Publishing...' : 'Publish Notice'}
                       </button>
@@ -453,48 +475,56 @@ export default function SystemNoticeModal({ isOpen, onClose, onCloseToday }: Sys
 
               {/* List of Notices */}
               <div className="space-y-2.5">
-                {notices.map((item, index) => (
-                  <div key={item.id || index} className="p-3.5 bg-white border border-slate-200/80 rounded-xl space-y-1 shadow-2xs">
-                    <div className="flex items-start justify-between gap-2">
-                      <div className="flex items-center gap-2">
-                        <span className="text-sm select-none">📢</span>
-                        <h3 className="text-xs font-bold text-slate-900 tracking-tight">
-                          {item.title}
-                        </h3>
-                      </div>
-                      <div className="flex items-center gap-1 shrink-0">
-                        <span className={`px-2 py-0.5 rounded-full text-[9px] font-bold border ${getTagBadgeClass(item.tag)}`}>
-                          {item.tag}
-                        </span>
-                        {isAdmin && (
-                          <button
-                            onClick={() => handleDeleteNotice(item.id)}
-                            className="p-1 text-slate-400 hover:text-rose-600 rounded-md transition-colors"
-                          >
-                            <Trash2 className="w-3 h-3" />
-                          </button>
-                        )}
-                      </div>
-                    </div>
-
-                    <p className="text-xs text-slate-600 pl-5 leading-relaxed">
-                      {item.content}
-                    </p>
-
-                    {item.link && (
-                      <div className="pl-5 pt-0.5">
-                        <Link
-                          to={item.link}
-                          onClick={onClose}
-                          className="inline-flex items-center gap-1 text-xs font-bold text-primary-600 hover:underline"
-                        >
-                          <span>{item.linkText || 'Learn more'}</span>
-                          <ArrowRight className="w-3 h-3" />
-                        </Link>
-                      </div>
-                    )}
+                {notices.length === 0 ? (
+                  <div className="p-6 text-center bg-white border border-slate-200/70 rounded-xl space-y-1">
+                    <p className="text-xs font-semibold text-slate-700">No active system notices</p>
+                    <p className="text-[11px] text-slate-400">All current updates will appear here.</p>
                   </div>
-                ))}
+                ) : (
+                  notices.map((item, index) => (
+                    <div key={item.id || index} className="p-3.5 bg-white border border-slate-200/80 rounded-xl space-y-1 shadow-2xs">
+                      <div className="flex items-start justify-between gap-2">
+                        <div className="flex items-center gap-2">
+                          <span className="text-sm select-none">📢</span>
+                          <h3 className="text-xs font-bold text-slate-900 tracking-tight">
+                            {item.title}
+                          </h3>
+                        </div>
+                        <div className="flex items-center gap-1 shrink-0">
+                          <span className={`px-2 py-0.5 rounded-full text-[9px] font-bold border ${getTagBadgeClass(item.tag)}`}>
+                            {item.tag}
+                          </span>
+                          {isAdmin && (
+                            <button
+                              onClick={() => handleDeleteNotice(item.id)}
+                              title="Delete Notice"
+                              className="p-1 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-md transition-colors"
+                            >
+                              <Trash2 className="w-3 h-3" />
+                            </button>
+                          )}
+                        </div>
+                      </div>
+
+                      <p className="text-xs text-slate-600 pl-5 leading-relaxed">
+                        {item.content}
+                      </p>
+
+                      {item.link && (
+                        <div className="pl-5 pt-0.5">
+                          <Link
+                            to={item.link}
+                            onClick={onClose}
+                            className="inline-flex items-center gap-1 text-xs font-bold text-primary-600 hover:underline"
+                          >
+                            <span>{item.linkText || 'Learn more'}</span>
+                            <ArrowRight className="w-3 h-3" />
+                          </Link>
+                        </div>
+                      )}
+                    </div>
+                  ))
+                )}
               </div>
             </div>
           )}
