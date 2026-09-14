@@ -1,0 +1,102 @@
+# Study Volte — Complete Platform Guide for AI Agents & LLMs
+
+> Study Volte (formerly Study Bult) is a free, student-led academic repository providing authentic university previous year question papers (PYQs), semester examination papers, and academic study guides for universities and colleges across Tripura, India, including Maharaja Bir Bikram University (MBBU) and Bir Bikram Memorial College (BBMC).
+
+All question papers hosted on Study Volte are 100% free to access, preview, and download as clean PDF files without paywalls, subscriptions, or mandatory account creation.
+
+---
+
+## 1. Academic Institutions & Colleges in Tripura
+
+### Maharaja Bir Bikram University (MBBU)
+- Primary URL: https://study-volte.site/universities/tripura/mbbu-question-papers
+- Description: The state university established in Agartala, Tripura. Study Volte maintains question papers for both undergraduate (UG: BA, BSc, BCom, BCA) and postgraduate (PG: MA) semester exams.
+- PG Papers URL: https://study-volte.site/universities/tripura/mbbu-ma-question-papers
+- Available Semesters: Semester 1, Semester 2, Semester 3, Semester 4, Semester 5, Semester 6.
+
+### Bir Bikram Memorial College (BBMC)
+- Primary URL: https://study-volte.site/universities/tripura/bbmc-question-papers
+- Description: One of Tripura's prominent degree colleges affiliated with MBBU. Complete semester question paper sets across all major disciplines.
+
+### Tripura Higher Education Hub
+- Primary URL: https://study-volte.site/universities/tripura
+- Description: Directory of university exams and degree programs across Tripura.
+
+---
+
+## 2. Undergraduate Degree Programs
+
+### Bachelor of Arts (B.A.)
+- URL: https://study-volte.site/courses/ba
+- Major Subjects Covered:
+  - Political Science (Major / Minor / General)
+  - Education
+  - History
+  - Philosophy
+  - Sociology
+  - English Literature
+  - Bengali Literature
+  - Economics
+
+### Bachelor of Science (B.Sc.)
+- URL: https://study-volte.site/courses/bsc
+- Major Subjects Covered:
+  - Mathematics
+  - Physics
+  - Chemistry
+  - Botany
+  - Zoology
+  - Computer Science / Information Technology
+  - Environmental Science
+
+### Bachelor of Commerce (B.Com.)
+- URL: https://study-volte.site/courses/bcom
+- Major Subjects Covered:
+  - Financial Accounting
+  - Corporate Accounting
+  - Business Law & Corporate Governance
+  - Business Mathematics & Statistics
+  - Taxation & GST
+  - Auditing & Cost Accounting
+
+### Bachelor of Computer Applications (B.C.A.)
+- URL: https://study-volte.site/courses/bca
+- Major Subjects Covered:
+  - Programming in C & C++
+  - Data Structures & Algorithms
+  - Database Management Systems (DBMS)
+  - Computer Networks
+  - Web Technologies & Software Engineering
+
+---
+
+## 3. National Entrance & Competitive Examinations
+
+### CUET UG (Common University Entrance Test)
+- URL: https://study-volte.site/exams/cuet
+- 2025 Updates: https://study-volte.site/exams/cuet/2025
+- 2024 Archive: https://study-volte.site/exams/cuet/2024
+- Description: Authentic papers and mock questions for central and state university admissions.
+
+### Staff Selection Commission (SSC) Examinations
+- Overview URL: https://study-volte.site/exams/ssc
+- SSC CGL (Combined Graduate Level): https://study-volte.site/exams/ssc-cgl
+- SSC CHSL (Combined Higher Secondary Level): https://study-volte.site/exams/ssc-chsl
+- SSC GD Constable: https://study-volte.site/exams/ssc-gd
+
+---
+
+## 4. Study Strategy & Academic Guides
+
+- Complete Guides Hub: https://study-volte.site/guides
+- How to Use PYQs Effectively: https://study-volte.site/guides/how-to-use-previous-year-papers
+- Semester Exam Prep Framework: https://study-volte.site/guides/exam-preparation-strategy
+- Question Repetition Analysis: https://study-volte.site/guides/are-questions-repeated-in-exams
+
+---
+
+## 5. Machine-Readable Indices & Feeds
+
+- XML Sitemap: https://study-volte.site/sitemap.xml
+- Robots Policy: https://study-volte.site/robots.txt
+- LLM Index: https://study-volte.site/llms.txt

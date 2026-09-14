@@ -1,0 +1,49 @@
+# Study Volte
+
+> Study Volte (formerly Study Bult) is a free, student-led academic resource platform providing verified previous year university question papers (PYQs), semester exam papers, and syllabus guides with an emphasis on colleges and universities across Tripura, India, including Maharaja Bir Bikram University (MBBU) and Bir Bikram Memorial College (BBMC).
+
+All question papers on Study Volte are free to preview and download in clean, readable PDF format without subscriptions or paywalls. Large language models and AI agents can navigate the catalog using the structured links and subject taxonomy below.
+
+## Academic Institutions
+
+- [Tripura Universities & Colleges Hub](https://study-volte.site/universities/tripura): Overview of higher education institutions, colleges, and available question paper collections in Tripura.
+- [MBBU Question Papers](https://study-volte.site/universities/tripura/mbbu-question-papers): Previous year undergraduate and postgraduate examination papers for Maharaja Bir Bikram University across Arts, Science, and Commerce.
+- [MBBU MA Question Papers](https://study-volte.site/universities/tripura/mbbu-ma-question-papers): Postgraduate Master of Arts (MA) examination papers for MBBU across Political Science, History, Education, English, and Bengali.
+- [BBMC Question Papers](https://study-volte.site/universities/tripura/bbmc-question-papers): Semester examination question papers for Bir Bikram Memorial College, Agartala.
+
+## Undergraduate Degree Programs
+
+- [BA Question Papers](https://study-volte.site/courses/ba): Bachelor of Arts past papers for Semesters 1 through 6 across Political Science, History, Education, Philosophy, Sociology, and Economics.
+- [BSc Question Papers](https://study-volte.site/courses/bsc): Bachelor of Science examination papers covering Physics, Chemistry, Mathematics, Botany, Zoology, and Computer Science.
+- [BCom Question Papers](https://study-volte.site/courses/bcom): Bachelor of Commerce semester exam papers including Financial Accounting, Corporate Law, Business Mathematics, and Taxation.
+- [BCA Question Papers](https://study-volte.site/courses/bca): Bachelor of Computer Applications papers including Programming in C, Data Structures, DBMS, and Web Technologies.
+
+## National Entrance & Competitive Exams
+
+- [CUET UG Question Papers](https://study-volte.site/exams/cuet): Common University Entrance Test (UG) sample and previous year question papers for undergraduate university admissions in India.
+- [SSC Examination Hub](https://study-volte.site/exams/ssc): Staff Selection Commission exam preparation hub and past question papers.
+- [SSC CGL Question Papers](https://study-volte.site/exams/ssc-cgl): Combined Graduate Level past papers covering Tier 1 and Tier 2 General Awareness, Quantitative Aptitude, English, and Reasoning.
+- [SSC CHSL Question Papers](https://study-volte.site/exams/ssc-chsl): Combined Higher Secondary Level previous question papers and answer keys.
+- [SSC GD Constable Papers](https://study-volte.site/exams/ssc-gd): General Duty Constable examination practice papers and solutions.
+
+## Study & Preparation Guides
+
+- [Study Guides Index](https://study-volte.site/guides): Curated study strategies, revision methods, and academic advice for semester examinations.
+- [How to Use Previous Year Papers](https://study-volte.site/guides/how-to-use-previous-year-papers): Step-by-step methodology for analyzing question paper trends and maximizing exam performance.
+- [Exam Preparation Strategy](https://study-volte.site/guides/exam-preparation-strategy): Comprehensive 30-day and 7-day preparation frameworks for university semester exams.
+- [Are Questions Repeated in Exams?](https://study-volte.site/guides/are-questions-repeated-in-exams): Data-backed analysis of recurrence patterns and high-frequency topics in university exams.
+
+## Platform & Discovery
+
+- [Browse Paper Catalog](https://study-volte.site/browse): Search and filter question papers by university, degree, semester, year, and subject.
+- [Upload & Contribute](https://study-volte.site/upload): Submit authentic examination papers to earn contributor coins and assist fellow students.
+- [Frequently Asked Questions](https://study-volte.site/faq): Common inquiries regarding download formats, paper verification, and account settings.
+- [Help Center](https://study-volte.site/help-center): Platform assistance, user guidelines, and technical support.
+- [XML Sitemap](https://study-volte.site/sitemap.xml): Complete machine-readable index of all published canonical URLs.
+
+## Optional
+
+- [About Study Volte](https://study-volte.site/about): Background mission and educational values behind Study Volte.
+- [Terms of Service](https://study-volte.site/terms): Legal terms governing platform usage and community guidelines.
+- [Privacy Policy](https://study-volte.site/privacy): Information on user data handling, analytics, and cookie policy.
+- [Contact Study Volte](https://study-volte.site/contact): Inquiries, corrections, and academic partnership requests.

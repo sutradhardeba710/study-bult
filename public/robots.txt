@@ -2,7 +2,9 @@
 User-agent: *
 Allow: /
 
-# High-value SEO content silos
+# High-value SEO content silos & AI Agent indexing
+Allow: /llms.txt
+Allow: /llms-full.txt
 Allow: /question-papers
 Allow: /browse
 Allow: /courses/
