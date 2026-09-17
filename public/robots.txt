@@ -40,6 +40,10 @@ Allow: /universities/
 Allow: /mbbu/
 Allow: /bbmc/
 
+# Google AdSense crawler
+User-agent: Mediapartners-Google
+Allow: /
+
 # Bingbot
 User-agent: Bingbot
 Allow: /

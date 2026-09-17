@@ -1,7 +1,7 @@
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import {
-  X, User, Upload, Home, LogOut, Shield, Settings, HelpCircle,
+  X, User, Users, Upload, Home, LogOut, Shield, Settings, HelpCircle,
   MessageCircle, FileQuestion, Search, FileText, Landmark,
   GraduationCap, FlaskConical, Briefcase, BookOpen, ChevronDown,
   ArrowRight, Menu, Sparkles, Bell, Megaphone
@@ -446,28 +446,10 @@ const Navigation = () => {
         setHasUnreadNotice(false);
       } else {
         setHasUnreadNotice(true);
-        // Only schedule popup for real human visitors after they interact with the page
-        if (closedInSession !== 'true' && !isCrawlerOrLighthouse()) {
-          const events = ['scroll', 'touchstart', 'click', 'keydown'];
-          const onFirstInteraction = () => {
-            events.forEach(e => window.removeEventListener(e, onFirstInteraction));
-            timer = setTimeout(() => {
-              setIsNoticeOpen(true);
-            }, 8000);
-          };
-          events.forEach(e => window.addEventListener(e, onFirstInteraction, { once: true, passive: true }));
-          removeInteractionListeners = () => {
-            events.forEach(e => window.removeEventListener(e, onFirstInteraction));
-          };
-        }
       }
     } catch {
       // safe fallback
     }
-    return () => {
-      if (timer) clearTimeout(timer);
-      if (removeInteractionListeners) removeInteractionListeners();
-    };
   }, []);
 
   // Synchronize unread badge with today's dismissal status
@@ -594,6 +576,7 @@ const Navigation = () => {
     { name: 'Home', href: currentUser ? '/browse' : '/' },
     { name: 'Browse Papers', href: '/browse' },
     { name: 'Study Guides', href: '/guides' },
+    { name: 'About Us', href: '/about' },
   ];
 
   // Mobile navigation
@@ -601,11 +584,13 @@ const Navigation = () => {
     { name: 'Home', href: currentUser ? '/browse' : '/', icon: Home },
     { name: 'All Papers', href: '/browse', icon: FileText },
     { name: 'Upload Paper', href: '/upload', icon: Upload },
+    { name: 'About Us', href: '/about', icon: Users },
     ...(currentUser ? [{ name: 'Dashboard', href: '/dashboard', icon: User }] : []),
     ...(userProfile?.role === 'admin' ? [{ name: 'Admin Panel', href: '/admin', icon: Shield }] : []),
   ];
 
   const supportLinks = [
+    { name: 'About Us', href: '/about', icon: Users },
     { name: 'Help Center', href: '/help-center', icon: HelpCircle },
     { name: 'FAQ', href: '/faq', icon: FileQuestion },
     { name: 'Contact Us', href: '/contact', icon: MessageCircle },

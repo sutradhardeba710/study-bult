@@ -134,18 +134,23 @@ const Privacy: React.FC = () => {
           <section>
             <h2 className="text-lg font-bold uppercase tracking-wide mt-8 mb-3 border-b border-gray-300 pb-1">9. Advertising and Third-Party Cookies</h2>
             <p className="mb-3">
-              9.1. The Service may display advertisements served by third-party advertising networks, including <strong>Google AdSense</strong>. These partners use cookies and similar technologies to serve ads based on Your prior visits to this Website and other websites across the Internet.
+              9.1. The Service may display advertisements served by third-party advertising networks, including <strong>Google AdSense</strong>. Third party vendors, including Google, use cookies to serve ads based on a user's prior visits to Your website or other websites across the Internet.
             </p>
             <p className="mb-3">
-              9.2. Google, as a third-party vendor, uses cookies — including the <strong>DoubleClick DART cookie</strong> — to serve ads to Users based on their visit to this Site and other sites on the Internet. Third-party vendors and ad networks may also use cookies to serve ads based on a User's prior activity.
+              9.2. Google's use of advertising cookies enables it and its partners to serve ads to Your users based on their visit to Your sites and/or other sites on the Internet. Google, as a third-party vendor, uses cookies — including the <strong>DoubleClick DART cookie</strong> — to serve personalized and contextual ads.
             </p>
             <p className="mb-3">
-              9.3. You may opt out of personalized advertising by visiting Google's Ads Settings at{' '}
-              <a href="https://www.google.com/settings/ads" target="_blank" rel="noopener noreferrer" className="text-blue-600 underline">www.google.com/settings/ads</a>. You may additionally opt out of third-party vendor cookies for personalized advertising by visiting{' '}
-              <a href="https://www.aboutads.info/choices" target="_blank" rel="noopener noreferrer" className="text-blue-600 underline">www.aboutads.info/choices</a>.
+              9.3. Users may opt out of personalized advertising by visiting Google's <strong>My Ad Center</strong> at{' '}
+              <a href="https://myadcenter.google.com/" target="_blank" rel="noopener noreferrer" className="text-blue-600 underline">myadcenter.google.com</a>{' '}
+              or Google Ads Settings at{' '}
+              <a href="https://adssettings.google.com" target="_blank" rel="noopener noreferrer" className="text-blue-600 underline">adssettings.google.com</a>.
+              Alternatively, You may opt out of third-party vendors' use of cookies for personalized advertising by visiting the Digital Advertising Alliance (DAA) at{' '}
+              <a href="https://www.aboutads.info/choices" target="_blank" rel="noopener noreferrer" className="text-blue-600 underline">www.aboutads.info/choices</a>{' '}
+              or the Network Advertising Initiative (NAI) opt-out page at{' '}
+              <a href="https://optout.networkadvertising.org/" target="_blank" rel="noopener noreferrer" className="text-blue-600 underline">optout.networkadvertising.org</a>.
             </p>
             <p className="mb-3">
-              9.4. For further information regarding how Google collects and uses data through its advertising services, please review Google's own policy at{' '}
+              9.4. For further information regarding how Google collects and uses data when you use our partners' sites or apps, please review Google's policy at{' '}
               <a href="https://policies.google.com/technologies/partner-sites" target="_blank" rel="noopener noreferrer" className="text-blue-600 underline">policies.google.com/technologies/partner-sites</a>.
             </p>
           </section>

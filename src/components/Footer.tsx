@@ -24,6 +24,8 @@ const programLinks = [
 ];
 
 const resourceLinks = [
+  { to: '/about', label: 'About Us' },
+  { to: '/contact', label: 'Contact Us' },
   { to: '/guides/how-to-use-previous-year-papers', label: 'How to Use PYQs' },
   { to: '/guides/exam-preparation-strategy', label: 'Exam Prep Strategy' },
   { to: '/guides/are-questions-repeated-in-exams', label: 'Are Questions Repeated?' },
@@ -244,6 +246,10 @@ const Footer = () => {
           </div>
 
           <div className="flex flex-wrap justify-center sm:justify-end gap-3 text-xs">
+            <Link to="/about" className="hover:text-slate-300 transition-colors">About Us</Link>
+            <span className="text-slate-700">·</span>
+            <Link to="/contact" className="hover:text-slate-300 transition-colors">Contact</Link>
+            <span className="text-slate-700">·</span>
             <Link to="/privacy" className="hover:text-slate-300 transition-colors">Privacy</Link>
             <span className="text-slate-700">·</span>
             <Link to="/terms" className="hover:text-slate-300 transition-colors">Terms</Link>
