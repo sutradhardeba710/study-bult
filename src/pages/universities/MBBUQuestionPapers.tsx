@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { BookOpen, Download, TrendingUp, Users, Award, FileText, ChevronRight } from 'lucide-react';
+import { BookOpen, Download, TrendingUp, Users, Award, FileText, ChevronRight, Calculator, ExternalLink } from 'lucide-react';
 import SEOHead from '../../components/SEOHead';
 import { collection, query, where, getDocs } from 'firebase/firestore';
 import { db } from '../../services/firebaseDb';
@@ -122,6 +122,14 @@ const MBBUQuestionPapers = () => {
                     "@type": "Answer",
                     "text": "Our platform is updated regularly by students. A new MBBU paper is uploaded weekly, especially during exam seasons. You can check the 'Latest Uploads' section for recent additions."
                 }
+            },
+            {
+                "@type": "Question",
+                "name": "How do I convert MBBU CGPA or SGPA to percentage?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Maharaja Bir Bikram University (MBBU) follows the CBCS 10-point grading system. To convert your MBBU semester SGPA or cumulative CGPA into equivalent percentage for job applications, scholarship forms, or higher education, you can use the free online CGPA to Percentage Converter (https://cgpaconverter.pages.dev/)."
+                }
             }
         ]
     };
@@ -145,7 +153,7 @@ const MBBUQuestionPapers = () => {
             <SEOHead
                 title="MBBU Previous Year Question Papers PDF Download | Maharaja Bir Bikram College Papers | Study Volte"
                 description="Download Maharaja Bir Bikram University (MBBU) and MBB College previous year question papers for all semesters. Free PDF download for BA, BSc, BCom, BCA, MA. All 6 semesters covered."
-                keywords="mbbu, mbbu previous year question paper, maharaja bir bikram college papers, maharaja bir bikram university question paper, mbb college previous year question paper, mbbu question paper 2024 2025, mbbu 1st sem question paper, mbbu 2nd sem question paper, mbbu 3rd sem question paper, mbbu ba question paper, mbbu bsc question paper, mbbu bcom question paper, mbbu bca question paper, mbbu pyq download, tripura university question papers, study volte"
+                keywords="mbbu, mbbu previous year question paper, maharaja bir bikram college papers, maharaja bir bikram university question paper, mbb college previous year question paper, mbbu question paper 2024 2025, mbbu 1st sem question paper, mbbu 2nd sem question paper, mbbu 3rd sem question paper, mbbu ba question paper, mbbu bsc question paper, mbbu bcom question paper, mbbu bca question paper, mbbu pyq download, tripura university question papers, mbbu cgpa converter, cgpa to percentage converter mbbu, study volte"
             />
 
             {/* FAQ Schema */}
@@ -353,7 +361,18 @@ const MBBUQuestionPapers = () => {
                                     </li>
                                     <li className="flex items-start">
                                         <span className="text-primary-600 mr-2">•</span>
-                                        <span>Choice Based Credit System (CBCS) followed</span>
+                                        <span>
+                                            Choice Based Credit System (CBCS) 10-point scale followed — convert your semester grades easily using this{' '}
+                                            <a
+                                                href="https://cgpaconverter.pages.dev/"
+                                                target="_blank"
+                                                rel="noopener"
+                                                className="text-primary-600 font-semibold underline hover:text-primary-800 transition-colors"
+                                            >
+                                                CGPA to Percentage Converter
+                                            </a>
+                                            .
+                                        </span>
                                     </li>
                                 </ul>
                             </div>
@@ -395,6 +414,74 @@ const MBBUQuestionPapers = () => {
                                 <div>
                                     <div className="text-primary-600 font-bold text-lg mb-2">⏱️ Time Management</div>
                                     <p className="text-gray-600 text-sm">Practice solving papers within the exam time limit</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                {/* MBBU Student Academic Utilities — CGPA to Percentage Converter */}
+                <section className="py-16 bg-white border-y border-gray-100">
+                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                        <div className="bg-gradient-to-br from-slate-900 via-primary-950 to-indigo-950 rounded-3xl p-8 sm:p-12 text-white relative overflow-hidden shadow-2xl border border-primary-500/20">
+                            {/* Ambient background glows */}
+                            <div className="absolute top-0 right-0 -mr-24 -mt-24 w-96 h-96 rounded-full bg-primary-500/20 blur-3xl pointer-events-none" />
+                            <div className="absolute bottom-0 left-0 -ml-24 -mb-24 w-96 h-96 rounded-full bg-amber-500/10 blur-3xl pointer-events-none" />
+
+                            <div className="relative z-10 grid lg:grid-cols-12 gap-8 items-center">
+                                <div className="lg:col-span-8">
+                                    <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-md px-3.5 py-1.5 rounded-full text-xs sm:text-sm font-semibold mb-4 border border-white/15 text-yellow-300">
+                                        <Calculator className="w-4 h-4" />
+                                        <span>Recommended Academic Utility for MBBU Students</span>
+                                    </div>
+
+                                    <h2 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-white tracking-tight mb-4 leading-tight">
+                                        MBBU CGPA to Percentage Converter &amp; Calculator
+                                    </h2>
+
+                                    <p className="text-gray-200 text-base sm:text-lg leading-relaxed mb-6 max-w-2xl">
+                                        Preparing for exams or graduating from Maharaja Bir Bikram University? Whether you need your equivalent percentage for job applications, scholarship forms, campus placements, or higher studies (MA, MSc, MCom), use the official{' '}
+                                        <a
+                                            href="https://cgpaconverter.pages.dev/"
+                                            target="_blank"
+                                            rel="noopener"
+                                            className="text-yellow-300 font-semibold underline hover:text-yellow-200 transition-colors"
+                                        >
+                                            CGPA to Percentage Converter
+                                        </a>
+                                        . It provides fast, accurate conversion based on the standard 10-point CBCS grading system followed by MBBU and Tripura University colleges.
+                                    </p>
+
+                                    <div className="grid sm:grid-cols-3 gap-4 pt-2 border-t border-white/10 text-sm text-gray-300">
+                                        <div className="flex items-center gap-2">
+                                            <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 shrink-0"></span>
+                                            <span>CBCS 10-Point Scale</span>
+                                        </div>
+                                        <div className="flex items-center gap-2">
+                                            <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 shrink-0"></span>
+                                            <span>Instant SGPA &amp; CGPA Conversion</span>
+                                        </div>
+                                        <div className="flex items-center gap-2">
+                                            <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 shrink-0"></span>
+                                            <span>Placement &amp; Exam Ready</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="lg:col-span-4 flex flex-col items-center sm:items-stretch lg:items-center justify-center gap-3">
+                                    <a
+                                        href="https://cgpaconverter.pages.dev/"
+                                        target="_blank"
+                                        rel="noopener"
+                                        className="w-full sm:w-auto lg:w-full inline-flex items-center justify-center gap-2 bg-gradient-to-r from-yellow-400 to-amber-500 hover:from-yellow-300 hover:to-amber-400 text-gray-900 font-bold px-7 py-4 rounded-xl shadow-lg hover:shadow-xl transition-all transform hover:-translate-y-0.5 text-center text-base"
+                                    >
+                                        <Calculator className="w-5 h-5 text-gray-900" />
+                                        <span>Open CGPA Converter</span>
+                                        <ExternalLink className="w-4 h-4 text-gray-800 ml-1 opacity-80" />
+                                    </a>
+                                    <p className="text-xs text-primary-200 text-center">
+                                        Free online grade calculator &bull; No registration required
+                                    </p>
                                 </div>
                             </div>
                         </div>
@@ -446,7 +533,24 @@ const MBBUQuestionPapers = () => {
                             {faqSchema.mainEntity.map((faq, index) => (
                                 <div key={index} className="card">
                                     <h3 className="text-lg font-semibold text-gray-900 mb-3">{faq.name}</h3>
-                                    <p className="text-gray-600 leading-relaxed">{faq.acceptedAnswer.text}</p>
+                                    <p className="text-gray-600 leading-relaxed">
+                                        {faq.name.includes('CGPA') ? (
+                                            <>
+                                                Maharaja Bir Bikram University (MBBU) follows the CBCS 10-point grading system. To convert your MBBU semester SGPA or cumulative CGPA into equivalent percentage for job applications, scholarship forms, or higher education, you can use the free online{' '}
+                                                <a
+                                                    href="https://cgpaconverter.pages.dev/"
+                                                    target="_blank"
+                                                    rel="noopener"
+                                                    className="text-primary-600 font-semibold underline hover:text-primary-800 transition-colors"
+                                                >
+                                                    CGPA to Percentage Converter
+                                                </a>
+                                                , which provides instant and accurate conversion on the standard 10-point scale.
+                                            </>
+                                        ) : (
+                                            faq.acceptedAnswer.text
+                                        )}
+                                    </p>
                                 </div>
                             ))}
                         </div>
@@ -472,6 +576,15 @@ const MBBUQuestionPapers = () => {
                                     {item.label}
                                 </Link>
                             ))}
+                            <a
+                                href="https://cgpaconverter.pages.dev/"
+                                target="_blank"
+                                rel="noopener"
+                                className="flex items-center justify-center text-center bg-amber-50 border border-amber-200 hover:border-amber-400 hover:bg-amber-100 text-amber-900 hover:text-amber-950 text-sm font-semibold px-3 py-3 rounded-xl transition-all group"
+                            >
+                                <span className="mr-1">🧮</span> CGPA Converter
+                                <ExternalLink className="w-3.5 h-3.5 ml-1 opacity-60 group-hover:opacity-100" />
+                            </a>
                         </div>
                     </div>
                 </section>
